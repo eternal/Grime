@@ -3,7 +3,7 @@
 //  build 05291057
 //=============================================================================
 #define DEBUG 1
-//#define FULLSCREEN 1
+#define FULLSCREEN 1
 //#define NOSPAWN 1
 //#define OLDSMGR 1 
 #include <irrlicht.h>
@@ -662,7 +662,7 @@ int main() {
 	effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon.hlsl"));
 	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/celshadeV.glsl"));
 	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/celshadeP.glsl"));
-
+    RestartLevel();
 	
 #ifdef SMGRDEBUG
 	scene::ISceneNode* selectedSceneNode =0;
