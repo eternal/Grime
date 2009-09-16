@@ -7,6 +7,8 @@ Player::Player(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxMa
     this->physxMan = manager;
     this->objects = objectArray;
     this->pair = cameraPair;
+    
+    health = 100;
 }
 
 Player::~Player(void)

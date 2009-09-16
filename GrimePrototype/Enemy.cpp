@@ -33,6 +33,7 @@ Enemy::Enemy(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxMana
     //set walking frame loop
     this->node->setFrameLoop(10,22);
     
+    attackTimer = 0;
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
 }
@@ -109,6 +110,15 @@ void Enemy::Update(s32 time)
             }
             else {
                 attackPhase = false;
+            }
+            if (distanceToTarget < 30)
+            {
+                attackTimer += time;
+            }
+            if (attackTimer >= 1000)
+            {
+                target->health -= 5;
+                attackTimer = 0;
             }
             CheckPhase();
             //normalise vector

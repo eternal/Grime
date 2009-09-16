@@ -39,5 +39,7 @@ class Enemy : public entity
         void FaceTarget();
         void CheckPhase();
         
+        s32 attackTimer;
+        
         void Update(s32 time);
 };

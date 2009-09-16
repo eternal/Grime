@@ -76,6 +76,7 @@ s32 effectBlur1 = 0;
 s32 effectBlur2 = 0;
 bool effectToggle = false;
 bool bloomToggle = false;
+s32 currentTime = 0;
 vector3df startPosition;
 
 
@@ -101,9 +102,9 @@ void SpawnSpiderCustom(vector3df position) {
 void SpawnSpiderTimer() 
 {
     //PROTOTYPE SPWAN POINTS
-    vector3df positionOne(-27.9f,333.46f,-309.44f);
-    vector3df positionTwo(-57.0f,209.37f,306.773f);
-    vector3df positionThree(97.63f,17.327f,-204.87f);
+    vector3df positionOne(-552.9f,28.0f,-339.166f);
+    vector3df positionTwo(-195.101f,28.0f,289.715f);
+    vector3df positionThree(131.92f,180.1f,-288.47f);
     //fairly self explanatory, 1/5 chance to get 1 spider at a random point, 1/5 chance to get 2 spiders
     // 1/5 chance to get 3 spiders, 2/5 chances for no spawn
     int rand1 = getRandom(5);
@@ -169,6 +170,9 @@ void RestartLevel() {
     
     player->pair->PhysxObject->setPosition(startPosition);
     player->pair->updateTransformation();
+    
+    timeBetweenSpawns = 2500;
+    player->health = 100;
 }
 
 //TEMPORARY CODE
@@ -590,6 +594,11 @@ int main() {
     gui::IGUIStaticText* spawns = guienv->addStaticText(temp, core::rect<s32>(164,38,400,200));
     generalText->setOverrideColor(video::SColor(255,255,255,255));
     spawns->setOverrideColor(video::SColor(255,255,255,255));
+    wchar_t temp2[10];  
+    gui::IGUIStaticText* textHealth = guienv->addStaticText(L"Health: ", core::rect<s32>(5,58,400,200));
+    gui::IGUIStaticText* health = guienv->addStaticText(L"100", core::rect<s32>(75,58,400,200));
+    textHealth->setOverrideColor(video::SColor(255,255,255,255));
+    health->setOverrideColor(video::SColor(255,255,255,255));
     // Preload texture animators
     // TODO: CLEAN and use particles instead of animated textures
     // just for prototype only
@@ -672,6 +681,11 @@ int main() {
             //std::cout << timeNow << std::endl;
             s32 elapsedTime = timeNow - lastTime;
             lastTime = timeNow;
+            currentTime += elapsedTime;
+            if (currentTime >= 100) {
+                timeBetweenSpawns--;
+                currentTime = 0;
+            }
 #ifndef NOSPAWN                        
             if ((lastTime - lastSpawn) >= timeBetweenSpawns)
             {
@@ -679,6 +693,9 @@ int main() {
                 lastSpawn = lastTime;
             }
 #endif            
+            if (player->health <= 0) {
+                RestartLevel();
+            }
             //simulate physics
 		    physxManager->simulate(elapsedTime/1000.0f);
 		    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING
@@ -709,7 +726,9 @@ int main() {
 #endif // DEBUG
             // Render the GUI
             _itow(timeBetweenSpawns, temp, 10);
+            _itow(player->health, temp2, 10);
             spawns->setText(temp);
+            health->setText(temp2);
             guienv->drawAll();
 
 #ifdef PHYSDEBUG

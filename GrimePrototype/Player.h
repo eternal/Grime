@@ -33,5 +33,5 @@ class Player : public entity
         SPhysxAndCameraPair* pair;
         core::array<SPhysxAndNodePair*>* objects;       
         
-        int health;
+        s32 health;
 };
