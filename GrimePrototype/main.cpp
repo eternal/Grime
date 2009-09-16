@@ -579,9 +579,9 @@ int main() {
     
     //grab bitmap font
     guienv->getSkin()->setFont(guienv->getFont("media/GillSans12.png"));
-    gui::IGUIStaticText* levelText = guienv->addStaticText(L"Grime Prototype: Bathroom", core::rect<s32>(5,2,200,200));
+    gui::IGUIStaticText* levelText = guienv->addStaticText(L"Grime Prototype: Kitchen", core::rect<s32>(5,2,200,200));
     levelText->setOverrideColor(video::SColor(255,255,255,255));
-    gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200908121338", core::rect<s32>(5,20,200,200));
+    gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200909170234", core::rect<s32>(5,20,200,200));
     buildText->setOverrideColor(video::SColor(255,255,255,255));  
     wchar_t temp[10];
     _itow(timeBetweenSpawns, temp, 10);
