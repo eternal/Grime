@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GrimePrototype", "GrimePrototype\GrimePrototype.vcproj", "{31E94679-5340-44A7-A9EC-A108A38576CB}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Grime Installer", "Grime Installer\Grime Installer.vdproj", "{1BDB9E34-FE5C-403E-B3F5-46FA30AC1270}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{31E94679-5340-44A7-A9EC-A108A38576CB}.Debug|Win32.ActiveCfg = Release|Win32
+		{31E94679-5340-44A7-A9EC-A108A38576CB}.Debug|Win32.Build.0 = Release|Win32
+		{31E94679-5340-44A7-A9EC-A108A38576CB}.Release|Win32.ActiveCfg = Debug|Win32
+		{31E94679-5340-44A7-A9EC-A108A38576CB}.Release|Win32.Build.0 = Debug|Win32
+		{1BDB9E34-FE5C-403E-B3F5-46FA30AC1270}.Debug|Win32.ActiveCfg = Release
+		{1BDB9E34-FE5C-403E-B3F5-46FA30AC1270}.Debug|Win32.Build.0 = Release
+		{1BDB9E34-FE5C-403E-B3F5-46FA30AC1270}.Release|Win32.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
