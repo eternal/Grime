@@ -639,38 +639,6 @@ int main() {
     light2->setLightType(ELT_POINT);
     ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-350, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),500.0f);
     light3->setLightType(ELT_POINT);
-    /// TOO PROCESSOR INTENSIVE
-    /*for (int i = 0; i < 6; ++i) {
-        effect->addShadowLight(SShadowLight(1024, vector3df(97.0f,150.0f,23.0f), vector3df(0, 0, 0), SColorf(0.3f, 0.3f, 0.3f, 0.5f), 1.0f, 600.0f, 90.0f * DEGTORAD));        
-    }
-    effect->getShadowLight(0).setTarget(light->getPosition() + vector3df(0,0,1));
-	effect->getShadowLight(1).setTarget(light->getPosition() + vector3df(0,0,-1));
-	effect->getShadowLight(2).setTarget(light->getPosition() + vector3df(1,0,0));
-	effect->getShadowLight(3).setTarget(light->getPosition() + vector3df(-1,0,0));
-	effect->getShadowLight(4).setTarget(light->getPosition() + vector3df(0,1,0));
-	effect->getShadowLight(5).setTarget(light->getPosition() + vector3df(0,-1,0));
-    for (int i = 0; i < 6; ++i) {
-        effect->addShadowLight(SShadowLight(1024, vector3df(97.0f,150.0f,23.0f), vector3df(0, 0, 0), SColorf(0.3f, 0.3f, 0.3f, 0.5f), 1.0f, 600.0f, 90.0f * DEGTORAD));        
-    }
-    effect->getShadowLight(6).setTarget(light2->getPosition() + vector3df(0,0,1));
-	effect->getShadowLight(7).setTarget(light2->getPosition() + vector3df(0,0,-1));
-	effect->getShadowLight(8).setTarget(light2->getPosition() + vector3df(1,0,0));
-	effect->getShadowLight(9).setTarget(light2->getPosition() + vector3df(-1,0,0));
-	effect->getShadowLight(10).setTarget(light2->getPosition() + vector3df(0,1,0));
-	effect->getShadowLight(11).setTarget(light2->getPosition() + vector3df(0,-1,0));
-	for (int i = 0; i < 6; ++i) {
-        effect->addShadowLight(SShadowLight(1024, vector3df(97.0f,150.0f,23.0f), vector3df(0, 0, 0), SColorf(0.3f, 0.3f, 0.3f, 0.5f), 1.0f, 600.0f, 90.0f * DEGTORAD));        
-    }
-    effect->getShadowLight(12).setTarget(light3->getPosition() + vector3df(0,0,1));
-	effect->getShadowLight(13).setTarget(light3->getPosition() + vector3df(0,0,-1));
-	effect->getShadowLight(14).setTarget(light3->getPosition() + vector3df(1,0,0));
-	effect->getShadowLight(15).setTarget(light3->getPosition() + vector3df(-1,0,0));
-	effect->getShadowLight(16).setTarget(light3->getPosition() + vector3df(0,1,0));
-	effect->getShadowLight(17).setTarget(light3->getPosition() + vector3df(0,-1,0));*/
-    
-	//effect->addShadowLight(SShadowLight(1024, vector3df(94.93f,294.0f,18.0f), vector3df(5, 0, 5),
-	//	SColor(0, 0, 255, 0), 200.0f, 6000.0f, 300.0f * DEGTORAD));
-
     //check which shader language to use
     
 	const stringc shaderExt = (driver->getDriverType() == EDT_DIRECT3D9) ? ".hlsl" : ".glsl";
