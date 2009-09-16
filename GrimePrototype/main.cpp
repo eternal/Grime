@@ -466,7 +466,7 @@ void CreateCamera() {
     //add the irrlicht fps camera scene node, modify the keymap to play with WASD
     camera = smgr->addCameraSceneNodeFPS(NULL, 50, 0.1f, -1, keyMap, 4, true);
     camera->setPosition(startPosition);
-    camera->setTarget(core::vector3df(0.0f,30.0f,2.0f));
+    camera->setTarget(core::vector3df(0.0f,20.0f,2.0f));
     //fill pair
     cameraPair->SceneNode = camera;
     cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 10.0f, 10000.0f);
