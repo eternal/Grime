@@ -76,6 +76,8 @@ s32 effectBlur1 = 0;
 s32 effectBlur2 = 0;
 bool effectToggle = false;
 bool bloomToggle = false;
+vector3df startPosition;
+
 
 //simple random number function
 s32 getRandom(s32 upper) {
@@ -148,7 +150,26 @@ void SpawnSpiderTimer()
     }
 }
 
-
+void RestartLevel() {
+    for (u32 i = 0 ; i < objects.size() ; i++) {
+        SPhysxAndNodePair* pair = objects[i];
+        physxManager->removePhysxObject(pair->PhysxObject);
+        pair->SceneNode->remove();
+        delete pair;
+        }
+    for (u32 i = 0; i < enemyObjects.size(); i++)
+    {
+        Enemy* enemy = enemyObjects[i];
+        physxManager->removePhysxObject(enemy->pair->PhysxObject);
+        enemy->pair->SceneNode->remove();
+        delete enemy;
+    }
+    enemyObjects.clear();
+    objects.clear();
+    
+    player->pair->PhysxObject->setPosition(startPosition);
+    player->pair->updateTransformation();
+}
 
 //TEMPORARY CODE
 //TODO: REWRITE
@@ -286,6 +307,9 @@ public:
                     enemyObjects.clear();
                     objects.clear();
                     break;
+                case KEY_KEY_I:
+                    RestartLevel();
+                    break;
                 case KEY_KEY_V:
                     // Toggle the debug data visibility
                     physxManager->setDebugDataVisible(!physxManager->isDebugDataVisible());
@@ -306,9 +330,9 @@ public:
                     if (bloomToggle)
                     {
                         effectBloom = effect->addPostProcessingEffectFromFile("Shaders/BloomP.hlsl");
-                        effectBlur1 = effect->addPostProcessingEffectFromFile("Shaders/BlurHP.hlsl");
+                        //effectBlur1 = effect->addPostProcessingEffectFromFile("Shaders/BlurHP.hlsl");
                         effectBlur2 = effect->addPostProcessingEffectFromFile("Shaders/BlurVP.hlsl");
-                        //toonPPEffect = effect->addPostProcessingEffectFromFile("Shaders/toon.hlsl");
+                        toonPPEffect = effect->addPostProcessingEffectFromFile("Shaders/toon.hlsl");
                         //effectHighPass = effect->addPostProcessingEffectFromFile("Shaders/BrightPass.hlsl");
                     }
                     else {
@@ -437,18 +461,17 @@ void CreateCamera() {
     //replace the pair if it exists (shouldnt happen)
     if (cameraPair) delete cameraPair;
     cameraPair = new SPhysxAndCameraPair;
-    core::vector3df pos(75, 150, -10);
     //core::vector3df pos(75, 15, -10);
     //SWITCHED from custom camera to internal for stability for prototype
     //add the irrlicht fps camera scene node, modify the keymap to play with WASD
     camera = smgr->addCameraSceneNodeFPS(NULL, 50, 0.1f, -1, keyMap, 4, true);
-    camera->setPosition(pos);
-    camera->setTarget(core::vector3df(0,0,0));
+    camera->setPosition(startPosition);
+    camera->setTarget(core::vector3df(0.0f,30.0f,2.0f));
     //fill pair
     cameraPair->SceneNode = camera;
-    cameraPair->PhysxObject = physxManager->createSphereObject(pos, core::vector3df(0,0,0), 10.0f, 10000.0f);
+    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 10.0f, 10000.0f);
     cameraPair->PhysxObject->setAngularDamping(1000.0f); // Stops the sphere from rolling
-    cameraPair->PreviousPosition = pos;
+    cameraPair->PreviousPosition = startPosition;
     cameraPair->CameraOffset = core::vector3df(0,15,0);
     
     // on screen gun
@@ -503,17 +526,20 @@ int main() {
     //create physx manager for scene details
     physxManager  = createPhysxManager(device, sceneDesc);
     //create room mesh from asset
-	IMesh* room = smgr->getMesh("media/projectr0526.obj")->getMesh(0);
+	IMesh* room = smgr->getMesh("media/level/kitchen retex final.b3d")->getMesh(0);
+	
 	//IMesh* room = smgr->getMesh("media/temp.b3d")->getMesh(0);
 	//create scene node for mesh and place
 	roomnode = smgr->addMeshSceneNode(room,0,-1,vector3df(0,0,0),vector3df(0,0,0));
 	//roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
 	
 	//scale to proper size
-	roomnode->setScale(vector3df(150,150,150));
+	roomnode->setScale(vector3df(300.0f,300.0f,300.0f));
 	for (u32 i = 0; i < roomnode->getMaterialCount(); i++) {
 	    roomnode->getMaterial(i).Lighting = true;
 	}
+	
+	startPosition = vector3df(0.0f,20.0f,0.0f);
 	
 	//normalize mesh's normals as it has been scaled
 	roomnode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true); //off for shitty lighting bug
@@ -534,7 +560,7 @@ int main() {
     for (u32 i = 0 ; i < room->getMeshBufferCount(); i++) {
         //first calculate the mesh triangles and make physx object
         //IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(1.0f,1.0f,1.0f));
-        IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(150.0f,150.0f,150.0f));
+        IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(300.0f,300.0f,300.0f));
         //secondly add the object to the world
         physxManager->createTriangleMeshObject(triMesh,vector3df(0.0f,0.0f,0.0f));
     }
@@ -590,6 +616,7 @@ int main() {
     //create custom fps camera with physics object
     CreateCamera();
     smgr->setActiveCamera(camera);
+    camera->setPosition(startPosition);
     //camera->setFarValue(500.0f);
     //spawn player and link camera
     player = new Player(smgr, mesh, physxManager, cameraPair, &objects, effect);
@@ -602,15 +629,15 @@ int main() {
 #endif //DEBUG
     
     //set fairly blue clear colour
-    effect->setClearColour(SColor(255, 100, 100, 250));
+    effect->setClearColour(SColor(255, 0, 0, 0));
     effect->setAmbientColor(SColor(255, 32, 32, 32));
     //smgr->setAmbientLight(video::SColorf(0.3,0.3,0.3,1));
     //TODO: REDO LIGHTING, THIS WILL DO FOR PROTOTYPE
-    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),600.0f);
+    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),400.0f);
     light->setLightType(ELT_POINT);
-    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(429, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),600.0f);
+    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(429, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),400.0f);
     light2->setLightType(ELT_POINT);
-    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-350, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),600.0f);
+    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-350, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),500.0f);
     light3->setLightType(ELT_POINT);
     /// TOO PROCESSOR INTENSIVE
     /*for (int i = 0; i < 6; ++i) {
@@ -649,12 +676,13 @@ int main() {
 	const stringc shaderExt = (driver->getDriverType() == EDT_DIRECT3D9) ? ".hlsl" : ".glsl";
     //effect->addEffectToNode(roomnode, 
     //add bright pass, blurs and bloom
-    /*
-	effect->addPostProcessingEffectFromFile(core::stringc("shaders/BrightPass") + shaderExt);
-	effect->addPostProcessingEffectFromFile(core::stringc("shaders/BlurHP") + shaderExt);
-	effect->addPostProcessingEffectFromFile(core::stringc("shaders/BlurVP") + shaderExt);
-	effect->addPostProcessingEffectFromFile(core::stringc("shaders/BloomP") + shaderExt);*/
-	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon") + shaderExt);
+    
+    
+	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/BrightPass.hlsl"));
+	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/BlurHP.hlsl"));
+	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/BlurVP.hlsl"));
+	effect->addPostProcessingEffectFromFile(core::stringc("shaders/BloomP.hlsl"));
+	effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon.hlsl"));
 	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/celshadeV.glsl"));
 	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/celshadeP.glsl"));
 

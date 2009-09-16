@@ -3,11 +3,11 @@ sampler2D ColorMapSampler : register(s0);
 float4 pixelMain( float2 TexCoords : TEXCOORD0 ) : COLOR0 
 {
 	half4 Color = tex2D(ColorMapSampler,TexCoords);
-	Color.r = round(Color.r*18)/18;
-	Color.g = round(Color.g*8)/8;
-	Color.b = round(Color.b*18)/18;
+	Color.r = round(Color.r*20)/20;
+	Color.g = round(Color.g*20)/20;
+	Color.b = round(Color.b*20)/20;
 
-	const float threshold = 0.1f;
+	const float threshold = 0.2f;
 
 	const int NUM = 9;
 	const float2 c[NUM] =
