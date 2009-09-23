@@ -3,7 +3,7 @@
 //  build 05291057
 //=============================================================================
 #define DEBUG 1
-//#define FULLSCREEN 1
+#define FULLSCREEN 1
 //#define NOSPAWN 1
 //#define OLDSMGR 1 
 #include <irrlicht.h>
@@ -304,18 +304,21 @@ public:
                     if (objectHit) {
                         if (objectHit->getType() == EOT_TRIANGLE_MESH)
                         {
-                            vector3df scale(10,10,30);
+                            vector3df scale(1,1,1);
+                            vector3df rot(0,0,0);
                             intersection.Y += scale.Y / 2;
                             vector3df temp = intersection;
                             temp.Y -= scale.Y / 2;
                             temp.X += scale.X / 6.25f;
                             SPhysxAndNodePair* pair = new SPhysxAndNodePair;
                             
-                            IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
+                            //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
+                            IMesh* cubeMesh = smgr->getMesh("media/block.obj");
                             //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
                             //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
                             pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), temp);
-                            pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, core::vector3df(0,0,0), scale);
+                            //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
+                            pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, intersection, rot, scale);
                             pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
                         }
                     }
