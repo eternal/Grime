@@ -255,6 +255,26 @@ public:
                 case KEY_SUBTRACT:
                     timeBetweenSpawns-= 100;
                     break;
+                case KEY_SPACE:
+                    //jump
+                    if (camera)
+                    {
+                        s32 currentJumpTime = device->getTimer()->getTime();
+                        s32 diff = currentJumpTime - lastJumpTime;
+#ifdef DEBUG                        
+                        std::cout << diff << std::endl;
+#endif //DEBUG                        
+                        //check if jump complete ~1.2seconds
+                        if (diff >= 1200)
+                        {
+                            core::vector3df linearVelocity;
+                            cameraPair->PhysxObject->getLinearVelocity(linearVelocity);
+                            cameraPair->PhysxObject->setLinearVelocity(core::vector3df(0,60,0));
+                            lastJumpTime = currentJumpTime;                            
+                        }
+                    }
+
+                    break;
             }
 #endif
             //if the key is held down, return and ignore
@@ -302,26 +322,7 @@ public:
                  }
                  break;
 #endif //DEBUG
-                case KEY_SPACE:
-                    //jump
-                    if (camera)
-                    {
-                        s32 currentJumpTime = device->getTimer()->getTime();
-                        s32 diff = currentJumpTime - lastJumpTime;
-#ifdef DEBUG                        
-                        std::cout << diff << std::endl;
-#endif //DEBUG                        
-                        //check if jump complete ~1.2seconds
-                        if (diff >= 1200)
-                        {
-                            core::vector3df linearVelocity;
-                            cameraPair->PhysxObject->getLinearVelocity(linearVelocity);
-                            cameraPair->PhysxObject->setLinearVelocity(core::vector3df(0,60,0));
-                            lastJumpTime = currentJumpTime;                            
-                        }
-                    }
-                    
-                    break;
+               
 #ifdef DEBUG                    
                 case KEY_KEY_C:
                     // DEBUG: Delete all objects
