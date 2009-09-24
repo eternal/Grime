@@ -259,18 +259,26 @@ public:
                     //jump
                     if (camera)
                     {
-                        s32 currentJumpTime = device->getTimer()->getTime();
-                        s32 diff = currentJumpTime - lastJumpTime;
-#ifdef DEBUG                        
-                        std::cout << diff << std::endl;
-#endif //DEBUG                        
-                        //check if jump complete ~1.2seconds
-                        if (diff >= 1200)
-                        {
-                            core::vector3df linearVelocity;
-                            cameraPair->PhysxObject->getLinearVelocity(linearVelocity);
-                            cameraPair->PhysxObject->setLinearVelocity(core::vector3df(0,60,0));
-                            lastJumpTime = currentJumpTime;                            
+                        // Perform a raycast to find the objects we just shot at
+                        core::line3df line;
+                        line.start = camera->getPosition();
+                        line.end = line.start;
+                        line.end.Y = -2000.0f;
+                        //access the physics engine to find the intersection point
+                        core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
+                        for (u32 i = 0; i < rayArray.size(); ++i) {
+                            SRaycastHitData ray = rayArray[i];
+                            if (ray.Object->getType() == EOT_TRIANGLE_MESH)
+                            {
+                                f32 dis = (ray.HitPosition - line.start).getLength();
+#ifdef DEBUG                                
+                                std::cout << "Distance:" << dis << std::endl;
+#endif //DEBUG
+                                if (dis <= 25)
+                                {
+                                    cameraPair->PhysxObject->setLinearVelocity(core::vector3df(0,70,0));
+                                }
+                            }
                         }
                     }
 
@@ -396,10 +404,12 @@ public:
             }
         } 
         else if (event.EventType == EET_MOUSE_INPUT_EVENT) {
-
+            bool mouseLeftPressedDown = false;
+            bool mouseRightPressedDown = false;
             switch (event.MouseInput.Event) {
                 //shoot
-                case EMIE_LMOUSE_LEFT_UP: {
+                case EMIE_LMOUSE_PRESSED_DOWN: {
+                    mouseLeftPressedDown = true;
                     // Perform a raycast to find the objects we just shot at
                     core::line3df line;
                     line.start = camera->getPosition();
@@ -408,7 +418,26 @@ public:
                     core::vector3df intersection;
                     core::vector3df normal;
                     //access the physics engine to find the intersection point
-                    IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
+                    core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
+                    //core::array<SRaycastHitData> filteredRayArray;
+                    SRaycastHitData closestObject;
+                    closestObject = rayArray[0];
+                    for (u32 i = 0; i < rayArray.size(); ++i) {
+                        SRaycastHitData ray = rayArray[i];
+                        if (ray.Object->getType() != EOT_SPHERE)
+                        {
+                            f32 dis = (ray.HitPosition - line.start).getLength();
+                            std::cout << "Test Distance: " << dis << std::endl;
+                            f32 dis2 = (closestObject.HitPosition - line.start).getLength();
+                            std::cout << "Current Closest: " << dis2 << std::endl;
+                            if (dis < dis2) {
+                                closestObject = ray;
+                            }
+                        }
+                    }
+                    std::cout << "===========" << std::endl;
+                    IPhysxObject* objectHit = closestObject.Object;
+                    //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
                     if (objectHit) {
 #ifdef DEBUG                    
                         // If it's a sphere we blow it up
@@ -458,16 +487,25 @@ public:
 #ifdef DEBUG                // push back a bit because i can
                             objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
 #endif //DEBUG                             
-                            createImpactEffect(intersection, normal);
+                            createImpactEffect(closestObject.HitPosition, closestObject.SurfaceNormal);
                         }
-                   
+
                     }
                 }
                 break;
+                case EMIE_LMOUSE_LEFT_UP: {
+                    mouseLeftPressedDown = false;
+                }
+                break;
 #ifdef DEBUG                
-                case EMIE_RMOUSE_LEFT_UP: {
+                case EMIE_RMOUSE_PRESSED_DOWN: {
+                    mouseRightPressedDown = true;
                     // Throw a sphere from the camera
                     objects.push_back(createSphereFromCamera(physxManager, smgr, driver, camera, 4, 20.0f));
+                }
+                break;
+                case EMIE_RMOUSE_LEFT_UP: {
+                    mouseRightPressedDown = false;
                     break;
                 }
 #endif // DEBUG
@@ -582,10 +620,7 @@ int main() {
 	startPosition = vector3df(0.0f,20.0f,0.0f);
 	
 	//normalize mesh's normals as it has been scaled
-	roomnode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true); //off for shitty lighting bug
-	//roomnode->getMaterial(0).setTexture(0, driver->getTexture("media/lialique.bmp"));
-    //roomnode->getMaterial(0).setTexture(2, driver->getTexture("media/cel.png"));
-    //roomnode->getMaterial(0).TextureLayer[2].BilinearFilter = false;
+	roomnode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     //effect->addShadowToNode(roomnode, EFT_NONE, ESM_BOTH);
     //effect->addNodeToDepthPass(roomnode);
     //effect->addEffectToNode(roomnode,(E_EFFECT_TYPE)0);
