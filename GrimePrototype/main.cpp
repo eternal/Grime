@@ -3,7 +3,7 @@
 //  build 05291057
 //=============================================================================
 #define DEBUG 1
-#define FULLSCREEN 1
+//#define FULLSCREEN 1
 //#define NOSPAWN 1
 //#define OLDSMGR 1 
 #include <irrlicht.h>
@@ -573,7 +573,8 @@ int main() {
 	//roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
 	
 	//scale to proper size
-	roomnode->setScale(vector3df(300.0f,300.0f,300.0f));
+	vector3df roomScale(600.0f,600.0f,600.0f);
+	roomnode->setScale(vector3df(roomScale));
 	for (u32 i = 0; i < roomnode->getMaterialCount(); i++) {
 	    roomnode->getMaterial(i).Lighting = true;
 	}
@@ -599,7 +600,7 @@ int main() {
     for (u32 i = 0 ; i < room->getMeshBufferCount(); i++) {
         //first calculate the mesh triangles and make physx object
         //IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(1.0f,1.0f,1.0f));
-        IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(300.0f,300.0f,300.0f));
+        IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), roomScale);
         //secondly add the object to the world
         physxManager->createTriangleMeshObject(triMesh,vector3df(0.0f,0.0f,0.0f));
     }
@@ -677,11 +678,11 @@ int main() {
     effect->setAmbientColor(SColor(255, 32, 32, 32));
     //smgr->setAmbientLight(video::SColorf(0.3,0.3,0.3,1));
     //TODO: REDO LIGHTING, THIS WILL DO FOR PROTOTYPE
-    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),400.0f);
+    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),800.0f);
     light->setLightType(ELT_POINT);
-    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(429, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),400.0f);
+    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(629, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),800.0f);
     light2->setLightType(ELT_POINT);
-    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-350, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),500.0f);
+    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-650, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1000.0f);
     light3->setLightType(ELT_POINT);
     //check which shader language to use
     
@@ -695,8 +696,6 @@ int main() {
 	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/BlurVP.hlsl"));
 	effect->addPostProcessingEffectFromFile(core::stringc("shaders/BloomP.hlsl"));
 	effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon.hlsl"));
-	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/celshadeV.glsl"));
-	//effect->addPostProcessingEffectFromFile(core::stringc("shaders/celshadeP.glsl"));
     RestartLevel();
 	
 #ifdef SMGRDEBUG
