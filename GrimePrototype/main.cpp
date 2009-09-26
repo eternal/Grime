@@ -329,19 +329,27 @@ public:
                         vector3df scale(1,1,1);
                         vector3df rot(0,0,0);
                         closestObject.HitPosition.Y += scale.Y / 2;
-                        vector3df temp = closestObject.HitPosition;
-                        vector3df temp2 = closestObject.HitPosition;
-                        temp.Y -= scale.Y / 2;
-                        temp.X += scale.X / 6.25f;
+                        
+                        vector3df blockPosition = closestObject.HitPosition;
+                        //Quantise block positions
+                        f32 blockPositionX = round_(blockPosition.X/30) * 30;
+                        f32 blockPositionZ = round_(blockPosition.Z/40) * 40;
+                        ///TODO FIX Y QUANTISE
+                        //f32 blockPositionY = round_(blockPosition.Y/30) * 30;
+                        blockPosition.X = blockPositionX;
+                        blockPosition.Z = blockPositionZ;
+                        vector3df blockPhysicsPosition = blockPosition;
+                        blockPhysicsPosition.Y -= scale.Y / 2;
+                        blockPhysicsPosition.X += scale.X / 6.25f;
                         SPhysxAndNodePair* pair = new SPhysxAndNodePair;
 
                         //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
                         IMesh* cubeMesh = smgr->getMesh("media/block.obj");
                         //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
                         //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
-                        pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), temp);
+                        pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), blockPhysicsPosition);
                         //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
-                        pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp2, rot, scale);
+                        pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, blockPosition, rot, scale);
                         pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
                     }
                  }
