@@ -13,8 +13,8 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     this->pair->PhysxObject->getPosition(pos);
     this->sound = soundEngine->play3D("media/sounds/Run1.wav", pos, true, false, true);
     health = 100;
-    currentWeapon = WEAPON_RPG;
-    pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/RPG1.obj")->getMesh(0), pair->SceneNode);
+    currentWeapon = WEAPON_PISTOL;
+    //pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/RPG1.obj")->getMesh(0), pair->SceneNode);
     SetWeapon(currentWeapon);
 }
 
@@ -25,13 +25,22 @@ Player::~Player(void)
 }
 void Player::SetWeapon(u32 weapon)
 {
+    if (pair->gun)
+    {
+        //if node already exists (99% of times) remove it as it will be replaced
+        pair->gun->remove();
+    }
     if (weapon == WEAPON_CLOSE)
     {
-    
+        //pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/gun3.obj")->getMesh(0));
+        pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/gun3.obj")->getMesh(0), pair->SceneNode);
+        pair->gun->setPosition(core::vector3df(4.5f,-10.2f,10.0f));
+        pair->gun->setRotation(core::vector3df(35.0f,90.0,90.0f));
+        pair->gun->setScale(core::vector3df(0.5f,0.5f,0.3f));
+        pair->gun->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);  
     }
-    else if (weapon == WEAPON_PISTOL) 
+    else if (weapon == WEAPON_PISTOL)
     {
-        pair->gun->remove();
         pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/weapon.obj")->getMesh(0), pair->SceneNode);
         pair->gun->setPosition(core::vector3df(1.5f,-3.2f,1.0f));
         pair->gun->setRotation(core::vector3df(0.0f,180.0,0.0f));
@@ -40,10 +49,6 @@ void Player::SetWeapon(u32 weapon)
     }
     else if (weapon == WEAPON_RPG)
     {
-        // on screen gun
-        // TODO: REFACTOR THIS AND ABOVE INTO CAMERA CLASS
-        // NOTE: UNSKINNED; UNFINISHED MODEL
-        pair->gun->remove();
         pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/RPG1.obj")->getMesh(0), pair->SceneNode);
         pair->gun->setPosition(vector3df(4.5f,-27.5f,-10.0f));
         pair->gun->setRotation(core::vector3df(0.0f,0.0,0.0f));
