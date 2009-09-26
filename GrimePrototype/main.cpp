@@ -247,14 +247,16 @@ class CEventReceiver : public IEventReceiver
 public:
     bool OnEvent(const SEvent& event) {       
         if (event.EventType == EET_KEY_INPUT_EVENT) {
-#ifdef DEBUG        
+     
             switch (event.KeyInput.Key) {
+#ifdef DEBUG   
                 case KEY_ADD:
                     timeBetweenSpawns+= 100;
                     break;
                 case KEY_SUBTRACT:
                     timeBetweenSpawns-= 100;
                     break;
+#endif //DEBUG
                 case KEY_SPACE:
                     //jump
                     if (camera)
@@ -284,7 +286,6 @@ public:
 
                     break;
             }
-#endif
             //if the key is held down, return and ignore
             if (event.KeyInput.PressedDown) return false;
 
@@ -299,6 +300,7 @@ public:
                     SpawnSpider();
                     std::cout << "Enemy count" << enemyObjects.size() << std::endl;
                     break;
+#endif //DEBUG
                 case KEY_KEY_G: {
                     core::line3df line;
                     line.start = camera->getPosition();
@@ -328,6 +330,7 @@ public:
                         vector3df rot(0,0,0);
                         closestObject.HitPosition.Y += scale.Y / 2;
                         vector3df temp = closestObject.HitPosition;
+                        vector3df temp2 = closestObject.HitPosition;
                         temp.Y -= scale.Y / 2;
                         temp.X += scale.X / 6.25f;
                         SPhysxAndNodePair* pair = new SPhysxAndNodePair;
@@ -338,13 +341,11 @@ public:
                         //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
                         pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), temp);
                         //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
-                        pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, closestObject.HitPosition, rot, scale);
+                        pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp2, rot, scale);
                         pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
                     }
                  }
-                 break;
-#endif //DEBUG
-               
+                 break;               
 #ifdef DEBUG                    
                 case KEY_KEY_C:
                     // DEBUG: Delete all objects
@@ -448,29 +449,9 @@ public:
                     IPhysxObject* objectHit = closestObject.Object;
                     //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
                     if (objectHit) {
-#ifdef DEBUG                    
-                        // If it's a sphere we blow it up
-                        if (objectHit->getType() == EOT_SPHERE) 
-                        {
-                            for (u32 i = 0 ; i < objects.size() ; ++i) 
-                            {  // check it against the objects in our array to see if it matches
-                                if (objects[i]->PhysxObject == objectHit) {
-                                    core::vector3df pos;
-                                    objects[i]->PhysxObject->getPosition(pos);
-                                    createExplosion(pos);
-                                    objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
-                                    //physxManager->removePhysxObject(objects[i]->PhysxObject);
-                                    //objects[i]->SceneNode->remove();
-                                    //delete objects[i];
-                                    //objects.erase(i);
-                                    break;
-                                }
-                            }	
-                        }
-
                         //check for collisions with any of the types of bounding boxes the enemies use
                         //TO REFACTOR, PLACE IN GAME CLASS
-                        else if (objectHit->getType() == EOT_CONVEX_MESH || objectHit->getType() == EOT_BOX || objectHit->getType() == EOT_SPHERE) 
+                        if (objectHit->getType() == EOT_CONVEX_MESH || objectHit->getType() == EOT_BOX || objectHit->getType() == EOT_SPHERE) 
                         {
                             for (u32 i = 0 ; i < enemyObjects.size() ; ++i) 
                             {  // check it against the objects in our array to see if it matches
@@ -489,17 +470,34 @@ public:
                                 }
                             }	
                         }  
-#endif //DEBUG                     
+#ifdef DEBUG                    
+                        // If it's a sphere we blow it up
+                        else if (objectHit->getType() == EOT_SPHERE) 
+                        {
+                            for (u32 i = 0 ; i < objects.size() ; ++i) 
+                            {  // check it against the objects in our array to see if it matches
+                                if (objects[i]->PhysxObject == objectHit) {
+                                    core::vector3df pos;
+                                    objects[i]->PhysxObject->getPosition(pos);
+                                    createExplosion(pos);
+                                    objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
+                                    //physxManager->removePhysxObject(objects[i]->PhysxObject);
+                                    //objects[i]->SceneNode->remove();
+                                    //delete objects[i];
+                                    //objects.erase(i);
+                                    break;
+                                }
+                            }	
+                        }
                         //for any other objects except for the camera
                         else if (objectHit != cameraPair->PhysxObject) 
                         {
-#ifdef DEBUG                // push back a bit because i can
                             objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
-#endif //DEBUG                             
                             createImpactEffect(closestObject.HitPosition, closestObject.SurfaceNormal);
                             //physxManager->createExplosion(closestObject.HitPosition, 30000.0f, 10000000.0f, 10000000.0f, 1.0f);
                         }
-
+                        
+#endif //DEBUG                     
                     }
                 }
                 break;
