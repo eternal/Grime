@@ -300,35 +300,46 @@ public:
                     std::cout << "Enemy count" << enemyObjects.size() << std::endl;
                     break;
                 case KEY_KEY_G: {
-                    // Perform a raycast to find the objects we just shot at
                     core::line3df line;
                     line.start = camera->getPosition();
                     //put the end of the line off in the distance
                     line.end = line.start + (camera->getTarget() - line.start).normalize() * 5000.0f;
-                    core::vector3df intersection;
-                    core::vector3df normal;
                     //access the physics engine to find the intersection point
-                    IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
-                    if (objectHit) {
-                        if (objectHit->getType() == EOT_TRIANGLE_MESH)
+                    core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
+                    //core::array<SRaycastHitData> filteredRayArray;
+                    SRaycastHitData closestObject;
+                    closestObject = rayArray[0];
+                    for (u32 i = 0; i < rayArray.size(); ++i) {
+                        SRaycastHitData ray = rayArray[i];
+                        if (ray.Object->getType() == EOT_TRIANGLE_MESH)
                         {
-                            vector3df scale(1,1,1);
-                            vector3df rot(0,0,0);
-                            intersection.Y += scale.Y / 2;
-                            vector3df temp = intersection;
-                            temp.Y -= scale.Y / 2;
-                            temp.X += scale.X / 6.25f;
-                            SPhysxAndNodePair* pair = new SPhysxAndNodePair;
-                            
-                            //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
-                            IMesh* cubeMesh = smgr->getMesh("media/block.obj");
-                            //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
-                            //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
-                            pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), temp);
-                            //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
-                            pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, intersection, rot, scale);
-                            pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+                            f32 dis = (ray.HitPosition - line.start).getLength();
+                            f32 dis2 = (closestObject.HitPosition - line.start).getLength();
+                            std::cout << "Test Distance: " << dis << std::endl;
+                            std::cout << "Current Closest: " << dis2 << std::endl;
+                            if (dis < dis2) {
+                                closestObject = ray;
+                            }
                         }
+                    }
+                    std::cout << "=========" << std::endl;
+                    if (closestObject.Object->getType() == EOT_TRIANGLE_MESH) {
+                        vector3df scale(1,1,1);
+                        vector3df rot(0,0,0);
+                        closestObject.HitPosition.Y += scale.Y / 2;
+                        vector3df temp = closestObject.HitPosition;
+                        temp.Y -= scale.Y / 2;
+                        temp.X += scale.X / 6.25f;
+                        SPhysxAndNodePair* pair = new SPhysxAndNodePair;
+
+                        //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
+                        IMesh* cubeMesh = smgr->getMesh("media/block.obj");
+                        //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
+                        //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
+                        pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), temp);
+                        //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
+                        pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, closestObject.HitPosition, rot, scale);
+                        pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
                     }
                  }
                  break;
@@ -415,8 +426,6 @@ public:
                     line.start = camera->getPosition();
                     //put the end of the line off in the distance
                     line.end = line.start + (camera->getTarget() - line.start).normalize() * 5000.0f;
-                    core::vector3df intersection;
-                    core::vector3df normal;
                     //access the physics engine to find the intersection point
                     core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
                     //core::array<SRaycastHitData> filteredRayArray;
@@ -427,8 +436,8 @@ public:
                         if (ray.Object->getType() != EOT_SPHERE)
                         {
                             f32 dis = (ray.HitPosition - line.start).getLength();
-                            std::cout << "Test Distance: " << dis << std::endl;
                             f32 dis2 = (closestObject.HitPosition - line.start).getLength();
+                            std::cout << "Test Distance: " << dis << std::endl;
                             std::cout << "Current Closest: " << dis2 << std::endl;
                             if (dis < dis2) {
                                 closestObject = ray;
@@ -488,6 +497,7 @@ public:
                             objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
 #endif //DEBUG                             
                             createImpactEffect(closestObject.HitPosition, closestObject.SurfaceNormal);
+                            //physxManager->createExplosion(closestObject.HitPosition, 30000.0f, 10000000.0f, 10000000.0f, 1.0f);
                         }
 
                     }
@@ -546,10 +556,12 @@ void CreateCamera() {
     camera->setTarget(core::vector3df(0.0f,20.0f,2.0f));
     //fill pair
     cameraPair->SceneNode = camera;
-    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 10.0f, 10000.0f);
+    vector3df physxStartPos = startPosition;
+    physxStartPos.Y += 100.0f;
+    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 15.0f, 10000.0f);
     cameraPair->PhysxObject->setAngularDamping(1000.0f); // Stops the sphere from rolling
     cameraPair->PreviousPosition = startPosition;
-    cameraPair->CameraOffset = core::vector3df(0,15,0);
+    cameraPair->CameraOffset = core::vector3df(0,10,0);
     
     // on screen gun
     // TODO: REFACTOR THIS AND ABOVE INTO CAMERA CLASS
