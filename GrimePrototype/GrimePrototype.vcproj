@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Cockroach.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CShaderPre.cpp"
 				>
 			</File>
@@ -196,10 +200,6 @@
 			</File>
 			<File
 				RelativePath=".\entity.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\game.cpp"
 				>
 			</File>
 			<File
@@ -225,15 +225,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\CameraPhysics.h"
-				>
-			</File>
-			<File
 				RelativePath=".\IrrPhysx\CCapsuleSceneNode.h"
 				>
 			</File>
 			<File
 				RelativePath=".\IrrPhysx\CGridSceneNode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Cockroach.h"
 				>
 			</File>
 			<File
@@ -261,11 +261,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\game.h"
+				RelativePath=".\irrKlangSceneNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\irrKlangSceneNode.h"
+				RelativePath=".\PairStructs.h"
 				>
 			</File>
 			<File

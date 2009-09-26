@@ -1,10 +1,13 @@
 #include "Enemy.h"
+#include <ctime> 
+#include <iostream>
+
 //possibly add randomising constructor later
 Enemy::Enemy(void)
 {
 }
 //normal constructor
-Enemy::Enemy(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<SPhysxAndNodePair*>* objectArray, Player* player, vector3df position)
+Enemy::Enemy(scene::ISceneManager* sceneManager,  irrklang::ISoundEngine* soundEngine,  IAnimatedMesh* mesh, IPhysxManager* manager, core::array<SPhysxAndNodePair*>* objectArray, Player* player, vector3df position)
     {
     //set position and scale data
     vector3df pos = position;
@@ -13,13 +16,20 @@ Enemy::Enemy(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxMana
     //set references
     this->smgr = sceneManager;
     this->physxMan = manager;
+    this->soundEngine = soundEngine;
     this->objects = objectArray;
     this->target = player;
     this->active = true;
+    this->health = 1;
+    this->speed = 1.0f;
+    this->strength = 1;
     //instantiate pair
     pair = new SPhysxAndNodePair;
     attackPhase = false;
     attackPhaseActive = false;
+    soundReset = false;
+    soundResetTimer = 0.0f;
+    soundWalkCurrentPosition = 0;
     
     IPhysxMesh* pmesh = physxMan->createConvexMesh(mesh->getMeshBuffer(0), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, rot, 1000.0f);
@@ -28,6 +38,18 @@ Enemy::Enemy(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxMana
     //add scene node to game
     this->node = sceneManager->addAnimatedMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
     pair->SceneNode = node;
+    
+    //pair->SoundNode = new CIrrKlangSceneNode(soundEngine, node, smgr, 1);
+    //pair->SoundNode->setSoundFileName("media/sounds/Bang1.wav");
+   // pair->SoundNode->setPlayOnceMode();
+   // pair->SoundNode->setMinMaxSoundDistance(1.0f);
+   
+    u32 randNum = (rand() % 300) + 1;
+    std::cout << randNum << std::endl;
+    sound = soundEngine->play3D("media/sounds/InsectWalk1.wav", this->pair->SceneNode->getAbsolutePosition(), true, false, true);
+    sound->setMinDistance(100.0f);
+    sound->setMaxDistance(500.0f);
+    sound->setPlayPosition(randNum);
     
     this->node->setAnimationSpeed(25.0f);
     //set walking frame loop
@@ -40,6 +62,10 @@ Enemy::Enemy(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxMana
 
 Enemy::~Enemy(void)
 {
+    //pair->SoundNode->stop();
+    //pair->SoundNode->drop();
+    sound->stop();
+    sound->drop();
 }
 
 void Enemy::FaceTarget() {
@@ -89,6 +115,8 @@ void Enemy::Update(s32 time)
 {
     if (active)
     {
+        sound->setPosition(this->pair->SceneNode->getAbsolutePosition());
+       // pair->SoundNode->setLoopingStreamMode();
         //if target exists
         if (target)
         {
@@ -111,20 +139,47 @@ void Enemy::Update(s32 time)
             else {
                 attackPhase = false;
             }
+            if (soundReset)
+            {
+                soundResetTimer += time;
+            }
             if (distanceToTarget < 30)
             {
                 attackTimer += time;
             }
             if (attackTimer >= 1000)
             {
-                target->health -= 5;
+            //    pair->SoundNode->stop();
+                soundWalkCurrentPosition = sound->getPlayPosition();
+                sound->stop();
+                sound->drop();
+                sound = soundEngine->play3D("media/sounds/Bite1.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
+                sound->setMinDistance(100.0f);
+                sound->setMaxDistance(1000.0f);
+                sound->setIsPaused(false);
+                soundReset = true;
+           //     pair->SoundNode->setPlayOnceMode();
+                target->health -= strength;
                 attackTimer = 0;
+                
+            }
+            if (soundResetTimer >= 300)
+            {
+                sound->stop();
+                sound->drop();
+                sound = soundEngine->play3D("media/sounds/InsectWalk1.wav", this->pair->SceneNode->getAbsolutePosition(), true, false, true);
+                sound->setPlayPosition(soundWalkCurrentPosition);
+                sound->setMinDistance(100.0f);
+                sound->setMaxDistance(1000.0f);
+                soundResetTimer = 0;
+                soundReset = false;
             }
             CheckPhase();
             //normalise vector
             direction.normalize();
             //normalise with respect to time elapsed since last update
-            direction = direction * (time/10.0f);
+            direction = direction * (time/10.0f) * speed;
+            direction.Y = 0; //no flying mr bug
             //find and apply the change
             resultant = position + direction;
             //check for floating point errors that were appearing            
@@ -135,5 +190,15 @@ void Enemy::Update(s32 time)
             }
         }
     }
-
+}
+bool Enemy::IsStillAlive() 
+{
+    if (health <= 0)
+    {
+        return false;
+    }
+    else 
+    {
+        return true;
+    } 
 }

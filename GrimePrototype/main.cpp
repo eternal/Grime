@@ -4,7 +4,7 @@
 //=============================================================================
 #define DEBUG 1
 //#define FULLSCREEN 1
-//#define NOSPAWN 1
+#define NOSPAWN 1
 //#define OLDSMGR 1 
 #include <irrlicht.h>
 #include <iostream>
@@ -12,20 +12,21 @@
 #include <cstdlib>
 #include <ctime> 
 #include "XEffects.h"
-#include "IrrPhysx/ShapeCreation.h"
+//#include "IrrPhysx/ShapeCreation.h"
 #include <NxPhysics.h>
 #include <irrKlang.h>
 #include "irrKlangSceneNode.h"
-#include "CameraPhysics.h"
-#include "game.h"
+#include "PairStructs.h"
 #include "entity.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Cockroach.h"
 
 using namespace irr;
 using namespace core;
 using namespace scene;
 using namespace video;
+using namespace IrrPhysx;
 
 //add libraries
 #ifdef _MSC_VER
@@ -88,12 +89,12 @@ s32 getRandom(s32 upper) {
 
 //Temporary spawning function to streamline spawning of enemies
 void SpawnSpider() {
-    Enemy* enemy = new Enemy(smgr, mesh, physxManager, &objects, player);
+    Enemy* enemy = new Enemy(smgr, soundEngine, mesh, physxManager, &objects, player);
     enemyObjects.push_back(enemy);
 }
 
 void SpawnSpiderCustom(vector3df position) {
-    Enemy* enemy = new Enemy(smgr, mesh, physxManager, &objects, player, position);
+    Enemy* enemy = new Cockroach(smgr, soundEngine, mesh, physxManager, &objects, player, position);
     enemyObjects.push_back(enemy);
 }
 
@@ -427,6 +428,10 @@ public:
             bool mouseLeftPressedDown = false;
             bool mouseRightPressedDown = false;
             switch (event.MouseInput.Event) {
+                case EMIE_MOUSE_WHEEL: {
+                    player->WeaponSelect(event.MouseInput.Wheel);
+                }
+                break;
                 //shoot
                 case EMIE_LMOUSE_PRESSED_DOWN: {
                     mouseLeftPressedDown = true;
@@ -465,15 +470,22 @@ public:
                             {  // check it against the objects in our array to see if it matches
                                 if (enemyObjects[i]->pair->PhysxObject == objectHit) {
                                     Enemy* enemy = enemyObjects[i];
-                                    core::vector3df pos;
-                                    enemy->pair->PhysxObject->getPosition(pos);
                                     //add small pushback and texture explosion
-                                    createExplosion(pos);           
-                                    //remove from arrays and memory                         
-                                    physxManager->removePhysxObject(enemy->pair->PhysxObject);
-                                    enemy->pair->SceneNode->remove();
-                                    delete enemy;
-                                    enemyObjects.erase(i);
+                                    enemy->health--; ///TODO ADD WEAPON CODE HERE
+                                    if (enemy->IsStillAlive())
+                                    {
+                                        createImpactEffect(closestObject.HitPosition,closestObject.SurfaceNormal);
+                                    }
+                                    else
+                                    {
+                                        createExplosion(closestObject.HitPosition);   
+                                        //kill enemy
+                                        //remove from arrays and memory                         
+                                        physxManager->removePhysxObject(enemy->pair->PhysxObject);
+                                        enemy->pair->SceneNode->remove();
+                                        delete enemy;
+                                        enemyObjects.erase(i);  
+                                    }
                                     break;
                                 }
                             }	
@@ -517,7 +529,7 @@ public:
                 case EMIE_RMOUSE_PRESSED_DOWN: {
                     mouseRightPressedDown = true;
                     // Throw a sphere from the camera
-                    objects.push_back(createSphereFromCamera(physxManager, smgr, driver, camera, 4, 20.0f));
+                    //objects.push_back(createSphereFromCamera(physxManager, smgr, driver, camera, 4, 20.0f));
                 }
                 break;
                 case EMIE_RMOUSE_LEFT_UP: {
@@ -564,19 +576,10 @@ void CreateCamera() {
     cameraPair->SceneNode = camera;
     vector3df physxStartPos = startPosition;
     physxStartPos.Y += 100.0f;
-    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 15.0f, 10000.0f);
+    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 15.0f, 30000.0f);
     cameraPair->PhysxObject->setAngularDamping(1000.0f); // Stops the sphere from rolling
     cameraPair->PreviousPosition = startPosition;
     cameraPair->CameraOffset = core::vector3df(0,10,0);
-    
-    // on screen gun
-    // TODO: REFACTOR THIS AND ABOVE INTO CAMERA CLASS
-    // NOTE: UNSKINNED; UNFINISHED MODEL
-    scene::ISceneNode* gun = smgr->addMeshSceneNode(smgr->getMesh("media/weapon.obj")->getMesh(0), camera);
-    gun->setPosition(core::vector3df(1.5f,-3.2f,1.0f));
-    gun->setRotation(core::vector3df(0.0f,180.0f,0.0f));
-    gun->setScale(core::vector3df(0.5f,0.5f,0.5f));
-    gun->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);   
 }
 
 int main() {
@@ -601,7 +604,7 @@ int main() {
     smgr = device->getSceneManager();
     guienv = device->getGUIEnvironment();
     soundEngine  = irrklang::createIrrKlangDevice();
-    
+    //soundEngine->setSoundVolume(1.0f);
     if (!soundEngine || !driver || !smgr || !guienv)
         return 1; //fatal error
     
@@ -676,14 +679,11 @@ int main() {
     levelText->setOverrideColor(video::SColor(255,255,255,255));
     gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200909170234", core::rect<s32>(5,20,200,200));
     buildText->setOverrideColor(video::SColor(255,255,255,255));  
-    wchar_t temp[10];
-    _itow(timeBetweenSpawns, temp, 10);
 
     gui::IGUIStaticText* generalText = guienv->addStaticText(L"Time Between Spawns: ", core::rect<s32>(5,38,400,200));
-    gui::IGUIStaticText* spawns = guienv->addStaticText(temp, core::rect<s32>(164,38,400,200));
+    gui::IGUIStaticText* spawns = guienv->addStaticText(L"2500", core::rect<s32>(164,38,400,200));
     generalText->setOverrideColor(video::SColor(255,255,255,255));
     spawns->setOverrideColor(video::SColor(255,255,255,255));
-    wchar_t temp2[10];  
     gui::IGUIStaticText* textHealth = guienv->addStaticText(L"Health: ", core::rect<s32>(5,58,400,200));
     gui::IGUIStaticText* health = guienv->addStaticText(L"100", core::rect<s32>(75,58,400,200));
     textHealth->setOverrideColor(video::SColor(255,255,255,255));
@@ -717,10 +717,10 @@ int main() {
     camera->setPosition(startPosition);
     //camera->setFarValue(500.0f);
     //spawn player and link camera
-    player = new Player(smgr, mesh, physxManager, cameraPair, &objects, effect);
+    player = new Player(smgr, soundEngine, mesh, physxManager, cameraPair, &objects, effect);
     
 //TODO: FIX PHYSICS MESHING BUG, BANDAID FIX BELOW BY SENDING FIRST SPAWN OFF MAP
-    enemyObjects.push_back( new Enemy(smgr, mesh, physxManager, &objects, NULL, vector3df(0.0f, -150.0f, 0.0f)));
+    enemyObjects.push_back( new Enemy(smgr, soundEngine, mesh, physxManager, &objects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
 #ifdef DEBUG    
     //temporary testing etc
     //enemyObjects.push_back( new Enemy(smgr, mesh, physxManager, &objects, player, vector3df(0.0f, 306.0f, 0.0f)));
@@ -812,10 +812,13 @@ int main() {
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
 #endif // DEBUG
             // Render the GUI
-            _itow(timeBetweenSpawns, temp, 10);
-            _itow(player->health, temp2, 10);
-            spawns->setText(temp);
-            health->setText(temp2);
+            //_itow(timeBetweenSpawns, temp, 10);
+            core::stringw strTime, strHealth = "";
+            strTime += timeBetweenSpawns;
+            strHealth += player->health;
+            //_itow(player->health, temp2, 10);
+            spawns->setText(strTime.c_str());
+            health->setText(strHealth.c_str());
             guienv->drawAll();
 
 #ifdef PHYSDEBUG

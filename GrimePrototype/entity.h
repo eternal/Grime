@@ -6,12 +6,14 @@
 #pragma once
 #include <irrlicht.h>
 #include <IrrPhysx.h>
-#include "IrrPhysx/ShapeCreation.h"
+#include "PairStructs.h"
+//#include "IrrPhysx/ShapeCreation.h"
 
 using namespace irr;
 using namespace core;
 using namespace scene;
 using namespace video;
+using namespace IrrPhysx;
 
 class entity
     {
