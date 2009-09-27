@@ -50,7 +50,7 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
         vector3df blockPhysicsPosition = blockPosition;
         blockPhysicsPosition.Y -= scale.Y / 2;
         blockPhysicsPosition.X += scale.X / 6.25f;
-        SPhysxAndNodePair* pair = new SPhysxAndNodePair;
+        pair = new SPhysxAndNodePair;
 
         //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
         IMesh* cubeMesh = smgr->getMesh("media/block.obj");

@@ -1,13 +1,12 @@
 #include "Player.h"
 #include <iostream>
 
-Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IPhysxManager* manager, SPhysxAndCameraPair* cameraPair,  core::array<SPhysxAndNodePair*>* objectArray, EffectHandler* effect)
+Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IPhysxManager* manager, SPhysxAndCameraPair* cameraPair, EffectHandler* effect)
 {
     //not much needs to be stored for player, just set references and pair
     this->smgr = sceneManager;
     this->physxMan = manager;
     this->soundEngine = soundEngine;
-    this->objects = objectArray;
     this->pair = cameraPair;
     vector3df pos;
     this->pair->PhysxObject->getPosition(pos);

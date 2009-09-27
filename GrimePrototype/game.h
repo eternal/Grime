@@ -5,4 +5,53 @@
 
 
 #pragma once
+#include <irrlicht.h>
+#include <irrKlang.h>
+#include <IrrPhysx.h>
+#include <cstdlib>
+#include "EffectHandler.h"
+#include "Player.h"
+#include "Enemy.h"
+#include "Block.h"
+#include "Projectile.h"
+#include "SpawnManager.h"
+
+using namespace irr;
+using namespace core;
+using namespace scene;
+using namespace video;
+
+class Game
+{
+public:
+    Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, EffectHandler* effect);
+    ~Game(void);
+    
+    ISceneManager* smgr;
+    ISoundEngine* soundEngine;
+    IPhysxManager* physxManager;
+    EffectHandler* effect;
+    
+    Player* player;
+    core::array<Enemy*> enemyObjects;
+    core::array<Block*> blockObjects;
+    core::array<Projectile*> projectileObjects;
+    SpawnManager* spawnManager;
+    SPhysxAndCameraPair* cameraPair;
+    
+    core::array<video::ITexture*> explosionTextures;
+    core::array<video::ITexture*> impactTextures;
+    
+    vector3df startPosition;
+    
+    void CreateExplosion(vector3df position);
+    void CreateImpactEffect(vector3df position, vector3df normal);
+    void CreateMuzzleFlash();
+    void CreateCamera();
+    
+    void Update(s32 time);
+    
+    s32 GetRandom(s32 upper);
+    void RestartLevel();
+};
 

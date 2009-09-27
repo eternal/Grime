@@ -9,7 +9,6 @@
 #include <irrlicht.h>
 #include <iostream>
 #include <IrrPhysx.h>
-//#include "IrrPhysx/ShapeCreation.h"
 #include "PairStructs.h"
 
 using namespace irr;
@@ -31,7 +30,7 @@ enum WEAPONS
 class Player : public Entity
 {
     public:
-        Player(scene::ISceneManager* smgr, irrklang::ISoundEngine* soundEngine, IPhysxManager* manager, SPhysxAndCameraPair* cameraPair, core::array<SPhysxAndNodePair*>* objectArray, EffectHandler* effects);
+        Player(scene::ISceneManager* smgr, irrklang::ISoundEngine* soundEngine, IPhysxManager* manager, SPhysxAndCameraPair* cameraPair, EffectHandler* effects);
         ~Player(void);
         
         //update is called every frame; perform game logic
@@ -48,8 +47,7 @@ class Player : public Entity
         IPhysxManager* physxMan;
         scene::IAnimatedMeshSceneNode* node;
         irrklang::ISoundEngine* soundEngine;
-        SPhysxAndCameraPair* pair;
-        core::array<SPhysxAndNodePair*>* objects;    
+        SPhysxAndCameraPair* pair; 
         
         irrklang::ISound* sound;
         s32 currentWeapon;   

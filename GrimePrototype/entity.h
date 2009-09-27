@@ -7,7 +7,6 @@
 #include <irrlicht.h>
 #include <IrrPhysx.h>
 #include "PairStructs.h"
-//#include "IrrPhysx/ShapeCreation.h"
 
 using namespace irr;
 using namespace core;

@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Game.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\irrKlangSceneNode.cpp"
 				>
 			</File>
@@ -286,6 +290,10 @@
 			</File>
 			<File
 				RelativePath=".\entity.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Game.h"
 				>
 			</File>
 			<File
