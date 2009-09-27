@@ -61,27 +61,7 @@ public:
 #endif //DEBUG
                 case KEY_SPACE:
                     //jump
-                    if (game->cameraPair->camera)
-                    {
-                        // Perform a raycast to find the objects we just shot at
-                        core::line3df line;
-                        line.start = game->cameraPair->camera->getPosition();
-                        line.end = line.start;
-                        line.end.Y = -2000.0f;
-                        //access the physics engine to find the intersection point
-                        core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
-                        for (u32 i = 0; i < rayArray.size(); ++i) {
-                            SRaycastHitData ray = rayArray[i];
-                            if (ray.Object->getType() == EOT_TRIANGLE_MESH)
-                            {
-                                f32 dis = (ray.HitPosition - line.start).getLength();
-                                if (dis <= 25)
-                                {
-                                    game->cameraPair->PhysxObject->setLinearVelocity(core::vector3df(0,70,0));
-                                }
-                            }
-                        }
-                    }
+                    game->player->Jump();
 
                     break;
             }
@@ -155,8 +135,6 @@ public:
             }
         } 
         else if (event.EventType == EET_MOUSE_INPUT_EVENT) {
-            bool mouseLeftPressedDown = false;
-            bool mouseRightPressedDown = false;
             if (event.MouseInput.isLeftPressed())
             {
                 game->WeaponFire();
@@ -173,16 +151,16 @@ public:
                 }
                 break;
                 case EMIE_LMOUSE_LEFT_UP: {
-                    mouseLeftPressedDown = false;
+
                 }
                 break;
 #ifdef DEBUG                
                 case EMIE_RMOUSE_PRESSED_DOWN: {
-                    mouseRightPressedDown = true;
+
                 }
                 break;
                 case EMIE_RMOUSE_LEFT_UP: {
-                    mouseRightPressedDown = false;
+
                     break;
                 }
 #endif // DEBUG
@@ -354,18 +332,6 @@ int main() {
             textPrimitives->setText(strPrimitives.c_str());
             guienv->drawAll();
 
-#ifdef PHYSDEBUG
-            //find normal between target and raycasted object
-			core::vector3df normal;
-            IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
-            if (objectHit) {
-                // Draw a 3D line showing the normal of the surface hit
-                core::vector3df lineEnd = intersection + normal * 10.0f;
-                driver->setTransform(video::ETS_WORLD, core::matrix4());
-                driver->setMaterial(lineMaterial);
-                driver->draw3DLine(intersection, lineEnd, video::SColor(255,0,0,255));
-                }
-#endif //PHYSDEBUG
             //done rendering
 			driver->endScene();
 

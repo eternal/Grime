@@ -144,6 +144,30 @@ s32 Player::CurrentCooldown()
 {
     return weaponCooldown[currentWeapon];
 }
+void Player::Jump()
+{
+    if (this->pair->camera)
+    {
+        // Perform a raycast to find the objects we just shot at
+        core::line3df line;
+        line.start = pair->camera->getPosition();
+        line.end = line.start;
+        line.end.Y = -2000.0f;
+        //access the physics engine to find the intersection point
+        core::array<SRaycastHitData> rayArray = physxMan->raycastAllRigidObjects(line);
+        for (u32 i = 0; i < rayArray.size(); ++i) {
+            SRaycastHitData ray = rayArray[i];
+            if (ray.Object->getType() == EOT_TRIANGLE_MESH)
+            {
+                f32 dis = (ray.HitPosition - line.start).getLength();
+                if (dis <= 25)
+                {
+                    pair->PhysxObject->setLinearVelocity(core::vector3df(0,70,0));
+                }
+            }
+        }
+    }
+}
 void Player::Update(s32 time) 
 {
     for (u32 i = 0; i < NUMBER_OF_WEAPONS; i++)

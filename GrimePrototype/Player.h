@@ -41,7 +41,8 @@ class Player : public Entity
         bool CurrentWeaponOnCooldown();
         void AddCoolDown();
         s32 CurrentCooldown();
-        
+        void Jump();
+
         //store local references to required data        
         scene::ISceneManager* smgr;
         IPhysxManager* physxMan;
