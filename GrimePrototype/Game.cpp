@@ -92,7 +92,7 @@ void Game::CreateCamera() {
     cameraPair->PhysxObject->setAngularDamping(1000.0f); // Stops the sphere from rolling
     cameraPair->PreviousPosition = startPosition;
     cameraPair->CameraOffset = core::vector3df(0,10,0);
-    cameraPair->camera->setFarValue(2200.0f);
+    cameraPair->camera->setFarValue(3000.0f);
     smgr->setActiveCamera(cameraPair->camera);
 }
 

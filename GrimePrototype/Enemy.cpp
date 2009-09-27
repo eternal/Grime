@@ -73,15 +73,10 @@ void Enemy::FaceTarget() {
     target->pair->PhysxObject->getPosition(targetPos);
     this->pair->PhysxObject->getPosition(selfPos);
     //find vector self->target
-    nodePos = targetPos - selfPos;
-    vector3df selfRot;
-    selfRot.Y = atan(nodePos.Z/nodePos.X) * (180.0f / irr::core::PI);
-    if((targetPos.X - selfRot.X) > 0) {
-        selfRot.Y = 90 - selfRot.Y;
-        } else if((targetPos.X - selfPos.X) < 0) {
-            selfRot.Y = -90 - selfRot.Y;
-        }
-    selfRot.Y += 180;
+    nodePos = selfPos - targetPos;
+    vector3df selfRot = nodePos.getHorizontalAngle();
+    selfRot.X = 0.0f;
+    selfRot.Z = 0.0f;
     this->pair->PhysxObject->setRotation(selfRot);
     this->pair->SceneNode->setRotation(selfRot);
 }
