@@ -479,6 +479,15 @@ public:
                                 }
                             }
                         }
+                        for (u32 i = 0; i < enemyObjects.size(); i++)
+                        {
+                            Enemy* enemy = enemyObjects[i];
+                            f32 distance = (enemy->pair->SceneNode->getAbsolutePosition() - closestObject.HitPosition).getLength();
+                            if (distance <= 32.0f)
+                            {
+                                enemy->health = 0;
+                            }
+                        }
                         std::cout << "=========" << std::endl;
                         if (closestObject.Object->getType() == EOT_TRIANGLE_MESH) {
                             vector3df scale(1,1,1);
