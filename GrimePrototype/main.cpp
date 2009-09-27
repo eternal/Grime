@@ -1,11 +1,9 @@
 //=============================================================================
 //  Grime Prototype main.cpp
-//  build 05291057
+//  build 200909281238
 //=============================================================================
 #define DEBUG 1
 //#define FULLSCREEN 1
-#define NOSPAWN 1
-//#define OLDSMGR 1 
 #include <irrlicht.h>
 #include <iostream>
 #include <IrrPhysx.h>
@@ -248,15 +246,6 @@ int main() {
     //remove cursor from view
 	device->getCursorControl()->setVisible(false);
 	
-#ifdef DEBUG
-    video::SMaterial lineMaterial;
-    lineMaterial.Lighting = false;
-    lineMaterial.Thickness = 2.0f;
-    
-    video::SMaterial triMaterial;
-    triMaterial.Lighting = false;
-#endif //DEBUG
-
     //add crosshair to centre of screen (64x64 image so -32)
     guienv->addImage(driver->getTexture("media/crosshair2.png"), core::position2di(resolution.Width/2-32,resolution.Height/2-32));
     
