@@ -33,7 +33,6 @@ using namespace IrrPhysx;
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:main")
 #endif
 
-
 //main globals for devices etc
 IrrlichtDevice* device = NULL;
 video::IVideoDriver* driver = NULL;
@@ -42,23 +41,7 @@ gui::IGUIEnvironment* guienv = NULL;
 IPhysxManager* physxManager = NULL;
 EffectHandler* effect = NULL;
 irrklang::ISoundEngine* soundEngine = NULL;
-ISceneNode* roomnode = NULL;
 Game* game = NULL;
-
-// Creates a sphere at the specified position, of the specified size and with the specified intial velocity (useful for throwing it)
-SPhysxAndNodePair* createSphere(IPhysxManager* physxManager, scene::ISceneManager* smgr, video::IVideoDriver* driver, const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity) {
-
-    SPhysxAndNodePair* pair = new SPhysxAndNodePair;
-    pair->PhysxObject = physxManager->createSphereObject(pos, core::vector3df(0,0,0), radius, density, initialVelocity);
-    pair->SceneNode = smgr->addSphereSceneNode(radius, 12, 0, -1, pos, core::vector3df(0, 0, 0), core::vector3df(1.0f, 1.0f, 1.0f));
-    //pair->SceneNode->setMaterialTexture(0, driver->getTexture(textures[rand()%NUM_TEXTURES]));
-    pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true); 
-
-    return pair;
-
-}
-//simple function for adding a camera and creating a physics pair for the camera
-
 
 //Event reciever class
 //Handle keyboard and mouse input
@@ -94,9 +77,6 @@ public:
                             if (ray.Object->getType() == EOT_TRIANGLE_MESH)
                             {
                                 f32 dis = (ray.HitPosition - line.start).getLength();
-#ifdef DEBUG                                
-                                std::cout << "Distance:" << dis << std::endl;
-#endif //DEBUG
                                 if (dis <= 25)
                                 {
                                     game->cameraPair->PhysxObject->setLinearVelocity(core::vector3df(0,70,0));
@@ -116,21 +96,14 @@ public:
                     driver->writeImageToFile(driver->createScreenShot(),"screenie.jpg",0);
                     break;
 #ifdef DEBUG
-                //case KEY_KEY_F:
-                //    //debug spawn enemy function
-                //    SpawnSpider();
-                //    std::cout << "Enemy count" << enemyObjects.size() << std::endl;
-                //    break;
                 case KEY_KEY_U:
                     game->CreateMuzzleFlash();
                 break;
-#endif //DEBUG
                 case KEY_KEY_G: {
                     Block* block = new Block(smgr, physxManager, &game->enemyObjects);
                     game->blockObjects.push_back(block);
                  }
-                 break;               
-#ifdef DEBUG                
+                 break;                             
                 case KEY_KEY_1: {
                     game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
                     }
@@ -162,32 +135,6 @@ public:
                     game->spawnManager->SpawnSpider(game->spawnManager->positionThree);
                 }
                 break;
-                //case KEY_KEY_C:
-                //    // DEBUG: Delete all objects
-                //    for (u32 i = 0 ; i < objects.size() ; i++) {
-                //        SPhysxAndNodePair* pair = objects[i];
-                //        physxManager->removePhysxObject(pair->PhysxObject);
-                //        pair->SceneNode->remove();
-                //        delete pair;
-                //        }
-                //    for (u32 i = 0; i < enemyObjects.size(); i++)
-                //    {
-                //        Enemy* enemy = enemyObjects[i];
-                //        physxManager->removePhysxObject(enemy->pair->PhysxObject);
-                //        enemy->pair->SceneNode->remove();
-                //        delete enemy;
-                //    }
-                //    for (u32 i = 0; i < projectileObjects.size(); i++)
-                //    {
-                //        Projectile* proj = projectileObjects[i];
-                //        physxManager->removePhysxObject(proj->pair->PhysxObject);
-                //        proj->pair->SceneNode->remove();
-                //        delete proj;
-                //    }
-                //    enemyObjects.clear();
-                //    objects.clear();
-                //    projectileObjects.clear();
-                //    break;
                 case KEY_KEY_I:
                     game->RestartLevel();
                     break;
@@ -195,35 +142,6 @@ public:
                     // Toggle the debug data visibility
                     physxManager->setDebugDataVisible(!physxManager->isDebugDataVisible());
                     break;
-                /*case KEY_KEY_P:
-                    effect->addEffectToNode(roomnode,(E_EFFECT_TYPE)currentShader);
-                    currentShader++;
-                    if (currentShader == 7)
-                        currentShader = 0;
-                    break;
-                case KEY_KEY_O:
-                    effectToggle = !effectToggle;
-                    if (effectToggle) toonPPEffect = effect->addPostProcessingEffectFromFile("Shaders/toon.hlsl");
-                    else effect->removePostProcessingEffect(toonPPEffect);
-                    break;*/
-                //case KEY_KEY_L:
-                //    bloomToggle = !bloomToggle;
-                //    if (bloomToggle)
-                //    {
-                //        effectBloom = effect->addPostProcessingEffectFromFile("Shaders/BloomP.hlsl");
-                //        //effectBlur1 = effect->addPostProcessingEffectFromFile("Shaders/BlurHP.hlsl");
-                //        effectBlur2 = effect->addPostProcessingEffectFromFile("Shaders/BlurVP.hlsl");
-                //        toonPPEffect = effect->addPostProcessingEffectFromFile("Shaders/toon.hlsl");
-                //        //effectHighPass = effect->addPostProcessingEffectFromFile("Shaders/BrightPass.hlsl");
-                //    }
-                //    else {
-                //        effect->removePostProcessingEffect(effectBloom);
-                //        effect->removePostProcessingEffect(effectBlur1);
-                //        effect->removePostProcessingEffect(effectBlur2);
-                //        //effect->removePostProcessingEffect(effectHighPass);
-                //        //effect->removePostProcessingEffect(toonPPEffect);
-                //    }
-                //    break;
                 case KEY_MULTIPLY:
                     game->spawnManager->timeBetweenSpawns = 100;
                     break;
@@ -243,130 +161,7 @@ public:
             bool mouseRightPressedDown = false;
             if (event.MouseInput.isLeftPressed())
             {
-                if (!(game->player->CurrentWeaponOnCooldown()))
-                {
-                    game->CreateMuzzleFlash();
-                    game->player->AddCoolDown();
-                    std::cout << "Fire" << std::endl;
-                    if (game->player->GetWeapon() == WEAPON_BLOCKGUN)
-                    {
-                        Block* block = new Block(smgr, physxManager, &game->enemyObjects);
-                        game->blockObjects.push_back(block);
-                    }
-                    else if (game->player->GetWeapon() == WEAPON_PISTOL)
-                    {
-                        // Perform a raycast to find the objects we just shot at
-                        core::line3df line;
-                        line.start = game->cameraPair->camera->getPosition();
-                        //put the end of the line off in the distance
-                        line.end = line.start + (game->cameraPair->camera->getTarget() - line.start).normalize() * 5000.0f;
-                        //access the physics engine to find the intersection point
-                        core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
-                        //core::array<SRaycastHitData> filteredRayArray;
-                        SRaycastHitData closestObject;
-                        if (rayArray.size() > 0)
-                        {
-                            closestObject = rayArray[0];
-                            for (u32 i = 0; i < rayArray.size(); ++i) 
-                            {
-                                SRaycastHitData ray = rayArray[i];
-                                if (ray.Object->getType() != EOT_SPHERE)
-                                {
-                                    f32 dis = (ray.HitPosition - line.start).getLength();
-                                    f32 dis2 = (closestObject.HitPosition - line.start).getLength();
-                                    std::cout << "Test Distance: " << dis << std::endl;
-                                    std::cout << "Current Closest: " << dis2 << std::endl;
-                                    if (dis < dis2) {
-                                        closestObject = ray;
-                                    }
-                                }
-                            }
-                        }
-                        std::cout << "===========" << std::endl;
-                        IPhysxObject* objectHit = closestObject.Object;
-                        //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
-                        if (objectHit) {
-                            //check for collisions with any of the types of bounding boxes the enemies use
-                            //TO REFACTOR, PLACE IN GAME CLASS
-                            if (objectHit->getType() == EOT_CONVEX_MESH || objectHit->getType() == EOT_BOX || objectHit->getType() == EOT_SPHERE) 
-                            {
-                                for (u32 i = 0 ; i < game->enemyObjects.size() ; ++i) 
-                                {  // check it against the objects in our array to see if it matches
-                                    if (game->enemyObjects[i]->pair->PhysxObject == objectHit) {
-                                        Enemy* enemy = game->enemyObjects[i];
-                                        //add small pushback and texture explosion
-                                        s32 chance = game->GetRandom(4);
-                                        if (chance == 4) // 1/4 chance
-                                        {
-                                            enemy->health--;
-                                        }
-                                        else
-                                        {
-                                            enemy->health -= 0.5;
-                                        }
-
-                                        if (enemy->IsStillAlive())
-                                        {
-                                            game->CreateImpactEffect(closestObject.HitPosition,closestObject.SurfaceNormal);
-                                            std::cout << enemy->health << " health left" << std::endl;
-                                        }
-                                        else
-                                        {
-                                            game->CreateExplosion(closestObject.HitPosition);   
-                                            //kill enemy
-                                            //remove from arrays and memory                         
-                                            physxManager->removePhysxObject(enemy->pair->PhysxObject);
-                                            enemy->pair->SceneNode->remove();
-                                            delete enemy;
-                                            game->enemyObjects.erase(i);  
-                                        }
-                                        break;
-                                    }
-                                }	
-                            }  
-    #ifdef DEBUG                    
-                            //// If it's a sphere we blow it up
-                            //else if (objectHit->getType() == EOT_SPHERE) 
-                            //{
-                            //    for (u32 i = 0 ; i < objects.size() ; ++i) 
-                            //    {  // check it against the objects in our array to see if it matches
-                            //        if (objects[i]->PhysxObject == objectHit) {
-                            //            core::vector3df pos;
-                            //            objects[i]->PhysxObject->getPosition(pos);
-                            //            createExplosion(pos);
-                            //            objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
-                            //            //physxManager->removePhysxObject(objects[i]->PhysxObject);
-                            //            //objects[i]->SceneNode->remove();
-                            //            //delete objects[i];
-                            //            //objects.erase(i);
-                            //            break;
-                            //        }
-                            //    }	
-                            //}
-                            //for any other objects except for the camera
-                            else if (objectHit != game->cameraPair->PhysxObject) 
-                            {
-                                objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
-                                game->CreateImpactEffect(closestObject.HitPosition, closestObject.SurfaceNormal);
-                                //physxManager->createExplosion(closestObject.HitPosition, 100.0f, 300000000.0f, 100000000000.0f, 0.2f);
-                            }
-                        }
-                    }
-                    else if (game->player->GetWeapon() == WEAPON_RPG)
-                    {
-                        core::vector3df t = game->cameraPair->camera->getPosition();
-                        core::vector3df vel = game->cameraPair->camera->getTarget() - game->cameraPair->camera->getPosition();
-                        vel.normalize();
-                        t = t + vel * 20.0f;
-                        vel*=1000.0f;
-
-                        game->projectileObjects.push_back(new Projectile(smgr,soundEngine,physxManager, createSphere(physxManager, smgr, driver, t, 10.0f, 1000.0f, &vel), &game->projectileObjects, game->explosionTextures, &game->enemyObjects));
-                    }
-                    else if (game->player->GetWeapon() == WEAPON_CLOSE)
-                    {
-                        physxManager->createExplosion(game->player->pair->SceneNode->getAbsolutePosition(), 100.0f, 300000000.0f, 100000000000.0f, 1.0f);
-                    }
-                }
+                game->WeaponFire();
                 
             }
             switch (event.MouseInput.Event) {
@@ -376,10 +171,7 @@ public:
                 break;
                 //single instance effect
                 case EMIE_LMOUSE_PRESSED_DOWN: {
-                    
-                        
-#endif //DEBUG                     
-                    
+      
                 }
                 break;
                 case EMIE_LMOUSE_LEFT_UP: {
@@ -389,8 +181,6 @@ public:
 #ifdef DEBUG                
                 case EMIE_RMOUSE_PRESSED_DOWN: {
                     mouseRightPressedDown = true;
-                    // Throw a sphere from the camera
-                    //objects.push_back(createSphereFromCamera(physxManager, smgr, driver, camera, 4, 20.0f));
                 }
                 break;
                 case EMIE_RMOUSE_LEFT_UP: {
@@ -411,7 +201,6 @@ public:
 
 int main() {
 	video::E_DRIVER_TYPE driverType;
-    //driverType = video::EDT_OPENGL; //USING OPENGL EXCLUSIVELY FOR PROTOTYPE DUE TO BETTER IRRLICHT LIGHTING SUPPORT
 	driverType = video::EDT_DIRECT3D9;
 	//event receiver instance
     CEventReceiver receiver;
@@ -435,7 +224,6 @@ int main() {
     //seed random numbers
     srand((unsigned)time(0));
     
-    //soundEngine->setSoundVolume(1.0f);
     if (!soundEngine || !driver || !smgr || !guienv)
         return 1; //fatal error
     
@@ -456,45 +244,10 @@ int main() {
     physxManager  = createPhysxManager(device, sceneDesc);
     
     game = new Game(smgr, soundEngine, physxManager, effect);
-    //create room mesh from asset
-	IMesh* room = smgr->getMesh("media/level/kitchen retex final.b3d")->getMesh(0);
-	
-	//IMesh* room = smgr->getMesh("media/temp.b3d")->getMesh(0);
-	//create scene node for mesh and place
-	roomnode = smgr->addMeshSceneNode(room,0,-1,vector3df(0,0,0),vector3df(0,0,0));
-	//roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
-	
-	//scale to proper size
-	vector3df roomScale(1200.0f,1200.0f,1200.0f);
-	roomnode->setScale(vector3df(roomScale));
-	for (u32 i = 0; i < roomnode->getMaterialCount(); i++) {
-	    roomnode->getMaterial(i).Lighting = true;
-	}
-	
-	
-	
-	//normalize mesh's normals as it has been scaled
-	roomnode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-    //effect->addShadowToNode(roomnode, EFT_NONE, ESM_BOTH);
-    //effect->addNodeToDepthPass(roomnode);
-    //effect->addEffectToNode(roomnode,(E_EFFECT_TYPE)0);
-    //effect->addEffectToNode(roomnode, (E_EFFECT_TYPE)0);
-#ifdef DEBUG	
-	scene::ITriangleSelector* selector = 0;
-    selector = smgr->createTriangleSelector(room,roomnode);
 
-    printf("%d\n",room->getMeshBufferCount());	
-#endif //DEBUG   
-    //get the mesh buffers of the mesh and create physics representation
-    for (u32 i = 0 ; i < room->getMeshBufferCount(); i++) {
-        //first calculate the mesh triangles and make physx object
-        //IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(1.0f,1.0f,1.0f));
-        IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), roomScale);
-        //secondly add the object to the world
-        physxManager->createTriangleMeshObject(triMesh,vector3df(0.0f,0.0f,0.0f));
-    }
     //remove cursor from view
 	device->getCursorControl()->setVisible(false);
+	
 #ifdef DEBUG
     video::SMaterial lineMaterial;
     lineMaterial.Lighting = false;
@@ -503,6 +256,7 @@ int main() {
     video::SMaterial triMaterial;
     triMaterial.Lighting = false;
 #endif //DEBUG
+
     //add crosshair to centre of screen (64x64 image so -32)
     guienv->addImage(driver->getTexture("media/crosshair2.png"), core::position2di(resolution.Width/2-32,resolution.Height/2-32));
     
@@ -538,9 +292,6 @@ int main() {
     //set gravity to a ridiculous amount due to scale
     core::vector3df gravity = vector3df(0.0f, -98.1f, 0.0f);
     physxManager->setGravity(gravity);
-#ifdef DEBUG    
-    std::cout << gravity.X << " " << gravity.Y << " " << gravity.Z << std::endl;
-#endif //DEBUG  
     
 //TODO: FIX PHYSICS MESHING BUG, BANDAID FIX BELOW BY SENDING FIRST SPAWN OFF MAP
     game->spawnManager->DIRTYMESHFIX();
@@ -548,7 +299,6 @@ int main() {
     //set black clear colour
     effect->setClearColour(SColor(255, 0, 0, 0));
     effect->setAmbientColor(SColor(255, 32, 32, 32));
-    //smgr->setAmbientLight(video::SColorf(0.3,0.3,0.3,1));
     //TODO: REDO LIGHTING, THIS WILL DO FOR PROTOTYPE
     ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
     light->setLightType(ELT_POINT);
@@ -564,10 +314,6 @@ int main() {
 	effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon.hlsl"));
     game->RestartLevel();
 	
-#ifdef SMGRDEBUG
-	scene::ISceneNode* selectedSceneNode =0;
-	scene::ISceneNode* lastSelectedSceneNode =0;
-#endif //SMGRDEBUG
     //set pre-loop data
 	int lastFPS = -1;
     s32 lastTime = device->getTimer()->getTime();
@@ -577,7 +323,6 @@ int main() {
 		{
 		    //find time between renders
             s32 timeNow = device->getTimer()->getTime();
-            //std::cout << timeNow << std::endl;
             s32 elapsedTime = timeNow - lastTime;
             lastTime = timeNow;
                     
@@ -592,12 +337,9 @@ int main() {
 		    game->Update(elapsedTime);
             //start drawing
 			driver->beginScene(true, true, video::SColor(255,200,200,200));
-#ifndef OLDSMGR			
+	
 			effect->update();
-#endif //OLDSMGR		
-#ifdef OLDSMGR //not required with the use of XEffects	
-			smgr->drawAll();
-#endif //OLDSMGR
+	
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
 #endif // DEBUG
@@ -635,22 +377,6 @@ int main() {
                 driver->draw3DLine(intersection, lineEnd, video::SColor(255,0,0,255));
                 }
 #endif //PHYSDEBUG
-#ifdef SMGRDEBUG
-            //old smgr code for lighting node that is under cursor; debug purposes only
-			selectedSceneNode =
-				smgr->getSceneCollisionManager()->getSceneNodeFromCameraBB(camera);
-
-			if (lastSelectedSceneNode)
-				lastSelectedSceneNode->setMaterialFlag(video::EMF_LIGHTING, true);
-
-			if (selectedSceneNode == roomnode || selectedSceneNode == bill)
-				selectedSceneNode = 0;
-
-			if (selectedSceneNode)
-				selectedSceneNode->setMaterialFlag(video::EMF_LIGHTING, false);
-
-			lastSelectedSceneNode = selectedSceneNode;
-#endif //SMGRDEBUG
             //done rendering
 			driver->endScene();
 
@@ -670,9 +396,6 @@ int main() {
 		else
 			device->yield();
 	}
-#ifdef DEBUG
-	selector->drop();
-#endif //DEBUG
 	device->drop();
 	return 0;
 }

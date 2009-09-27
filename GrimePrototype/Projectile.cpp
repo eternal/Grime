@@ -82,7 +82,6 @@ void Projectile::Update( s32 time )
 	                }
 	            }
 	        }
-	        std::cout << (E_OBJECT_TYPE)closestObject.Object->getType() << std::endl;
 	        if (closestObject.Object)
 	        {
 	            if (closestObject.Object->getType() != EOT_SPHERE)

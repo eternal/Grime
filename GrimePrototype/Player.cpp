@@ -76,7 +76,6 @@ void Player::SetWeapon(u32 weapon)
 }
 void Player::WeaponSelect(f32 delta) 
 {
-   // std::cout << delta << std::endl;
     if (delta > 0.0f)
     {
         f32 tempDelta = delta;
@@ -106,7 +105,6 @@ void Player::WeaponSelect(f32 delta)
         }
         
     }    
-    std::cout << currentWeapon << std::endl;
     this->SetWeapon(currentWeapon);
 }
 int Player::GetWeapon()

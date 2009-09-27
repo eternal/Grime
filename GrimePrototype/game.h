@@ -38,6 +38,8 @@ public:
     core::array<Projectile*> projectileObjects;
     SpawnManager* spawnManager;
     SPhysxAndCameraPair* cameraPair;
+    ISceneNode* roomnode;
+    IMesh* room;
     
     core::array<video::ITexture*> explosionTextures;
     core::array<video::ITexture*> impactTextures;
@@ -53,5 +55,7 @@ public:
     
     s32 GetRandom(s32 upper);
     void RestartLevel();
+    void WeaponFire();
+    SPhysxAndNodePair* CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity);
 };
 

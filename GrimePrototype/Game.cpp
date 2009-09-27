@@ -6,6 +6,30 @@ Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxM
     this->soundEngine = soundEngine;
     this->physxManager = physxManager;
     this->effect = effect;
+    room = smgr->getMesh("media/level/kitchen retex final.b3d")->getMesh(0);
+    
+    //create scene node for mesh and place
+    roomnode = smgr->addMeshSceneNode(room,0,-1,vector3df(0,0,0),vector3df(0,0,0));
+    //roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
+
+    //scale to proper size
+    vector3df roomScale(1200.0f,1200.0f,1200.0f);
+    roomnode->setScale(vector3df(roomScale));
+    for (u32 i = 0; i < roomnode->getMaterialCount(); i++) {
+        roomnode->getMaterial(i).Lighting = true;
+    }
+    
+    //normalize mesh's normals as it has been scaled
+    roomnode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+    
+    //get the mesh buffers of the mesh and create physics representation
+    for (u32 i = 0 ; i < room->getMeshBufferCount(); i++) {
+        //first calculate the mesh triangles and make physx object
+        //IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(1.0f,1.0f,1.0f));
+        IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), roomScale);
+        //secondly add the object to the world
+        physxManager->createTriangleMeshObject(triMesh,vector3df(0.0f,0.0f,0.0f));
+    }
     
     startPosition = vector3df(0.0f,20.0f,0.0f);
     this->CreateCamera();
@@ -26,6 +50,18 @@ Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxM
 
 Game::~Game(void)
 {
+}
+
+// Creates a sphere at the specified position, of the specified size and with the specified intial velocity (useful for throwing it)
+SPhysxAndNodePair* Game::CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity) {
+
+    SPhysxAndNodePair* pair = new SPhysxAndNodePair;
+    pair->PhysxObject = physxManager->createSphereObject(pos, core::vector3df(0,0,0), radius, density, initialVelocity);
+    pair->SceneNode = smgr->addSphereSceneNode(radius, 12, 0, -1, pos, core::vector3df(0, 0, 0), core::vector3df(1.0f, 1.0f, 1.0f));
+    //pair->SceneNode->setMaterialTexture(0, driver->getTexture(textures[rand()%NUM_TEXTURES]));
+    pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true); 
+    return pair;
+
 }
 
 void Game::CreateCamera() {
@@ -182,7 +218,132 @@ void Game::RestartLevel() {
     spawnManager->timeBetweenSpawns = 2500;
     player->health = 100;
 }
+void Game::WeaponFire()
+{
+    if (!(player->CurrentWeaponOnCooldown()))
+    {
+        CreateMuzzleFlash();
+        player->AddCoolDown();
+        std::cout << "Fire" << std::endl;
+        if (player->GetWeapon() == WEAPON_BLOCKGUN)
+        {
+            Block* block = new Block(smgr, physxManager, &enemyObjects);
+            blockObjects.push_back(block);
+        }
+        else if (player->GetWeapon() == WEAPON_PISTOL)
+        {
+            // Perform a raycast to find the objects we just shot at
+            core::line3df line;
+            line.start = cameraPair->camera->getPosition();
+            //put the end of the line off in the distance
+            line.end = line.start + (cameraPair->camera->getTarget() - line.start).normalize() * 5000.0f;
+            //access the physics engine to find the intersection point
+            core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
+            //core::array<SRaycastHitData> filteredRayArray;
+            SRaycastHitData closestObject;
+            if (rayArray.size() > 0)
+            {
+                closestObject = rayArray[0];
+                for (u32 i = 0; i < rayArray.size(); ++i) 
+                {
+                    SRaycastHitData ray = rayArray[i];
+                    if (ray.Object->getType() != EOT_SPHERE)
+                    {
+                        f32 dis = (ray.HitPosition - line.start).getLength();
+                        f32 dis2 = (closestObject.HitPosition - line.start).getLength();
+                        std::cout << "Test Distance: " << dis << std::endl;
+                        std::cout << "Current Closest: " << dis2 << std::endl;
+                        if (dis < dis2) {
+                            closestObject = ray;
+                        }
+                    }
+                }
+            }
+            std::cout << "===========" << std::endl;
+            IPhysxObject* objectHit = closestObject.Object;
+            //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
+            if (objectHit) {
+                //check for collisions with any of the types of bounding boxes the enemies use
+                //TO REFACTOR, PLACE IN GAME CLASS
+                if (objectHit->getType() == EOT_CONVEX_MESH || objectHit->getType() == EOT_BOX || objectHit->getType() == EOT_SPHERE) 
+                {
+                    for (u32 i = 0 ; i < enemyObjects.size() ; ++i) 
+                    {  // check it against the objects in our array to see if it matches
+                        if (enemyObjects[i]->pair->PhysxObject == objectHit) {
+                            Enemy* enemy = enemyObjects[i];
+                            //add small pushback and texture explosion
+                            s32 chance = GetRandom(4);
+                            if (chance == 4) // 1/4 chance
+                            {
+                                enemy->health--;
+                            }
+                            else
+                            {
+                                enemy->health -= 0.5;
+                            }
 
+                            if (enemy->IsStillAlive())
+                            {
+                                CreateImpactEffect(closestObject.HitPosition,closestObject.SurfaceNormal);
+                                std::cout << enemy->health << " health left" << std::endl;
+                            }
+                            else
+                            {
+                                CreateExplosion(closestObject.HitPosition);   
+                                //kill enemy
+                                //remove from arrays and memory                         
+                                physxManager->removePhysxObject(enemy->pair->PhysxObject);
+                                enemy->pair->SceneNode->remove();
+                                delete enemy;
+                                enemyObjects.erase(i);  
+                            }
+                            break;
+                        }
+                    }	
+                }                    
+                //// If it's a sphere we blow it up
+                //else if (objectHit->getType() == EOT_SPHERE) 
+                //{
+                //    for (u32 i = 0 ; i < objects.size() ; ++i) 
+                //    {  // check it against the objects in our array to see if it matches
+                //        if (objects[i]->PhysxObject == objectHit) {
+                //            core::vector3df pos;
+                //            objects[i]->PhysxObject->getPosition(pos);
+                //            createExplosion(pos);
+                //            objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
+                //            //physxManager->removePhysxObject(objects[i]->PhysxObject);
+                //            //objects[i]->SceneNode->remove();
+                //            //delete objects[i];
+                //            //objects.erase(i);
+                //            break;
+                //        }
+                //    }	
+                //}
+                //for any other objects except for the camera
+                else if (objectHit != cameraPair->PhysxObject) 
+                {
+                    objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
+                    CreateImpactEffect(closestObject.HitPosition, closestObject.SurfaceNormal);
+                    //physxManager->createExplosion(closestObject.HitPosition, 100.0f, 300000000.0f, 100000000000.0f, 0.2f);
+                }
+            }
+        }
+        else if (player->GetWeapon() == WEAPON_RPG)
+        {
+            core::vector3df t = cameraPair->camera->getPosition();
+            core::vector3df vel = cameraPair->camera->getTarget() - cameraPair->camera->getPosition();
+            vel.normalize();
+            t = t + vel * 20.0f;
+            vel*=1000.0f;
+
+            projectileObjects.push_back(new Projectile(smgr,soundEngine,physxManager, CreateSphere(t, 10.0f, 1000.0f, &vel), &projectileObjects, explosionTextures, &enemyObjects));
+        }
+        else if (player->GetWeapon() == WEAPON_CLOSE)
+        {
+            physxManager->createExplosion(player->pair->SceneNode->getAbsolutePosition(), 100.0f, 300000000.0f, 100000000000.0f, 1.0f);
+        }
+    }
+}
 //simple random number function
 s32 Game::GetRandom(s32 upper) {
     return (rand() % upper) + 1;

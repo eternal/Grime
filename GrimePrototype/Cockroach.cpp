@@ -41,7 +41,6 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
     // pair->SoundNode->setMinMaxSoundDistance(1.0f);
 
     u32 randNum = (rand() % 300) + 1;
-    std::cout << randNum << std::endl;
     sound = soundEngine->play3D("media/sounds/InsectWalk1.wav", this->pair->SceneNode->getAbsolutePosition(), true, false, true);
     sound->setMinDistance(100.0f);
     sound->setMaxDistance(500.0f);
