@@ -18,6 +18,12 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     {
         weaponCooldown[i] = 0;
     }
+    
+    //preload meshes
+    smgr->getMesh("media/gun3.obj");
+    smgr->getMesh("media/RPG1.obj");
+    smgr->getMesh("media/weapon.obj");
+    
     //pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/RPG1.obj")->getMesh(0), pair->SceneNode);
     SetWeapon(currentWeapon);
 }
@@ -34,7 +40,16 @@ void Player::SetWeapon(u32 weapon)
         //if node already exists (99% of times) remove it as it will be replaced
         pair->gun->remove();
     }
-    if (weapon == WEAPON_CLOSE)
+    if (weapon == WEAPON_BLOCKGUN)
+    {
+        pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/gun3.obj")->getMesh(0), pair->SceneNode);
+        pair->gun->setPosition(core::vector3df(4.5f,-10.2f,10.0f));
+        pair->gun->setRotation(core::vector3df(35.0f,90.0,90.0f));
+        pair->gun->setScale(core::vector3df(0.5f,0.5f,0.3f));
+        pair->gun->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);  
+        pair->gun->setVisible(false);
+    }
+    else if (weapon == WEAPON_CLOSE)
     {
         //pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/gun3.obj")->getMesh(0));
         pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/gun3.obj")->getMesh(0), pair->SceneNode);
@@ -62,7 +77,7 @@ void Player::SetWeapon(u32 weapon)
 }
 void Player::WeaponSelect(s32 delta) 
 {
-    std::cout << delta << std::endl;
+   // std::cout << delta << std::endl;
     if (delta > 0)
     {
         int tempDelta = delta;
@@ -123,7 +138,10 @@ void Player::AddCoolDown()
     {
         this->weaponCooldown[WEAPON_CLOSE] = 10000;
     }
-
+    else if (this->currentWeapon == WEAPON_BLOCKGUN)
+    {
+        this->weaponCooldown[WEAPON_BLOCKGUN] = 2000;
+    }
 }
 s32 Player::CurrentCooldown()
 {
