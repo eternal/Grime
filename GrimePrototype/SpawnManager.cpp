@@ -21,7 +21,7 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     cockroachMesh = smgr->getMesh("media/cockroack_rigged_a02.x");
     spiderMesh = smgr->getMesh("media/spiderupdated.x");
     ratMesh = smgr->getMesh("media/rat.x");
-    beetleMesh = smgr->getMesh("media/beetle.x");
+    beetleMesh = smgr->getMesh("media/beetle2.x");
 }
 SpawnManager::~SpawnManager(void)
 {
