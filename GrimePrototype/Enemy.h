@@ -21,7 +21,7 @@ class Enemy : public entity
 {
     public:
         Enemy(void);
-        Enemy(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<SPhysxAndNodePair*>* objectArray, Player* player, vector3df position = vector3df(-501.0f,100.0f,-230.0f));
+        Enemy(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* objectArray, Player* player, vector3df position = vector3df(-501.0f,100.0f,-230.0f));
         ~Enemy(void);
         
         //physics pair
@@ -32,13 +32,13 @@ class Enemy : public entity
         IPhysxManager* physxMan;
         scene::IAnimatedMeshSceneNode* node;
         
-        core::array<SPhysxAndNodePair*>* objects;        
+        core::array<Enemy*>* enemyArray;        
         ISound* sound;
         
         Player* target;
         u16 strength;
         f32 speed;
-        u16 health;
+        f32 health;
         
         bool active;
         bool attackPhase;

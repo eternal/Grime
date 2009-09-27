@@ -37,6 +37,10 @@ class Player : public entity
         void Update(s32 time);
         void SetWeapon(u32 weapon);
         void WeaponSelect(s32 delta);
+        int GetWeapon();
+        bool CurrentWeaponOnCooldown();
+        void AddCoolDown();
+        s32 CurrentCooldown();
         
         //store local references to required data        
         scene::ISceneManager* smgr;
@@ -48,6 +52,7 @@ class Player : public entity
         
         irrklang::ISound* sound;
         s32 currentWeapon;   
+        s32 weaponCooldown[NUMBER_OF_WEAPONS];
         
         s32 health;
 };

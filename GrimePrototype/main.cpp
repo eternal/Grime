@@ -4,7 +4,7 @@
 //=============================================================================
 #define DEBUG 1
 //#define FULLSCREEN 1
-#define NOSPAWN 1
+//#define NOSPAWN 1
 //#define OLDSMGR 1 
 #include <irrlicht.h>
 #include <iostream>
@@ -21,6 +21,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Cockroach.h"
+#include "Projectile.h"
 
 using namespace irr;
 using namespace core;
@@ -62,6 +63,7 @@ f32 objectDensity = 50;
 //globals for player and enemy array
 Player* player;
 core::array<Enemy*> enemyObjects;
+core::array<Projectile*> projectileObjects;
 //global for the enemy mesh
 //TODO: CLEAN 
 IAnimatedMesh* mesh;
@@ -83,18 +85,30 @@ vector3df startPosition;
 
 //simple random number function
 s32 getRandom(s32 upper) {
-    srand((unsigned)time(0));
     return (rand() % upper) + 1;
+}
+
+// Creates a sphere at the specified position, of the specified size and with the specified intial velocity (useful for throwing it)
+SPhysxAndNodePair* createSphere(IPhysxManager* physxManager, scene::ISceneManager* smgr, video::IVideoDriver* driver, const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity) {
+
+    SPhysxAndNodePair* pair = new SPhysxAndNodePair;
+    pair->PhysxObject = physxManager->createSphereObject(pos, core::vector3df(0,0,0), radius, density, initialVelocity);
+    pair->SceneNode = smgr->addSphereSceneNode(radius, 12, 0, -1, pos, core::vector3df(0, 0, 0), core::vector3df(1.0f, 1.0f, 1.0f));
+    //pair->SceneNode->setMaterialTexture(0, driver->getTexture(textures[rand()%NUM_TEXTURES]));
+    pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true); 
+
+    return pair;
+
 }
 
 //Temporary spawning function to streamline spawning of enemies
 void SpawnSpider() {
-    Enemy* enemy = new Enemy(smgr, soundEngine, mesh, physxManager, &objects, player);
+    Enemy* enemy = new Enemy(smgr, soundEngine, mesh, physxManager, &enemyObjects, player);
     enemyObjects.push_back(enemy);
 }
 
 void SpawnSpiderCustom(vector3df position) {
-    Enemy* enemy = new Cockroach(smgr, soundEngine, mesh, physxManager, &objects, player, position);
+    Enemy* enemy = new Cockroach(smgr, soundEngine, mesh, physxManager, &enemyObjects, player, position);
     enemyObjects.push_back(enemy);
 }
 
@@ -371,8 +385,16 @@ public:
                         enemy->pair->SceneNode->remove();
                         delete enemy;
                     }
+                    for (u32 i = 0; i < projectileObjects.size(); i++)
+                    {
+                        Projectile* proj = projectileObjects[i];
+                        physxManager->removePhysxObject(proj->pair->PhysxObject);
+                        proj->pair->SceneNode->remove();
+                        delete proj;
+                    }
                     enemyObjects.clear();
                     objects.clear();
+                    projectileObjects.clear();
                     break;
                 case KEY_KEY_I:
                     RestartLevel();
@@ -427,6 +449,126 @@ public:
         else if (event.EventType == EET_MOUSE_INPUT_EVENT) {
             bool mouseLeftPressedDown = false;
             bool mouseRightPressedDown = false;
+            if (event.MouseInput.isLeftPressed())
+            {
+                if (!(player->CurrentWeaponOnCooldown()))
+                {
+                    std::cout << "Fire" << std::endl;
+                    if (player->GetWeapon() == WEAPON_PISTOL)
+                    {
+                        // Perform a raycast to find the objects we just shot at
+                        core::line3df line;
+                        line.start = camera->getPosition();
+                        //put the end of the line off in the distance
+                        line.end = line.start + (camera->getTarget() - line.start).normalize() * 5000.0f;
+                        //access the physics engine to find the intersection point
+                        core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
+                        //core::array<SRaycastHitData> filteredRayArray;
+                        SRaycastHitData closestObject;
+                        closestObject = rayArray[0];
+                        for (u32 i = 0; i < rayArray.size(); ++i) {
+                            SRaycastHitData ray = rayArray[i];
+                            if (ray.Object->getType() != EOT_SPHERE)
+                            {
+                                f32 dis = (ray.HitPosition - line.start).getLength();
+                                f32 dis2 = (closestObject.HitPosition - line.start).getLength();
+                                std::cout << "Test Distance: " << dis << std::endl;
+                                std::cout << "Current Closest: " << dis2 << std::endl;
+                                if (dis < dis2) {
+                                    closestObject = ray;
+                                }
+                            }
+                        }
+                        player->AddCoolDown();
+                        std::cout << "===========" << std::endl;
+                        IPhysxObject* objectHit = closestObject.Object;
+                        //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
+                        if (objectHit) {
+                            //check for collisions with any of the types of bounding boxes the enemies use
+                            //TO REFACTOR, PLACE IN GAME CLASS
+                            if (objectHit->getType() == EOT_CONVEX_MESH || objectHit->getType() == EOT_BOX || objectHit->getType() == EOT_SPHERE) 
+                            {
+                                for (u32 i = 0 ; i < enemyObjects.size() ; ++i) 
+                                {  // check it against the objects in our array to see if it matches
+                                    if (enemyObjects[i]->pair->PhysxObject == objectHit) {
+                                        Enemy* enemy = enemyObjects[i];
+                                        //add small pushback and texture explosion
+                                        s32 chance = getRandom(4);
+                                        if (chance == 4) // 1/4 chance
+                                        {
+                                            enemy->health--;
+                                        }
+                                        else
+                                        {
+                                            enemy->health -= 0.5;
+                                        }
+
+                                        if (enemy->IsStillAlive())
+                                        {
+                                            createImpactEffect(closestObject.HitPosition,closestObject.SurfaceNormal);
+                                            std::cout << enemy->health << " health left" << std::endl;
+                                        }
+                                        else
+                                        {
+                                            createExplosion(closestObject.HitPosition);   
+                                            //kill enemy
+                                            //remove from arrays and memory                         
+                                            physxManager->removePhysxObject(enemy->pair->PhysxObject);
+                                            enemy->pair->SceneNode->remove();
+                                            delete enemy;
+                                            enemyObjects.erase(i);  
+                                        }
+                                        break;
+                                    }
+                                }	
+                            }  
+    #ifdef DEBUG                    
+                            // If it's a sphere we blow it up
+                            else if (objectHit->getType() == EOT_SPHERE) 
+                            {
+                                for (u32 i = 0 ; i < objects.size() ; ++i) 
+                                {  // check it against the objects in our array to see if it matches
+                                    if (objects[i]->PhysxObject == objectHit) {
+                                        core::vector3df pos;
+                                        objects[i]->PhysxObject->getPosition(pos);
+                                        createExplosion(pos);
+                                        objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
+                                        //physxManager->removePhysxObject(objects[i]->PhysxObject);
+                                        //objects[i]->SceneNode->remove();
+                                        //delete objects[i];
+                                        //objects.erase(i);
+                                        break;
+                                    }
+                                }	
+                            }
+                            //for any other objects except for the camera
+                            else if (objectHit != cameraPair->PhysxObject) 
+                            {
+                                objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
+                                createImpactEffect(closestObject.HitPosition, closestObject.SurfaceNormal);
+                                //physxManager->createExplosion(closestObject.HitPosition, 100.0f, 300000000.0f, 100000000000.0f, 0.2f);
+                            }
+                        }
+                    }
+                    else if (player->GetWeapon() == WEAPON_RPG)
+                    {
+                        player->AddCoolDown();
+                        core::vector3df t = camera->getPosition();
+                        core::vector3df vel = camera->getTarget() - camera->getPosition();
+                        vel.normalize();
+                        t = t + vel * 20.0f;
+                        vel*=1000.0f;
+
+                        projectileObjects.push_back(new Projectile(smgr,soundEngine,physxManager, createSphere(physxManager, smgr, driver, t, 10.0f, 1000.0f, &vel), &projectileObjects, explosionTextures, &enemyObjects));
+                    }
+                    else if (player->GetWeapon() == WEAPON_CLOSE)
+                    {
+                        player->AddCoolDown();
+                        physxManager->createExplosion(player->pair->SceneNode->getAbsolutePosition(), 100.0f, 300000000.0f, 100000000000.0f, 1.0f);
+                    }
+                }
+                
+            }
             switch (event.MouseInput.Event) {
                 case EMIE_MOUSE_WHEEL: {
                     player->WeaponSelect(event.MouseInput.Wheel);
@@ -434,91 +576,10 @@ public:
                 break;
                 //shoot
                 case EMIE_LMOUSE_PRESSED_DOWN: {
-                    mouseLeftPressedDown = true;
-                    // Perform a raycast to find the objects we just shot at
-                    core::line3df line;
-                    line.start = camera->getPosition();
-                    //put the end of the line off in the distance
-                    line.end = line.start + (camera->getTarget() - line.start).normalize() * 5000.0f;
-                    //access the physics engine to find the intersection point
-                    core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
-                    //core::array<SRaycastHitData> filteredRayArray;
-                    SRaycastHitData closestObject;
-                    closestObject = rayArray[0];
-                    for (u32 i = 0; i < rayArray.size(); ++i) {
-                        SRaycastHitData ray = rayArray[i];
-                        if (ray.Object->getType() != EOT_SPHERE)
-                        {
-                            f32 dis = (ray.HitPosition - line.start).getLength();
-                            f32 dis2 = (closestObject.HitPosition - line.start).getLength();
-                            std::cout << "Test Distance: " << dis << std::endl;
-                            std::cout << "Current Closest: " << dis2 << std::endl;
-                            if (dis < dis2) {
-                                closestObject = ray;
-                            }
-                        }
-                    }
-                    std::cout << "===========" << std::endl;
-                    IPhysxObject* objectHit = closestObject.Object;
-                    //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
-                    if (objectHit) {
-                        //check for collisions with any of the types of bounding boxes the enemies use
-                        //TO REFACTOR, PLACE IN GAME CLASS
-                        if (objectHit->getType() == EOT_CONVEX_MESH || objectHit->getType() == EOT_BOX || objectHit->getType() == EOT_SPHERE) 
-                        {
-                            for (u32 i = 0 ; i < enemyObjects.size() ; ++i) 
-                            {  // check it against the objects in our array to see if it matches
-                                if (enemyObjects[i]->pair->PhysxObject == objectHit) {
-                                    Enemy* enemy = enemyObjects[i];
-                                    //add small pushback and texture explosion
-                                    enemy->health--; ///TODO ADD WEAPON CODE HERE
-                                    if (enemy->IsStillAlive())
-                                    {
-                                        createImpactEffect(closestObject.HitPosition,closestObject.SurfaceNormal);
-                                    }
-                                    else
-                                    {
-                                        createExplosion(closestObject.HitPosition);   
-                                        //kill enemy
-                                        //remove from arrays and memory                         
-                                        physxManager->removePhysxObject(enemy->pair->PhysxObject);
-                                        enemy->pair->SceneNode->remove();
-                                        delete enemy;
-                                        enemyObjects.erase(i);  
-                                    }
-                                    break;
-                                }
-                            }	
-                        }  
-#ifdef DEBUG                    
-                        // If it's a sphere we blow it up
-                        else if (objectHit->getType() == EOT_SPHERE) 
-                        {
-                            for (u32 i = 0 ; i < objects.size() ; ++i) 
-                            {  // check it against the objects in our array to see if it matches
-                                if (objects[i]->PhysxObject == objectHit) {
-                                    core::vector3df pos;
-                                    objects[i]->PhysxObject->getPosition(pos);
-                                    createExplosion(pos);
-                                    objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
-                                    //physxManager->removePhysxObject(objects[i]->PhysxObject);
-                                    //objects[i]->SceneNode->remove();
-                                    //delete objects[i];
-                                    //objects.erase(i);
-                                    break;
-                                }
-                            }	
-                        }
-                        //for any other objects except for the camera
-                        else if (objectHit != cameraPair->PhysxObject) 
-                        {
-                            objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
-                            createImpactEffect(closestObject.HitPosition, closestObject.SurfaceNormal);
-                            //physxManager->createExplosion(closestObject.HitPosition, 30000.0f, 10000000.0f, 10000000.0f, 1.0f);
-                        }
+                    
                         
 #endif //DEBUG                     
-                    }
+                    
                 }
                 break;
                 case EMIE_LMOUSE_LEFT_UP: {
@@ -604,6 +665,10 @@ int main() {
     smgr = device->getSceneManager();
     guienv = device->getGUIEnvironment();
     soundEngine  = irrklang::createIrrKlangDevice();
+    
+    //seed random numbers
+    srand((unsigned)time(0));
+    
     //soundEngine->setSoundVolume(1.0f);
     if (!soundEngine || !driver || !smgr || !guienv)
         return 1; //fatal error
@@ -688,6 +753,11 @@ int main() {
     gui::IGUIStaticText* health = guienv->addStaticText(L"100", core::rect<s32>(75,58,400,200));
     textHealth->setOverrideColor(video::SColor(255,255,255,255));
     health->setOverrideColor(video::SColor(255,255,255,255));
+    
+    gui::IGUIStaticText* textCooldown = guienv->addStaticText(L"Cooldown: ", rect<s32>(5,78,400,200));
+    gui::IGUIStaticText* cooldown = guienv->addStaticText(L"Cooldown", rect<s32>(105,78,400,200));
+    textCooldown->setOverrideColor(SColor(255,255,255,255));
+    cooldown->setOverrideColor(SColor(255,255,255,255));
     // Preload texture animators
     // TODO: CLEAN and use particles instead of animated textures
     // just for prototype only
@@ -720,7 +790,7 @@ int main() {
     player = new Player(smgr, soundEngine, mesh, physxManager, cameraPair, &objects, effect);
     
 //TODO: FIX PHYSICS MESHING BUG, BANDAID FIX BELOW BY SENDING FIRST SPAWN OFF MAP
-    enemyObjects.push_back( new Enemy(smgr, soundEngine, mesh, physxManager, &objects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
+    enemyObjects.push_back( new Enemy(smgr, soundEngine, mesh, physxManager, &enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
 #ifdef DEBUG    
     //temporary testing etc
     //enemyObjects.push_back( new Enemy(smgr, mesh, physxManager, &objects, player, vector3df(0.0f, 306.0f, 0.0f)));
@@ -789,9 +859,7 @@ int main() {
 		    physxManager->fetchResults();
 		    //update scene objects related to physics
             for (u32 i = 0 ; i < objects.size() ; i++) 
-                objects[i]->updateTransformation();
-            for (u32 i = 0; i < enemyObjects.size(); i++)
-                enemyObjects[i]->pair->updateTransformation();                
+                objects[i]->updateTransformation();              
             cameraPair->updateTransformation();
             
             //begin update routines
@@ -799,6 +867,10 @@ int main() {
 		    for (u32 i = 0; i < enemyObjects.size(); i++) {
 		        enemyObjects[i]->Update(elapsedTime);
 		        //effect->addEffectToNode(enemyObjects[i]->pair->SceneNode,(E_EFFECT_TYPE)5);
+		    }
+		    for (u32 i = 0; i < projectileObjects.size(); i++)
+		    {
+		        projectileObjects[i]->Update(elapsedTime);
 		    }
             //start drawing
 			driver->beginScene(true, true, video::SColor(255,200,200,200));
@@ -813,12 +885,14 @@ int main() {
 #endif // DEBUG
             // Render the GUI
             //_itow(timeBetweenSpawns, temp, 10);
-            core::stringw strTime, strHealth = "";
+            core::stringw strTime, strHealth, strCooldown = "";
             strTime += timeBetweenSpawns;
             strHealth += player->health;
+            strCooldown += player->CurrentCooldown();
             //_itow(player->health, temp2, 10);
             spawns->setText(strTime.c_str());
             health->setText(strHealth.c_str());
+            cooldown->setText(strCooldown.c_str());
             guienv->drawAll();
 
 #ifdef PHYSDEBUG

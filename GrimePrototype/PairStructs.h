@@ -61,6 +61,7 @@ struct SPhysxAndCameraPair : public SPhysxAndNodePair {
     core::vector3df CameraOffset;
     
     ISceneNode* gun;
+    ICameraSceneNode* camera;
 
     //called every update
     void updateTransformation() {

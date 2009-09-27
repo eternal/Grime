@@ -11,9 +11,13 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     this->pair = cameraPair;
     vector3df pos;
     this->pair->PhysxObject->getPosition(pos);
-    this->sound = soundEngine->play3D("media/sounds/Run1.wav", pos, true, false, true);
+    this->sound = soundEngine->play3D("media/sounds/Run1.wav", pos, true, true, true);
     health = 100;
     currentWeapon = WEAPON_PISTOL;
+    for (u32 i = 0; i < NUMBER_OF_WEAPONS; i++)
+    {
+        weaponCooldown[i] = 0;
+    }
     //pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/RPG1.obj")->getMesh(0), pair->SceneNode);
     SetWeapon(currentWeapon);
 }
@@ -21,7 +25,7 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
 Player::~Player(void)
 {
     sound->stop();
-    sound->drop();   
+    sound->drop();
 }
 void Player::SetWeapon(u32 weapon)
 {
@@ -45,7 +49,7 @@ void Player::SetWeapon(u32 weapon)
         pair->gun->setPosition(core::vector3df(1.5f,-3.2f,1.0f));
         pair->gun->setRotation(core::vector3df(0.0f,180.0,0.0f));
         pair->gun->setScale(core::vector3df(0.5f,0.5f,0.5f));
-        pair->gun->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true); 
+        pair->gun->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     }
     else if (weapon == WEAPON_RPG)
     {
@@ -91,9 +95,49 @@ void Player::WeaponSelect(s32 delta)
     std::cout << currentWeapon << std::endl;
     this->SetWeapon(currentWeapon);
 }
+int Player::GetWeapon()
+{
+    return currentWeapon;
+}
+bool Player::CurrentWeaponOnCooldown() 
+{
+    if (this->weaponCooldown[currentWeapon] <= 0.0f)
+    {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+void Player::AddCoolDown() 
+{
+    if (this->currentWeapon == WEAPON_PISTOL)
+    {
+        this->weaponCooldown[WEAPON_PISTOL] = 250;
+    }
+    else if (this->currentWeapon == WEAPON_RPG)
+    {
+        this->weaponCooldown[WEAPON_RPG] = 3000;
+    }
+    else if (this->currentWeapon == WEAPON_CLOSE)
+    {
+        this->weaponCooldown[WEAPON_CLOSE] = 10000;
+    }
+
+}
+s32 Player::CurrentCooldown()
+{
+    return weaponCooldown[currentWeapon];
+}
 void Player::Update(s32 time) 
 {
-    
+    for (u32 i = 0; i < NUMBER_OF_WEAPONS; i++)
+    {
+        if (weaponCooldown[i] > 0.0f)
+        {
+            weaponCooldown[i] -= time;
+        }
+    }
     vector3df pos, rot;
     pair->PhysxObject->getPosition(pos);
     pair->PhysxObject->getRotation(rot);
