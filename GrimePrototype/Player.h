@@ -28,16 +28,16 @@ enum WEAPONS
 };
 
 
-class Player : public entity
+class Player : public Entity
 {
     public:
-        Player(scene::ISceneManager* smgr, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, SPhysxAndCameraPair* cameraPair, core::array<SPhysxAndNodePair*>* objectArray, EffectHandler* effects);
+        Player(scene::ISceneManager* smgr, irrklang::ISoundEngine* soundEngine, IPhysxManager* manager, SPhysxAndCameraPair* cameraPair, core::array<SPhysxAndNodePair*>* objectArray, EffectHandler* effects);
         ~Player(void);
         
         //update is called every frame; perform game logic
         void Update(s32 time);
         void SetWeapon(u32 weapon);
-        void WeaponSelect(s32 delta);
+        void WeaponSelect(f32 delta);
         int GetWeapon();
         bool CurrentWeaponOnCooldown();
         void AddCoolDown();

@@ -1,11 +1,11 @@
 #include "entity.h"
-entity::entity() {
+Entity::Entity() {
 
 }
 
 //////////////////////////////////////////////////////////////////////////
 //TEMPORARY CODE
-entity::entity(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<SPhysxAndNodePair*>* objectArray)
+Entity::Entity(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<SPhysxAndNodePair*>* objectArray)
     {
         vector3df pos = vector3df(0.0f,100.0f,0.0f);
         vector3df rot = vector3df(0.0f,0.0f,0.0f);
@@ -28,6 +28,6 @@ entity::entity(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxMa
         objects->push_back(pair);
     }
 
-entity::~entity(void)
+Entity::~Entity(void)
     {
     }

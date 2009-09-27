@@ -4,7 +4,7 @@
 //=============================================================================
 #define DEBUG 1
 //#define FULLSCREEN 1
-//#define NOSPAWN 1
+#define NOSPAWN 1
 //#define OLDSMGR 1 
 #include <irrlicht.h>
 #include <iostream>
@@ -21,7 +21,12 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Cockroach.h"
+#include "Spider.h"
+#include "Beetle.h"
+#include "Rat.h" 
 #include "Projectile.h"
+#include "Block.h"
+#include "SpawnManager.h"
 
 using namespace irr;
 using namespace core;
@@ -58,28 +63,15 @@ core::array<SPhysxAndNodePair*> objects;
 //TO REFACTOR INTO GAME CLASS
 core::array<video::ITexture*> explosionTextures;
 core::array<video::ITexture*> impactTextures;
-//default object density as a global
-f32 objectDensity = 50;
 //globals for player and enemy array
 Player* player;
 core::array<Enemy*> enemyObjects;
+core::array<Block*> blockObjects;
 core::array<Projectile*> projectileObjects;
-//global for the enemy mesh
+
+SpawnManager* spawnManager = NULL;
 //TODO: CLEAN 
-IAnimatedMesh* mesh;
-s32 lastJumpTime = 0;
-s32 timeBetweenSpawns = 2500;
-s32 lastSpawn = 0;
 SKeyMap* keyMap;
-s32 currentShader = 0;
-s32 toonPPEffect = 0;
-s32 effectBloom = 0;
-s32 effectHighPass = 0;
-s32 effectBlur1 = 0;
-s32 effectBlur2 = 0;
-bool effectToggle = false;
-bool bloomToggle = false;
-s32 currentTime = 0;
 vector3df startPosition;
 
 
@@ -99,71 +91,6 @@ SPhysxAndNodePair* createSphere(IPhysxManager* physxManager, scene::ISceneManage
 
     return pair;
 
-}
-
-//Temporary spawning function to streamline spawning of enemies
-void SpawnSpider() {
-    Enemy* enemy = new Enemy(smgr, soundEngine, mesh, physxManager, &enemyObjects, player);
-    enemyObjects.push_back(enemy);
-}
-
-void SpawnSpiderCustom(vector3df position) {
-    Enemy* enemy = new Cockroach(smgr, soundEngine, mesh, physxManager, &enemyObjects, player, position);
-    enemyObjects.push_back(enemy);
-}
-
-//once the spawn timer ticks over, spawn another
-//TEMPORARY CODE
-void SpawnSpiderTimer() 
-{
-    //PROTOTYPE SPWAN POINTS
-    vector3df positionOne(-552.9f,28.0f,-339.166f);
-    vector3df positionTwo(-195.101f,28.0f,289.715f);
-    vector3df positionThree(131.92f,180.1f,-288.47f);
-    //fairly self explanatory, 1/5 chance to get 1 spider at a random point, 1/5 chance to get 2 spiders
-    // 1/5 chance to get 3 spiders, 2/5 chances for no spawn
-    int rand1 = getRandom(5);
-    if (rand1 == 1)
-    {
-        int rand2 = getRandom(3);
-        if (rand2 == 1)
-        {
-            SpawnSpiderCustom(positionOne);
-        }
-        if (rand2 == 2)
-        {
-            SpawnSpiderCustom(positionTwo);
-        }
-        if (rand2 == 3)
-        {
-            SpawnSpiderCustom(positionThree);
-        }
-    }
-    else if (rand1 == 2)
-    {
-        int rand2 = getRandom(3);
-        if (rand2 == 1)
-        {
-            SpawnSpiderCustom(positionOne);
-            SpawnSpiderCustom(positionTwo);
-        }
-        if (rand2 == 2)
-        {
-            SpawnSpiderCustom(positionOne);
-            SpawnSpiderCustom(positionThree);
-        }
-        if (rand2 == 3)
-        {
-            SpawnSpiderCustom(positionThree);
-            SpawnSpiderCustom(positionTwo);
-        }
-    }
-    else if (rand1 == 3)
-    {
-        SpawnSpiderCustom(positionOne);
-        SpawnSpiderCustom(positionTwo);
-        SpawnSpiderCustom(positionThree);
-    }
 }
 
 void RestartLevel() {
@@ -186,7 +113,7 @@ void RestartLevel() {
     player->pair->PhysxObject->setPosition(startPosition);
     player->pair->updateTransformation();
     
-    timeBetweenSpawns = 2500;
+    spawnManager->timeBetweenSpawns = 2500;
     player->health = 100;
 }
 
@@ -212,6 +139,31 @@ void createExplosion(const core::vector3df& position) {
     // create deletion animator to automatically remove the billboard
     anim = smgr->createDeleteAnimator(100*10);
     
+    bill->addAnimator(anim);
+    anim->drop();
+}
+void createMuzzleFlash() {
+#ifdef DEBUG
+    // Testing physics pushback
+   // physxManager->createExplosion(position, 100.0f, 500.0f, 200.0f, 1.0f);
+#endif
+    vector3df position(5.0f,-3.5f,20.0f);
+    scene::ISceneNodeAnimator* anim = NULL;
+    // create animation for explosion
+    anim = smgr->createTextureAnimator(explosionTextures, 10, false);
+    // create explosion billboard
+    
+    scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(smgr->getActiveCamera(), core::dimension2d<f32>(10,10), position);
+    // Setup the material
+    bill->setMaterialFlag(video::EMF_LIGHTING, false);
+    bill->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/explosion/01.jpg"));
+    bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+    // Add the animator
+    bill->addAnimator(anim);
+    anim->drop();
+    // create deletion animator to automatically remove the billboard
+    anim = smgr->createDeleteAnimator(10*10);
+
     bill->addAnimator(anim);
     anim->drop();
 }
@@ -254,6 +206,40 @@ void createImpactEffect(const core::vector3df& position, const core::vector3df& 
     deleteAnim->drop();
 }
 
+//simple function for adding a camera and creating a physics pair for the camera
+void CreateCamera() {
+    //WASD Keymap
+    keyMap = new SKeyMap[5];
+    keyMap[0].Action = EKA_MOVE_FORWARD;
+    keyMap[0].KeyCode = KEY_KEY_W;
+    keyMap[1].Action = EKA_MOVE_BACKWARD;
+    keyMap[1].KeyCode = KEY_KEY_S;
+    keyMap[2].Action = EKA_STRAFE_LEFT;
+    keyMap[2].KeyCode = KEY_KEY_A;
+    keyMap[3].Action = EKA_STRAFE_RIGHT;
+    keyMap[3].KeyCode = KEY_KEY_D;
+    keyMap[4].Action = EKA_JUMP_UP;
+    keyMap[4].KeyCode = KEY_SPACE;
+
+    //replace the pair if it exists (shouldnt happen)
+    if (cameraPair) delete cameraPair;
+    cameraPair = new SPhysxAndCameraPair;
+    //core::vector3df pos(75, 15, -10);
+    //SWITCHED from custom camera to internal for stability for prototype
+    //add the irrlicht fps camera scene node, modify the keymap to play with WASD
+    camera = smgr->addCameraSceneNodeFPS(NULL, 50, 0.1f, -1, keyMap, 4, true);
+    camera->setPosition(startPosition);
+    camera->setTarget(core::vector3df(0.0f,32.0f,5.0f));
+    //fill pair
+    cameraPair->SceneNode = camera;
+    vector3df physxStartPos = startPosition;
+    physxStartPos.Y += 100.0f;
+    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 15.0f, 30000.0f);
+    cameraPair->PhysxObject->setAngularDamping(1000.0f); // Stops the sphere from rolling
+    cameraPair->PreviousPosition = startPosition;
+    cameraPair->CameraOffset = core::vector3df(0,10,0);
+}
+
 //Event reciever class
 //Handle keyboard and mouse input
 //TODO: Move into own class file
@@ -266,10 +252,10 @@ public:
             switch (event.KeyInput.Key) {
 #ifdef DEBUG   
                 case KEY_ADD:
-                    timeBetweenSpawns+= 100;
+                    spawnManager->timeBetweenSpawns+= 100;
                     break;
                 case KEY_SUBTRACT:
-                    timeBetweenSpawns-= 100;
+                    spawnManager->timeBetweenSpawns-= 100;
                     break;
 #endif //DEBUG
                 case KEY_SPACE:
@@ -310,92 +296,78 @@ public:
                     driver->writeImageToFile(driver->createScreenShot(),"screenie.jpg",0);
                     break;
 #ifdef DEBUG
-                case KEY_KEY_F:
-                    //debug spawn enemy function
-                    SpawnSpider();
-                    std::cout << "Enemy count" << enemyObjects.size() << std::endl;
-                    break;
+                //case KEY_KEY_F:
+                //    //debug spawn enemy function
+                //    SpawnSpider();
+                //    std::cout << "Enemy count" << enemyObjects.size() << std::endl;
+                //    break;
+                case KEY_KEY_U:
+                    createMuzzleFlash();
+                break;
 #endif //DEBUG
                 case KEY_KEY_G: {
-                    core::line3df line;
-                    line.start = camera->getPosition();
-                    //put the end of the line off in the distance
-                    line.end = line.start + (camera->getTarget() - line.start).normalize() * 5000.0f;
-                    //access the physics engine to find the intersection point
-                    core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
-                    //core::array<SRaycastHitData> filteredRayArray;
-                    SRaycastHitData closestObject;
-                    closestObject = rayArray[0];
-                    for (u32 i = 0; i < rayArray.size(); ++i) {
-                        SRaycastHitData ray = rayArray[i];
-                        if (ray.Object->getType() == EOT_TRIANGLE_MESH)
-                        {
-                            f32 dis = (ray.HitPosition - line.start).getLength();
-                            f32 dis2 = (closestObject.HitPosition - line.start).getLength();
-                            std::cout << "Test Distance: " << dis << std::endl;
-                            std::cout << "Current Closest: " << dis2 << std::endl;
-                            if (dis < dis2) {
-                                closestObject = ray;
-                            }
-                        }
-                    }
-                    std::cout << "=========" << std::endl;
-                    if (closestObject.Object->getType() == EOT_TRIANGLE_MESH) {
-                        vector3df scale(1,1,1);
-                        vector3df rot(0,0,0);
-                        closestObject.HitPosition.Y += scale.Y / 2;
-                        
-                        vector3df blockPosition = closestObject.HitPosition;
-                        //Quantise block positions
-                        f32 blockPositionX = round_(blockPosition.X/30) * 30;
-                        f32 blockPositionZ = round_(blockPosition.Z/40) * 40;
-                        ///TODO FIX Y QUANTISE
-                        //f32 blockPositionY = round_(blockPosition.Y/30) * 30;
-                        blockPosition.X = blockPositionX;
-                        blockPosition.Z = blockPositionZ;
-                        vector3df blockPhysicsPosition = blockPosition;
-                        blockPhysicsPosition.Y -= scale.Y / 2;
-                        blockPhysicsPosition.X += scale.X / 6.25f;
-                        SPhysxAndNodePair* pair = new SPhysxAndNodePair;
-
-                        //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
-                        IMesh* cubeMesh = smgr->getMesh("media/block.obj");
-                        //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
-                        //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
-                        pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), blockPhysicsPosition);
-                        //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
-                        pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, blockPosition, rot, scale);
-                        pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
-                    }
+                    Block* block = new Block(smgr, physxManager, &enemyObjects);
+                    blockObjects.push_back(block);
                  }
                  break;               
-#ifdef DEBUG                    
-                case KEY_KEY_C:
-                    // DEBUG: Delete all objects
-                    for (u32 i = 0 ; i < objects.size() ; i++) {
-                        SPhysxAndNodePair* pair = objects[i];
-                        physxManager->removePhysxObject(pair->PhysxObject);
-                        pair->SceneNode->remove();
-                        delete pair;
-                        }
-                    for (u32 i = 0; i < enemyObjects.size(); i++)
-                    {
-                        Enemy* enemy = enemyObjects[i];
-                        physxManager->removePhysxObject(enemy->pair->PhysxObject);
-                        enemy->pair->SceneNode->remove();
-                        delete enemy;
+#ifdef DEBUG                
+                case KEY_KEY_1: {
+                    spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
                     }
-                    for (u32 i = 0; i < projectileObjects.size(); i++)
-                    {
-                        Projectile* proj = projectileObjects[i];
-                        physxManager->removePhysxObject(proj->pair->PhysxObject);
-                        proj->pair->SceneNode->remove();
-                        delete proj;
-                    }
-                    enemyObjects.clear();
-                    objects.clear();
-                    projectileObjects.clear();
                     break;
+                case KEY_KEY_2: {
+                    spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
+                    }
+                    break;
+                case KEY_KEY_3: {
+                    spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
+                    }
+                    break;
+                case KEY_KEY_4: {
+                    spawnManager->SpawnRat(vector3df(0.0f,100.0f,0.0f));
+                    }
+                    break; 
+                case KEY_KEY_8: 
+                {
+                    spawnManager->SpawnSpider(spawnManager->positionOne);
+                }
+                break;
+                case KEY_KEY_9: 
+                {
+                    spawnManager->SpawnSpider(spawnManager->positionTwo);
+                }
+                break;
+                case KEY_KEY_0: 
+                {
+                    spawnManager->SpawnSpider(spawnManager->positionThree);
+                }
+                break;
+                //case KEY_KEY_C:
+                //    // DEBUG: Delete all objects
+                //    for (u32 i = 0 ; i < objects.size() ; i++) {
+                //        SPhysxAndNodePair* pair = objects[i];
+                //        physxManager->removePhysxObject(pair->PhysxObject);
+                //        pair->SceneNode->remove();
+                //        delete pair;
+                //        }
+                //    for (u32 i = 0; i < enemyObjects.size(); i++)
+                //    {
+                //        Enemy* enemy = enemyObjects[i];
+                //        physxManager->removePhysxObject(enemy->pair->PhysxObject);
+                //        enemy->pair->SceneNode->remove();
+                //        delete enemy;
+                //    }
+                //    for (u32 i = 0; i < projectileObjects.size(); i++)
+                //    {
+                //        Projectile* proj = projectileObjects[i];
+                //        physxManager->removePhysxObject(proj->pair->PhysxObject);
+                //        proj->pair->SceneNode->remove();
+                //        delete proj;
+                //    }
+                //    enemyObjects.clear();
+                //    objects.clear();
+                //    projectileObjects.clear();
+                //    break;
                 case KEY_KEY_I:
                     RestartLevel();
                     break;
@@ -403,7 +375,7 @@ public:
                     // Toggle the debug data visibility
                     physxManager->setDebugDataVisible(!physxManager->isDebugDataVisible());
                     break;
-                case KEY_KEY_P:
+                /*case KEY_KEY_P:
                     effect->addEffectToNode(roomnode,(E_EFFECT_TYPE)currentShader);
                     currentShader++;
                     if (currentShader == 7)
@@ -413,30 +385,30 @@ public:
                     effectToggle = !effectToggle;
                     if (effectToggle) toonPPEffect = effect->addPostProcessingEffectFromFile("Shaders/toon.hlsl");
                     else effect->removePostProcessingEffect(toonPPEffect);
-                    break;
-                case KEY_KEY_L:
-                    bloomToggle = !bloomToggle;
-                    if (bloomToggle)
-                    {
-                        effectBloom = effect->addPostProcessingEffectFromFile("Shaders/BloomP.hlsl");
-                        //effectBlur1 = effect->addPostProcessingEffectFromFile("Shaders/BlurHP.hlsl");
-                        effectBlur2 = effect->addPostProcessingEffectFromFile("Shaders/BlurVP.hlsl");
-                        toonPPEffect = effect->addPostProcessingEffectFromFile("Shaders/toon.hlsl");
-                        //effectHighPass = effect->addPostProcessingEffectFromFile("Shaders/BrightPass.hlsl");
-                    }
-                    else {
-                        effect->removePostProcessingEffect(effectBloom);
-                        effect->removePostProcessingEffect(effectBlur1);
-                        effect->removePostProcessingEffect(effectBlur2);
-                        //effect->removePostProcessingEffect(effectHighPass);
-                        //effect->removePostProcessingEffect(toonPPEffect);
-                    }
-                    break;
+                    break;*/
+                //case KEY_KEY_L:
+                //    bloomToggle = !bloomToggle;
+                //    if (bloomToggle)
+                //    {
+                //        effectBloom = effect->addPostProcessingEffectFromFile("Shaders/BloomP.hlsl");
+                //        //effectBlur1 = effect->addPostProcessingEffectFromFile("Shaders/BlurHP.hlsl");
+                //        effectBlur2 = effect->addPostProcessingEffectFromFile("Shaders/BlurVP.hlsl");
+                //        toonPPEffect = effect->addPostProcessingEffectFromFile("Shaders/toon.hlsl");
+                //        //effectHighPass = effect->addPostProcessingEffectFromFile("Shaders/BrightPass.hlsl");
+                //    }
+                //    else {
+                //        effect->removePostProcessingEffect(effectBloom);
+                //        effect->removePostProcessingEffect(effectBlur1);
+                //        effect->removePostProcessingEffect(effectBlur2);
+                //        //effect->removePostProcessingEffect(effectHighPass);
+                //        //effect->removePostProcessingEffect(toonPPEffect);
+                //    }
+                //    break;
                 case KEY_MULTIPLY:
-                    timeBetweenSpawns = 100;
+                    spawnManager->timeBetweenSpawns = 100;
                     break;
                 case KEY_DIVIDE:
-                    timeBetweenSpawns = 2500;
+                    spawnManager->timeBetweenSpawns = 2500;
                     break;
                     
 #endif //DEBUG
@@ -453,69 +425,13 @@ public:
             {
                 if (!(player->CurrentWeaponOnCooldown()))
                 {
+                    createMuzzleFlash();
+                    player->AddCoolDown();
                     std::cout << "Fire" << std::endl;
                     if (player->GetWeapon() == WEAPON_BLOCKGUN)
                     {
-                        player->AddCoolDown();
-                        core::line3df line;
-                        line.start = camera->getPosition();
-                        //put the end of the line off in the distance
-                        line.end = line.start + (camera->getTarget() - line.start).normalize() * 5000.0f;
-                        //access the physics engine to find the intersection point
-                        core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
-                        //core::array<SRaycastHitData> filteredRayArray;
-                        SRaycastHitData closestObject;
-                        closestObject = rayArray[0];
-                        for (u32 i = 0; i < rayArray.size(); ++i) {
-                            SRaycastHitData ray = rayArray[i];
-                            if (ray.Object->getType() == EOT_TRIANGLE_MESH)
-                            {
-                                f32 dis = (ray.HitPosition - line.start).getLength();
-                                f32 dis2 = (closestObject.HitPosition - line.start).getLength();
-                                std::cout << "Test Distance: " << dis << std::endl;
-                                std::cout << "Current Closest: " << dis2 << std::endl;
-                                if (dis < dis2) {
-                                    closestObject = ray;
-                                }
-                            }
-                        }
-                        for (u32 i = 0; i < enemyObjects.size(); i++)
-                        {
-                            Enemy* enemy = enemyObjects[i];
-                            f32 distance = (enemy->pair->SceneNode->getAbsolutePosition() - closestObject.HitPosition).getLength();
-                            if (distance <= 32.0f)
-                            {
-                                enemy->health = 0;
-                            }
-                        }
-                        std::cout << "=========" << std::endl;
-                        if (closestObject.Object->getType() == EOT_TRIANGLE_MESH) {
-                            vector3df scale(1,1,1);
-                            vector3df rot(0,0,0);
-                            closestObject.HitPosition.Y += scale.Y / 2;
-
-                            vector3df blockPosition = closestObject.HitPosition;
-                            //Quantise block positions
-                            f32 blockPositionX = round_(blockPosition.X/30) * 30;
-                            f32 blockPositionZ = round_(blockPosition.Z/40) * 40;
-                            ///TODO FIX Y QUANTISE
-                            //f32 blockPositionY = round_(blockPosition.Y/30) * 30;
-                            blockPosition.X = blockPositionX;
-                            blockPosition.Z = blockPositionZ;
-                            vector3df blockPhysicsPosition = blockPosition;
-                            blockPhysicsPosition.Y -= scale.Y / 2;
-                            blockPhysicsPosition.X += scale.X / 6.25f;
-                            SPhysxAndNodePair* pair = new SPhysxAndNodePair;
-
-                            //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
-                            IMesh* cubeMesh = smgr->getMesh("media/block.obj");
-                            //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
-                            //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
-                            pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), blockPhysicsPosition);
-                            //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
-                            pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, blockPosition, rot, scale);
-                            pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
-                        }
+                        Block* block = new Block(smgr, physxManager, &enemyObjects);
+                        blockObjects.push_back(block);
                     }
                     else if (player->GetWeapon() == WEAPON_PISTOL)
                     {
@@ -528,21 +444,23 @@ public:
                         core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
                         //core::array<SRaycastHitData> filteredRayArray;
                         SRaycastHitData closestObject;
-                        closestObject = rayArray[0];
-                        for (u32 i = 0; i < rayArray.size(); ++i) {
-                            SRaycastHitData ray = rayArray[i];
-                            if (ray.Object->getType() != EOT_SPHERE)
-                            {
-                                f32 dis = (ray.HitPosition - line.start).getLength();
-                                f32 dis2 = (closestObject.HitPosition - line.start).getLength();
-                                std::cout << "Test Distance: " << dis << std::endl;
-                                std::cout << "Current Closest: " << dis2 << std::endl;
-                                if (dis < dis2) {
-                                    closestObject = ray;
+                        if (rayArray.size() > 0)
+                        {
+                            closestObject = rayArray[0];
+                            for (u32 i = 0; i < rayArray.size(); ++i) {
+                                SRaycastHitData ray = rayArray[i];
+                                if (ray.Object->getType() != EOT_SPHERE)
+                                {
+                                    f32 dis = (ray.HitPosition - line.start).getLength();
+                                    f32 dis2 = (closestObject.HitPosition - line.start).getLength();
+                                    std::cout << "Test Distance: " << dis << std::endl;
+                                    std::cout << "Current Closest: " << dis2 << std::endl;
+                                    if (dis < dis2) {
+                                        closestObject = ray;
+                                    }
                                 }
                             }
                         }
-                        player->AddCoolDown();
                         std::cout << "===========" << std::endl;
                         IPhysxObject* objectHit = closestObject.Object;
                         //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
@@ -586,24 +504,24 @@ public:
                                 }	
                             }  
     #ifdef DEBUG                    
-                            // If it's a sphere we blow it up
-                            else if (objectHit->getType() == EOT_SPHERE) 
-                            {
-                                for (u32 i = 0 ; i < objects.size() ; ++i) 
-                                {  // check it against the objects in our array to see if it matches
-                                    if (objects[i]->PhysxObject == objectHit) {
-                                        core::vector3df pos;
-                                        objects[i]->PhysxObject->getPosition(pos);
-                                        createExplosion(pos);
-                                        objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
-                                        //physxManager->removePhysxObject(objects[i]->PhysxObject);
-                                        //objects[i]->SceneNode->remove();
-                                        //delete objects[i];
-                                        //objects.erase(i);
-                                        break;
-                                    }
-                                }	
-                            }
+                            //// If it's a sphere we blow it up
+                            //else if (objectHit->getType() == EOT_SPHERE) 
+                            //{
+                            //    for (u32 i = 0 ; i < objects.size() ; ++i) 
+                            //    {  // check it against the objects in our array to see if it matches
+                            //        if (objects[i]->PhysxObject == objectHit) {
+                            //            core::vector3df pos;
+                            //            objects[i]->PhysxObject->getPosition(pos);
+                            //            createExplosion(pos);
+                            //            objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
+                            //            //physxManager->removePhysxObject(objects[i]->PhysxObject);
+                            //            //objects[i]->SceneNode->remove();
+                            //            //delete objects[i];
+                            //            //objects.erase(i);
+                            //            break;
+                            //        }
+                            //    }	
+                            //}
                             //for any other objects except for the camera
                             else if (objectHit != cameraPair->PhysxObject) 
                             {
@@ -615,7 +533,6 @@ public:
                     }
                     else if (player->GetWeapon() == WEAPON_RPG)
                     {
-                        player->AddCoolDown();
                         core::vector3df t = camera->getPosition();
                         core::vector3df vel = camera->getTarget() - camera->getPosition();
                         vel.normalize();
@@ -626,7 +543,6 @@ public:
                     }
                     else if (player->GetWeapon() == WEAPON_CLOSE)
                     {
-                        player->AddCoolDown();
                         physxManager->createExplosion(player->pair->SceneNode->getAbsolutePosition(), 100.0f, 300000000.0f, 100000000000.0f, 1.0f);
                     }
                 }
@@ -637,7 +553,7 @@ public:
                     player->WeaponSelect(event.MouseInput.Wheel);
                 }
                 break;
-                //shoot
+                //single instance effect
                 case EMIE_LMOUSE_PRESSED_DOWN: {
                     
                         
@@ -671,40 +587,6 @@ public:
         return false;
     }
 };
-
-//simple function for adding a camera and creating a physics pair for the camera
-void CreateCamera() {
-    //WASD Keymap
-    keyMap = new SKeyMap[5];
-    keyMap[0].Action = EKA_MOVE_FORWARD;
-    keyMap[0].KeyCode = KEY_KEY_W;
-    keyMap[1].Action = EKA_MOVE_BACKWARD;
-    keyMap[1].KeyCode = KEY_KEY_S;
-    keyMap[2].Action = EKA_STRAFE_LEFT;
-    keyMap[2].KeyCode = KEY_KEY_A;
-    keyMap[3].Action = EKA_STRAFE_RIGHT;
-    keyMap[3].KeyCode = KEY_KEY_D;
-    keyMap[4].Action = EKA_JUMP_UP;
-    keyMap[4].KeyCode = KEY_SPACE;
-    
-    //replace the pair if it exists (shouldnt happen)
-    if (cameraPair) delete cameraPair;
-    cameraPair = new SPhysxAndCameraPair;
-    //core::vector3df pos(75, 15, -10);
-    //SWITCHED from custom camera to internal for stability for prototype
-    //add the irrlicht fps camera scene node, modify the keymap to play with WASD
-    camera = smgr->addCameraSceneNodeFPS(NULL, 50, 0.1f, -1, keyMap, 4, true);
-    camera->setPosition(startPosition);
-    camera->setTarget(core::vector3df(0.0f,20.0f,2.0f));
-    //fill pair
-    cameraPair->SceneNode = camera;
-    vector3df physxStartPos = startPosition;
-    physxStartPos.Y += 100.0f;
-    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 15.0f, 30000.0f);
-    cameraPair->PhysxObject->setAngularDamping(1000.0f); // Stops the sphere from rolling
-    cameraPair->PreviousPosition = startPosition;
-    cameraPair->CameraOffset = core::vector3df(0,10,0);
-}
 
 int main() {
 	video::E_DRIVER_TYPE driverType;
@@ -745,7 +627,7 @@ int main() {
     // Set some Physx scene description parameters to optimise raycasting
     SSceneDesc sceneDesc;
     // Set the bounding box of the physx "scene"
-    sceneDesc.MaxBounds = core::aabbox3df(core::vector3df(-1200,-200,-1200), core::vector3df(1200,800,1200));
+    sceneDesc.MaxBounds = core::aabbox3df(core::vector3df(-2300,-200,-2000), core::vector3df(2000,800,2000));
     sceneDesc.BoundPlanes = true;
     // Y axis up
     sceneDesc.UpAxis = 1;
@@ -760,7 +642,7 @@ int main() {
 	//roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
 	
 	//scale to proper size
-	vector3df roomScale(600.0f,600.0f,600.0f);
+	vector3df roomScale(1200.0f,1200.0f,1200.0f);
 	roomnode->setScale(vector3df(roomScale));
 	for (u32 i = 0; i < roomnode->getMaterialCount(); i++) {
 	    roomnode->getMaterial(i).Lighting = true;
@@ -817,10 +699,18 @@ int main() {
     textHealth->setOverrideColor(video::SColor(255,255,255,255));
     health->setOverrideColor(video::SColor(255,255,255,255));
     
-    gui::IGUIStaticText* textCooldown = guienv->addStaticText(L"Cooldown: ", rect<s32>(5,78,400,200));
-    gui::IGUIStaticText* cooldown = guienv->addStaticText(L"Cooldown", rect<s32>(105,78,400,200));
+    gui::IGUIStaticText* textCooldown = guienv->addStaticText(L"Cooldown: ", rect<s32>(5,578,400,800));
+    gui::IGUIStaticText* cooldown = guienv->addStaticText(L"Cooldown", rect<s32>(105,578,400,800));
     textCooldown->setOverrideColor(SColor(255,255,255,255));
     cooldown->setOverrideColor(SColor(255,255,255,255));
+    
+    gui::IGUIStaticText* textPosition = guienv->addStaticText(L"Position: ", rect<s32>(5,598,400,800));
+    gui::IGUIStaticText* textPosition2 = guienv->addStaticText(L"Position", rect<s32>(105,598,400,800));
+    textPosition->setOverrideColor(SColor(255,255,255,255));
+    textPosition2->setOverrideColor(SColor(255,255,255,255));
+    
+    gui::IGUIStaticText* textPrimitives = guienv->addStaticText(L"Primitives Drawn: ", rect<s32>(5, 618, 400, 800));
+    textPrimitives->setOverrideColor(SColor(255,255,255,255));
     // Preload texture animators
     // TODO: CLEAN and use particles instead of animated textures
     // just for prototype only
@@ -841,34 +731,27 @@ int main() {
     std::cout << gravity.X << " " << gravity.Y << " " << gravity.Z << std::endl;
 #endif //DEBUG
 
-    //instantiate enemy mesh
-    mesh = smgr->getMesh("media/spideranim.x");
-    //mesh = smgr->getMesh("media/Bench1.obj");
     //create custom fps camera with physics object
     CreateCamera();
     smgr->setActiveCamera(camera);
     camera->setPosition(startPosition);
     //camera->setFarValue(500.0f);
     //spawn player and link camera
-    player = new Player(smgr, soundEngine, mesh, physxManager, cameraPair, &objects, effect);
-    
+    player = new Player(smgr, soundEngine, physxManager, cameraPair, &objects, effect);
+    spawnManager = new SpawnManager(smgr, soundEngine, physxManager, &enemyObjects, player);
 //TODO: FIX PHYSICS MESHING BUG, BANDAID FIX BELOW BY SENDING FIRST SPAWN OFF MAP
-    enemyObjects.push_back( new Enemy(smgr, soundEngine, mesh, physxManager, &enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
-#ifdef DEBUG    
-    //temporary testing etc
-    //enemyObjects.push_back( new Enemy(smgr, mesh, physxManager, &objects, player, vector3df(0.0f, 306.0f, 0.0f)));
-#endif //DEBUG
+    spawnManager->DIRTYMESHFIX();
     
-    //set fairly blue clear colour
+    //set black clear colour
     effect->setClearColour(SColor(255, 0, 0, 0));
     effect->setAmbientColor(SColor(255, 32, 32, 32));
     //smgr->setAmbientLight(video::SColorf(0.3,0.3,0.3,1));
     //TODO: REDO LIGHTING, THIS WILL DO FOR PROTOTYPE
-    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),800.0f);
+    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
     light->setLightType(ELT_POINT);
-    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(629, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),800.0f);
+    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(1229, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
     light2->setLightType(ELT_POINT);
-    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-650, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1000.0f);
+    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-1250, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),2000.0f);
     light3->setLightType(ELT_POINT);
     //check which shader language to use
     
@@ -891,7 +774,6 @@ int main() {
     //set pre-loop data
 	int lastFPS = -1;
     s32 lastTime = device->getTimer()->getTime();
-    lastJumpTime = lastTime;
 	while(device->run())
 	{
 		if (device->isWindowActive())
@@ -901,18 +783,7 @@ int main() {
             //std::cout << timeNow << std::endl;
             s32 elapsedTime = timeNow - lastTime;
             lastTime = timeNow;
-            currentTime += elapsedTime;
-            if (currentTime >= 100) {
-                timeBetweenSpawns--;
-                currentTime = 0;
-            }
-#ifndef NOSPAWN                        
-            if ((lastTime - lastSpawn) >= timeBetweenSpawns)
-            {
-                SpawnSpiderTimer();
-                lastSpawn = lastTime;
-            }
-#endif            
+                    
             if (player->health <= 0) {
                 RestartLevel();
             }
@@ -927,6 +798,10 @@ int main() {
             
             //begin update routines
             player->Update(elapsedTime);
+#ifndef NOSPAWN                        
+            spawnManager->Update(elapsedTime);
+#endif //NOSPAWN
+            
 		    for (u32 i = 0; i < enemyObjects.size(); i++) {
 		        enemyObjects[i]->Update(elapsedTime);
 		        //effect->addEffectToNode(enemyObjects[i]->pair->SceneNode,(E_EFFECT_TYPE)5);
@@ -946,16 +821,26 @@ int main() {
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
 #endif // DEBUG
-            // Render the GUI
-            //_itow(timeBetweenSpawns, temp, 10);
-            core::stringw strTime, strHealth, strCooldown = "";
-            strTime += timeBetweenSpawns;
+            core::stringw strTime, strHealth, strCooldown, strPosition, strPrimitives = "";
+            strTime += spawnManager->timeBetweenSpawns;
             strHealth += player->health;
             strCooldown += player->CurrentCooldown();
+            strPosition += "X: "; 
+            strPosition += camera->getAbsolutePosition().X;
+            strPosition += " Y: ";
+            strPosition += camera->getAbsolutePosition().Y; 
+            strPosition += " Z: "; 
+            strPosition += camera->getAbsolutePosition().Z;
+            strPrimitives += "Primitives Count: ";
+            strPrimitives += driver->getPrimitiveCountDrawn();
+            strPrimitives += " PhysxObjects Count: ";
+            strPrimitives += physxManager->getNumPhysxObjects();
             //_itow(player->health, temp2, 10);
             spawns->setText(strTime.c_str());
             health->setText(strHealth.c_str());
             cooldown->setText(strCooldown.c_str());
+            textPosition2->setText(strPosition.c_str());
+            textPrimitives->setText(strPrimitives.c_str());
             guienv->drawAll();
 
 #ifdef PHYSDEBUG
@@ -1000,10 +885,6 @@ int main() {
 
 				device->setWindowCaption(str.c_str());
 				lastFPS = fps;
-#ifdef DEBUG
-                std::cout << driver->getPrimitiveCountDrawn() << std::endl;
-				printf("X: %f, Y: %f, Z: %f\n",camera->getAbsolutePosition().X,camera->getAbsolutePosition().Y,camera->getAbsolutePosition().Z);
-#endif //DEBUG		
 			}
 		}
 		else

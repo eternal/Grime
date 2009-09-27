@@ -15,12 +15,12 @@ using namespace scene;
 using namespace video;
 using namespace IrrPhysx;
 
-class entity
+class Entity
     {
     public:
-        entity(void);
-        entity(scene::ISceneManager* smgr, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<SPhysxAndNodePair*>* objectArray);
-        ~entity(void);
+        Entity(void);
+        Entity(scene::ISceneManager* smgr, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<SPhysxAndNodePair*>* objectArray);
+        ~Entity(void);
         
         //required references
         scene::ISceneManager* smgr;

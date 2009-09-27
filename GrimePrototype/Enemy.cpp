@@ -12,7 +12,7 @@ Enemy::Enemy(scene::ISceneManager* sceneManager,  irrklang::ISoundEngine* soundE
     //set position and scale data
     vector3df pos = position;
     vector3df rot = vector3df(0.0f,0.0f,0.0f);
-    vector3df scale = vector3df(2.0f,2.0f,2.0f);
+    vector3df scale = vector3df(3.0f,3.0f,3.0f);
     //set references
     this->smgr = sceneManager;
     this->physxMan = manager;
@@ -165,7 +165,7 @@ void Enemy::Update(s32 time)
                     sound->setIsPaused(false);
                     soundReset = true;
                     //     pair->SoundNode->setPlayOnceMode();
-                    target->health -= strength;
+                    target->health -= strength; 
                     attackTimer = 0;
 
                 }

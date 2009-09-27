@@ -175,6 +175,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Beetle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Block.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\IrrPhysx\CCapsuleSceneNode.cpp"
 				>
 			</File>
@@ -218,12 +226,32 @@
 				RelativePath=".\Projectile.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Rat.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SpawnManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Spider.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\Beetle.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Block.h"
+				>
+			</File>
 			<File
 				RelativePath=".\IrrPhysx\CCapsuleSceneNode.h"
 				>
@@ -277,7 +305,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Rat.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SpawnManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Spider.h"
 				>
 			</File>
 			<File

@@ -1,7 +1,7 @@
 #include "Player.h"
 #include <iostream>
 
-Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, SPhysxAndCameraPair* cameraPair,  core::array<SPhysxAndNodePair*>* objectArray, EffectHandler* effect)
+Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IPhysxManager* manager, SPhysxAndCameraPair* cameraPair,  core::array<SPhysxAndNodePair*>* objectArray, EffectHandler* effect)
 {
     //not much needs to be stored for player, just set references and pair
     this->smgr = sceneManager;
@@ -75,13 +75,13 @@ void Player::SetWeapon(u32 weapon)
         pair->gun->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);   
     }
 }
-void Player::WeaponSelect(s32 delta) 
+void Player::WeaponSelect(f32 delta) 
 {
    // std::cout << delta << std::endl;
-    if (delta > 0)
+    if (delta > 0.0f)
     {
-        int tempDelta = delta;
-        while (tempDelta > 0)
+        f32 tempDelta = delta;
+        while (tempDelta > 0.0f)
         {
             currentWeapon++;
             tempDelta--;
@@ -93,8 +93,8 @@ void Player::WeaponSelect(s32 delta)
     }
     else 
     {
-        s32 reverseDelta = -delta;
-        while (reverseDelta > 0)
+        f32 reverseDelta = -delta;
+        while (reverseDelta > 0.0f)
         {   
             reverseDelta--;
             if (currentWeapon == 0)

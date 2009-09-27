@@ -17,7 +17,7 @@ using namespace scene;
 using namespace video;
 using namespace IrrPhysx;
 
-class Enemy : public entity
+class Enemy : public Entity
 {
     public:
         Enemy(void);
@@ -45,13 +45,13 @@ class Enemy : public entity
         bool attackPhaseActive;
         bool soundReset;
         
-        void FaceTarget();
+        virtual void FaceTarget();
         void CheckPhase();
         
         s32 attackTimer;
         f32 soundResetTimer;
         u32 soundWalkCurrentPosition;
         
-        void Update(s32 time);
+        virtual void Update(s32 time);
         bool IsStillAlive();
 };

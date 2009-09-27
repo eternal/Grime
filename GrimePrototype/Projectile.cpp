@@ -11,8 +11,8 @@ Projectile::Projectile( scene::ISceneManager* sceneManager, irrklang::ISoundEngi
     this->explosionTextures = explosionTextures;
     this->enemyArray = enemyArray;
     active = true;
-    
-    radius = 100.0f;
+    timeElapsed = 0;
+    radius = 200.0f;
     power = 5;
 }
 
@@ -28,19 +28,19 @@ void Projectile::DamageTargets(vector3df pos, f32 radius, s32 power)
         f32 distance = (enemy->pair->SceneNode->getAbsolutePosition() - this->pair->SceneNode->getAbsolutePosition()).getLength();
         if (distance <= radius) //explosion radius
         {
-            f32 hitStrength = ((distance/radius) * power);
+            f32 hitStrength = ((distance/radius) * power) + 2.0f;
             enemy->health -= hitStrength;
             std::cout << "Target hit: " << hitStrength << " damage." << "Distance: " << distance << std::endl;
         }
     }
 }
 
+
 void Projectile::Update( s32 time )
 {
     if (active)
     {
         pair->updateTransformation();
-        
         //draw rocket trail
         scene::ISceneNodeAnimator* anim = NULL;
         // create animation for explosion
@@ -92,36 +92,46 @@ void Projectile::Update( s32 time )
 	                if (closestObject.Object->getType() != EOT_SPHERE)
 	                {
 	
-	                    if (distance <= 70.5f)
+	                    if (distance <= 105.0f)
 	                    {
-	                        std::cout << "IMPACT" << std::endl;
-	                        scene::ISceneNodeAnimator* anim = NULL;
-	                        // create animation for explosion
-	                        anim = smgr->createTextureAnimator(explosionTextures, 100, false);
-	                        // create explosion billboard
-	                        scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(300,300), line.start);
-	                        // Setup the material
-	                        bill->setMaterialFlag(video::EMF_LIGHTING, false);
-	                        bill->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/explosion/01.jpg"));
-	                        bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-	                        // Add the animator
-	                        bill->addAnimator(anim);
-	                        anim->drop();
-	                        // create deletion animator to automatically remove the billboard
-	                        anim = smgr->createDeleteAnimator(100*10);
-	
-	                        bill->addAnimator(anim);
-	                        anim->drop();
-	                        
-	                        this->DamageTargets(pair->SceneNode->getAbsolutePosition(), radius, power);
-	                        physxManager->createExplosion(pair->SceneNode->getAbsolutePosition(), radius * 3.0f, power * 1000000.0f, power * 1000000.0f, 0.2f);
-	                        this->active = false;
-	                        this->pair->SceneNode->setVisible(false);
-	                        physxManager->removePhysxObject(pair->PhysxObject);
+	                        Detonate();
 	                    }
 	                }      
 	            }
 	        }
 	    }
+        timeElapsed += time;
+        if (timeElapsed >= 5000)
+        {
+            Detonate();
+        }
     }
+}
+
+void Projectile::Detonate()
+{
+    std::cout << "IMPACT" << std::endl;
+    scene::ISceneNodeAnimator* anim = NULL;
+    // create animation for explosion
+    anim = smgr->createTextureAnimator(explosionTextures, 100, false);
+    // create explosion billboard
+    scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(300,300), this->pair->SceneNode->getAbsolutePosition());
+    // Setup the material
+    bill->setMaterialFlag(video::EMF_LIGHTING, false);
+    bill->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/explosion/01.jpg"));
+    bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+    // Add the animator
+    bill->addAnimator(anim);
+    anim->drop();
+    // create deletion animator to automatically remove the billboard
+    anim = smgr->createDeleteAnimator(100*10);
+
+    bill->addAnimator(anim);
+    anim->drop();
+
+    this->DamageTargets(pair->SceneNode->getAbsolutePosition(), radius, power);
+    physxManager->createExplosion(pair->SceneNode->getAbsolutePosition(), radius * 3.0f, power * 1000000.0f, power * 1000000.0f, 0.2f);
+    this->active = false;
+    this->pair->SceneNode->setVisible(false);
+    physxManager->removePhysxObject(pair->PhysxObject);
 }
