@@ -53,6 +53,21 @@ struct SPhysxAndNodePair {
 //    }
 //    
 //};
+struct SPhysxAndBlockPair : public SPhysxAndNodePair {
+    //get all the details from the normal pair
+    SPhysxAndBlockPair() : SPhysxAndNodePair() { }
+    
+    core::vector3df blockOffset;
+    
+    //called every update
+    void updateTransformation() {
+        if (PhysxObject && SceneNode) {
+            core::vector3df currentPhysxPos;
+            PhysxObject->getPosition(currentPhysxPos);
+            SceneNode->setPosition(currentPhysxPos + blockOffset);
+        }
+    }
+};
 
 struct SPhysxAndCameraPair : public SPhysxAndNodePair {
     //get all the details from the normal pair

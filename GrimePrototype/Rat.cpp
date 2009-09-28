@@ -64,3 +64,8 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
 Rat::~Rat(void)
 {
 }
+
+void Rat::Update( s32 time )
+{
+    
+}

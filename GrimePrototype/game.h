@@ -45,6 +45,7 @@ public:
     core::array<video::ITexture*> impactTextures;
     
     vector3df startPosition;
+    bool blockFinalToggle;
     
     void CreateExplosion(vector3df position);
     void CreateImpactEffect(vector3df position, vector3df normal);
@@ -57,5 +58,6 @@ public:
     void RestartLevel();
     void WeaponFire();
     SPhysxAndNodePair* CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity);
+    void FinalWave();
 };
 

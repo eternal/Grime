@@ -69,6 +69,9 @@ public:
             if (event.KeyInput.PressedDown) return false;
 
             switch (event.KeyInput.Key) {
+                case KEY_KEY_H:
+                    game->FinalWave();
+                    break;
                 case KEY_F9:
                     //screenshot                  
                     driver->writeImageToFile(driver->createScreenShot(),"screenie.jpg",0);

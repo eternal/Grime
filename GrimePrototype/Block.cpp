@@ -2,6 +2,8 @@
 
 Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects)
 {
+    this->smgr = smgr;
+    this->physxManager = physxManager;
     core::line3df line;
     line.start = smgr->getActiveCamera()->getPosition();
     //put the end of the line off in the distance 
@@ -13,7 +15,7 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
     closestObject = rayArray[0];
     for (u32 i = 0; i < rayArray.size(); ++i) {
         SRaycastHitData ray = rayArray[i];
-        if (ray.Object->getType() == EOT_TRIANGLE_MESH)
+        if (ray.Object->getType() == EOT_TRIANGLE_MESH || ray.Object->getType() == EOT_BOX)
         {
             f32 dis = (ray.HitPosition - line.start).getLength();
             f32 dis2 = (closestObject.HitPosition - line.start).getLength();
@@ -34,7 +36,7 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
         }
     }
     std::cout << "=========" << std::endl;
-    if (closestObject.Object->getType() == EOT_TRIANGLE_MESH) {
+    if (closestObject.Object->getType() == EOT_TRIANGLE_MESH || closestObject.Object->getType() == EOT_BOX) {
         vector3df scale(1,1,1);
         vector3df rot(0,0,0);
         closestObject.HitPosition.Y += scale.Y / 2;
@@ -50,10 +52,10 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
         vector3df blockPhysicsPosition = blockPosition;
         blockPhysicsPosition.Y -= scale.Y / 2;
         blockPhysicsPosition.X += scale.X / 6.25f;
-        pair = new SPhysxAndNodePair;
-
+        pair = new SPhysxAndBlockPair;
+        pair->blockOffset.Y = 0.0f;
         //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
-        IMesh* cubeMesh = smgr->getMesh("media/block.obj");
+        cubeMesh = smgr->getMesh("media/block.obj");
         //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
         //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
         pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), blockPhysicsPosition);
@@ -65,4 +67,24 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
 
 Block::~Block(void)
 {
+}
+void Block::ConvertToStatic() 
+{
+    physxManager->removePhysxObject(pair->PhysxObject);
+    pair->blockOffset = vector3df(0,0,0);
+    pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), vector3df(1,1,1)), pair->SceneNode->getAbsolutePosition());
+}
+
+void Block::ConvertToDynamic() 
+{
+    physxManager->removePhysxObject(pair->PhysxObject);
+    vector3df blockScale(15.0f,12.5f,20.0f);
+    vector3df blockPosition = pair->SceneNode->getAbsolutePosition();
+    pair->blockOffset = vector3df(0.0f,-12.5f,0.0f);
+    blockPosition.Y += 12.5f;
+    pair->PhysxObject = physxManager->createBoxObject(blockPosition, core::vector3df(0,0,0), blockScale, 30000000.0f, &(vector3df(0,0,0)));
+}
+void Block::Update(s32 time)
+{
+    pair->updateTransformation();
 }

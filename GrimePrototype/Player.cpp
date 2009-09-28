@@ -157,7 +157,7 @@ void Player::Jump()
         core::array<SRaycastHitData> rayArray = physxMan->raycastAllRigidObjects(line);
         for (u32 i = 0; i < rayArray.size(); ++i) {
             SRaycastHitData ray = rayArray[i];
-            if (ray.Object->getType() == EOT_TRIANGLE_MESH)
+            if (ray.Object->getType() == EOT_TRIANGLE_MESH || ray.Object->getType() == EOT_BOX)
             {
                 f32 dis = (ray.HitPosition - line.start).getLength();
                 if (dis <= 25)

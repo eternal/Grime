@@ -168,3 +168,8 @@ irr::core::vector3df SpawnManager::RandomPoint()
         return positionThree;
     }
 }
+void SpawnManager::FinalWave() 
+{
+    //spawn rat
+    SpawnRat(positionOne);
+}

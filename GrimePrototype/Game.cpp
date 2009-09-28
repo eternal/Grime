@@ -2,6 +2,7 @@
 
 Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, EffectHandler* effect)
 {
+    blockFinalToggle = false;
     this->smgr = smgr;
     this->soundEngine = soundEngine;
     this->physxManager = physxManager;
@@ -192,6 +193,10 @@ void Game::Update( s32 time )
     {
         projectileObjects[i]->Update(time);
     }
+    for (u32 i = 0; i < blockObjects.size(); ++i)
+    {
+        blockObjects[i]->Update(time);
+    }
 }
 
 void Game::RestartLevel() {
@@ -343,6 +348,25 @@ void Game::WeaponFire()
             physxManager->createExplosion(player->pair->SceneNode->getAbsolutePosition(), 100.0f, 300000000.0f, 100000000000.0f, 1.0f);
         }
     }
+}
+void Game::FinalWave() 
+{
+    //convert blox to physxblocks
+    for (u32 i = 0; i < blockObjects.size(); ++i)
+    {
+        Block* block = blockObjects[i];
+        if (blockFinalToggle)
+        {
+            block->ConvertToDynamic();
+        }
+        else {
+            block->ConvertToStatic();
+        }
+        
+    }
+    blockFinalToggle = !blockFinalToggle;
+    //spawn rat
+    //spawnManager->FinalWave();
 }
 //simple random number function
 s32 Game::GetRandom(s32 upper) {
