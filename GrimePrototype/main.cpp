@@ -72,6 +72,12 @@ public:
                 case KEY_KEY_H:
                     game->FinalWave();
                     break;
+                case KEY_KEY_J: {
+                    game->CleanupArrays();
+                    }
+                    break;
+                case KEY_KEY_K:
+                    break;
                 case KEY_F9:
                     //screenshot                  
                     driver->writeImageToFile(driver->createScreenShot(),"screenie.jpg",0);
@@ -292,23 +298,23 @@ int main() {
     s32 lastTime = device->getTimer()->getTime();
 	while(device->run())
 	{
-		if (device->isWindowActive())
-		{
-		    //find time between renders
-            s32 timeNow = device->getTimer()->getTime();
-            s32 elapsedTime = timeNow - lastTime;
-            lastTime = timeNow;
-                    
-            if (game->player->health <= 0) {
-                game->RestartLevel();
-            }
-            //simulate physics
-		    physxManager->simulate(elapsedTime/1000.0f);
-		    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING
-		    physxManager->fetchResults();
-            
-		    game->Update(elapsedTime);
-            //start drawing
+	    //find time between renders
+        s32 timeNow = device->getTimer()->getTime();
+        s32 elapsedTime = timeNow - lastTime;
+        lastTime = timeNow;
+                
+        if (game->player->health <= 0) {
+            game->RestartLevel();
+        }
+        //simulate physics
+	    physxManager->simulate(elapsedTime/1000.0f);
+	    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING
+	    physxManager->fetchResults();
+        
+	    game->Update(elapsedTime);
+        //start drawing
+        if (device->isWindowActive())
+        {            
 			driver->beginScene(true, true, video::SColor(255,200,200,200));
 	
 			effect->update();

@@ -7,7 +7,7 @@ Enemy::Enemy(void)
 {
 }
 //normal constructor
-Enemy::Enemy(scene::ISceneManager* sceneManager,  irrklang::ISoundEngine* soundEngine,  IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* objectArray, Player* player, vector3df position)
+Enemy::Enemy(scene::ISceneManager* sceneManager,  irrklang::ISoundEngine* soundEngine,  IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* enemyArray, Player* player, vector3df position)
     {
     //set position and scale data
     vector3df pos = position;
@@ -17,7 +17,7 @@ Enemy::Enemy(scene::ISceneManager* sceneManager,  irrklang::ISoundEngine* soundE
     this->smgr = sceneManager;
     this->physxMan = manager;
     this->soundEngine = soundEngine;
-    this->enemyArray = objectArray;
+    this->enemyArray = enemyArray;
     this->target = player;
     this->active = true;
     this->health = 1;
@@ -109,90 +109,121 @@ void Enemy::Update(s32 time)
 {
     if (active)
     {    
-        if (this->IsStillAlive())
+        if (this->IsStillAlive() && this->pair->PhysxObject && this->pair->SceneNode)
         {
+            try {
+                this->pair->updateTransformation();  
 
-            this->pair->updateTransformation();  
-            
-            sound->setPosition(this->pair->SceneNode->getAbsolutePosition());
-            
-            // pair->SoundNode->setLoopingStreamMode();
-            //if target exists
-            if (target)
-            {
-                FaceTarget();
-                //TODO: UNIFY VARIABLES FOR READABILITY
-                vector3df direction, position, playerPos, resultant;
-                f32 distanceToTarget;
-                //get position of player and target
-                this->pair->PhysxObject->getPosition(position);
-                this->target->pair->PhysxObject->getPosition(playerPos);
-                //get vector this->player
-                direction = playerPos - position;   
-                //get magnitude
-                distanceToTarget = direction.getLength();
-                //std::cout << distanceToTarget << std::endl;
-                if (distanceToTarget < 50)
-                {
-                    attackPhase = true;
-                }
-                else {
-                    attackPhase = false;
-                }
-                if (soundReset)
-                {
-                    soundResetTimer += time;
-                }
-                if (distanceToTarget < 30)
-                {
-                    attackTimer += time;
-                }
-                if (attackTimer >= 1000)
-                {
-                    //    pair->SoundNode->stop();
-                    soundWalkCurrentPosition = sound->getPlayPosition();
-                    sound->stop();
-                    sound->drop();
-                    sound = soundEngine->play3D("media/sounds/Bite1.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
-                    sound->setMinDistance(100.0f);
-                    sound->setMaxDistance(1000.0f);
-                    sound->setIsPaused(false);
-                    soundReset = true;
-                    //     pair->SoundNode->setPlayOnceMode();
-                    target->health -= strength; 
-                    attackTimer = 0;
+                sound->setPosition(this->pair->SceneNode->getAbsolutePosition());
 
-                }
-                if (soundResetTimer >= 300)
+                // pair->SoundNode->setLoopingStreamMode();
+                //if target exists
+                if (target)
                 {
-                    sound->stop();
-                    sound->drop();
-                    sound = soundEngine->play3D("media/sounds/InsectWalk1.wav", this->pair->SceneNode->getAbsolutePosition(), true, false, true);
-                    sound->setPlayPosition(soundWalkCurrentPosition);
-                    sound->setMinDistance(100.0f);
-                    sound->setMaxDistance(1000.0f);
-                    soundResetTimer = 0;
-                    soundReset = false;
-                }
-                CheckPhase();
-                //normalise vector
-                direction.normalize();
-                //normalise with respect to time elapsed since last update
-                direction = direction * (time/10.0f) * speed;
-                direction.Y = 0; //no flying mr bug
-                //find and apply the change
-                resultant = position + direction;
-                //check for floating point errors that were appearing            
-                if (!(_isnan(resultant.X)))
-                {
-                    this->pair->PhysxObject->setPosition(resultant);
-                    this->pair->updateTransformation();
+                    FaceTarget();
+                    //TODO: UNIFY VARIABLES FOR READABILITY
+                    vector3df direction, position, playerPos, resultant;
+                    f32 distanceToTarget;
+                    //get position of player and target
+                    this->pair->PhysxObject->getPosition(position);
+                    this->target->pair->PhysxObject->getPosition(playerPos);
+                    //get vector this->player
+                    direction = playerPos - position;   
+                    //get magnitude
+                    distanceToTarget = direction.getLength();
+                    //std::cout << distanceToTarget << std::endl;
+                    if (distanceToTarget < 50)
+                    {
+                        attackPhase = true;
+                    }
+                    else {
+                        attackPhase = false;
+                    }
+                    if (soundReset)
+                    {
+                        soundResetTimer += time;
+                    }
+                    if (distanceToTarget < 30)
+                    {
+                        attackTimer += time;
+                    }
+                    if (attackTimer >= 1000)
+                    {
+                        //    pair->SoundNode->stop();
+                        soundWalkCurrentPosition = sound->getPlayPosition();
+                        sound->stop();
+                        sound->drop();
+                        sound = soundEngine->play3D("media/sounds/Bite1.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
+                        sound->setMinDistance(100.0f);
+                        sound->setMaxDistance(1000.0f);
+                        sound->setIsPaused(false);
+                        soundReset = true;
+                        //     pair->SoundNode->setPlayOnceMode();
+                        target->health -= strength; 
+                        attackTimer = 0;
+
+                    }
+                    if (soundResetTimer >= 300)
+                    {
+                        sound->stop();
+                        sound->drop();
+                        sound = soundEngine->play3D("media/sounds/InsectWalk1.wav", this->pair->SceneNode->getAbsolutePosition(), true, false, true);
+                        sound->setPlayPosition(soundWalkCurrentPosition);
+                        sound->setMinDistance(100.0f);
+                        sound->setMaxDistance(1000.0f);
+                        soundResetTimer = 0;
+                        soundReset = false;
+                    }
+                    CheckPhase();
+                    //normalise vector
+                    direction.normalize();
+                    //normalise with respect to time elapsed since last update
+                    direction = direction * (time/10.0f) * speed;
+                    direction.Y = 0; //no flying mr bug
+                    //find and apply the change
+                    resultant = position + direction;
+                    //check for floating point errors that were appearing            
+                    if (!(_isnan(resultant.X)))
+                    {
+                        this->pair->PhysxObject->setPosition(resultant);
+                        this->pair->updateTransformation();
+                    }
                 }
             }
+            catch (...)
+            {
+                std::cout << "exception lol" << std::endl;
+                std::cout << "Enemy: " << &pair << std::endl;
+                active = false;
+                try {
+                    this->pair->SceneNode->setVisible(false);
+                    this->pair->SceneNode->remove();
+                }
+                catch (...)
+                {
+                    std::cout << "Recovery failed: Mesh still in Scene Graph" << std::endl;
+                }
+                try {
+                    physxMan->removePhysxObject(this->pair->PhysxObject);
+                }
+                catch (...)
+                {
+                    std::cout << "Recovery failed: Mesh still in Physics Graph" << std::endl;
+                }
+
+            }
+            
         }
         else {                    
-            physxMan->removePhysxObject(this->pair->PhysxObject);
-            this->pair->SceneNode->setVisible(false);
+            try {
+                physxMan->removePhysxObject(this->pair->PhysxObject);
+                this->pair->SceneNode->setVisible(false);
+            }
+            catch (...)
+            {
+                std::cout << "another exception" << std::endl;
+                std::cout << "Enemy: " << &pair << std::endl;
+            }
             active = false;
         } 
     }

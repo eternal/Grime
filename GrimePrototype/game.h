@@ -41,6 +41,8 @@ public:
     ISceneNode* roomnode;
     IMesh* room;
     
+    s32 cleanupTimer;
+    
     core::array<video::ITexture*> explosionTextures;
     core::array<video::ITexture*> impactTextures;
     
@@ -59,5 +61,8 @@ public:
     void WeaponFire();
     SPhysxAndNodePair* CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity);
     void FinalWave();
+    
+    void CleanupArrays();
+    core::array<Enemy*> RebuildEnemies();
 };
 

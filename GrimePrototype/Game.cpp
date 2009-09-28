@@ -1,8 +1,10 @@
 #include "Game.h"
+//#define WEAPONDEBUG 1
 
 Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, EffectHandler* effect)
 {
     blockFinalToggle = false;
+    cleanupTimer = 0;
     this->smgr = smgr;
     this->soundEngine = soundEngine;
     this->physxManager = physxManager;
@@ -182,12 +184,25 @@ void Game::CreateMuzzleFlash()
 
 void Game::Update( s32 time )
 {
+    cleanupTimer += time;
+    if (cleanupTimer >= 15000)
+    {
+        enemyObjects = this->RebuildEnemies();
+        cleanupTimer = 0;
+    }
     cameraPair->updateTransformation();
     player->Update(time);
     spawnManager->Update(time);
     for (u32 i = 0; i < enemyObjects.size(); i++) {
-        enemyObjects[i]->Update(time);
-        //effect->addEffectToNode(enemyObjects[i]->pair->SceneNode,(E_EFFECT_TYPE)5);
+        try 
+        {
+            enemyObjects[i]->Update(time);
+        }
+        catch (...)
+        {
+            enemyObjects = this->RebuildEnemies();
+            std::cerr << "Exception Handled in Game::Update. Enemies array rebuilt" << std::endl;
+        }
     }
     for (u32 i = 0; i < projectileObjects.size(); i++)
     {
@@ -229,7 +244,9 @@ void Game::WeaponFire()
     {
         CreateMuzzleFlash();
         player->AddCoolDown();
+#ifdef WEAPONDEBUG
         std::cout << "Fire" << std::endl;
+#endif
         if (player->GetWeapon() == WEAPON_BLOCKGUN)
         {
             Block* block = new Block(smgr, physxManager, &enemyObjects);
@@ -256,15 +273,19 @@ void Game::WeaponFire()
                     {
                         f32 dis = (ray.HitPosition - line.start).getLength();
                         f32 dis2 = (closestObject.HitPosition - line.start).getLength();
+#ifdef WEAPONDEBUG
                         std::cout << "Test Distance: " << dis << std::endl;
                         std::cout << "Current Closest: " << dis2 << std::endl;
+#endif
                         if (dis < dis2) {
                             closestObject = ray;
                         }
                     }
                 }
             }
+#ifdef WEAPONDEBUG            
             std::cout << "===========" << std::endl;
+#endif            
             IPhysxObject* objectHit = closestObject.Object;
             //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
             if (objectHit) {
@@ -296,11 +317,28 @@ void Game::WeaponFire()
                             {
                                 CreateExplosion(closestObject.HitPosition);   
                                 //kill enemy
-                                //remove from arrays and memory                         
-                                physxManager->removePhysxObject(enemy->pair->PhysxObject);
-                                enemy->pair->SceneNode->remove();
-                                delete enemy;
-                                enemyObjects.erase(i);  
+                                //remove from arrays and memory
+                                try 
+                                {
+                                    physxManager->removePhysxObject(enemy->pair->PhysxObject);
+                                    enemy->pair->SceneNode->remove();
+                                    delete enemy;
+                                    enemyObjects.erase(i);  
+                                }                       
+                                catch (...)
+                                {
+                                    std::cout << "Automatic removal failure" << std::endl;
+                                    try {
+                                        enemyObjects.erase(i); //preserve arrays
+                                        enemy->active = false;
+                                        enemy->pair->SceneNode->setVisible(false);
+                                        enemy->pair->SceneNode->remove();
+                                    }
+                                    catch (...)
+                                    {
+                                        std::cout << "Recovery failure. Adverse effects may be experienced." << std::endl;
+                                    }
+                                }
                             }
                             break;
                         }
@@ -371,4 +409,32 @@ void Game::FinalWave()
 //simple random number function
 s32 Game::GetRandom(s32 upper) {
     return (rand() % upper) + 1;
+}
+
+core::array<Enemy*> Game::RebuildEnemies()
+{
+    core::array<Enemy*> enemiesRebuild;
+    for (u32 i = 0; i < enemyObjects.size(); ++i)
+    {
+        try
+        {
+            Enemy* enemy = enemyObjects[i];
+            enemy->pair->PhysxObject->getType(); //throwaway function to check enemy works
+            enemiesRebuild.push_back(enemy);
+        }
+        catch (...)
+        {
+            std::cout << "Physx object corrupted or missing: cleaning enemy from array" << std::endl;
+        }
+    }
+    std::cout << "Enemy array rebuilt." << std::endl;
+    return enemiesRebuild;
+}
+
+void Game::CleanupArrays()
+{
+    core::array<Enemy*> enemies;
+    enemies = this->RebuildEnemies();
+    this->enemyObjects.clear();
+    this->enemyObjects = enemies;
 }

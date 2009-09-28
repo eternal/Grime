@@ -7,6 +7,7 @@
 #include <IrrPhysx.h>
 #include <irrKlang.h>
 #include "irrKlangSceneNode.h"
+#include <iostream>
 
 using namespace irr;
 using namespace IrrPhysx;
@@ -14,6 +15,28 @@ using namespace IrrPhysx;
 struct SPhysxAndNodePair {
 
     SPhysxAndNodePair() {
+        PhysxObject = NULL;
+        SceneNode = NULL;
+    }
+    void updateTransformation() 
+    {
+            core::vector3df vec(0,0,0);
+            // Update the node's position to that of the physx object
+
+            if (PhysxObject)
+            {
+                PhysxObject->getPosition(vec);
+                SceneNode->setPosition(vec);            
+            }
+
+    }
+    IPhysxObject* PhysxObject;
+    scene::ISceneNode* SceneNode;
+
+};
+struct SPhysxAndNodePairCloth {
+
+    SPhysxAndNodePairCloth() {
         PhysxObject = NULL;
         SceneNode = NULL;
     }
@@ -28,12 +51,11 @@ struct SPhysxAndNodePair {
             SceneNode->setPosition(vec);
         }
     }
-    
+
     IPhysxObject* PhysxObject;
     scene::ISceneNode* SceneNode;
 
 };
-
 //struct SPhysxAndNodePairAudible : public SPhysxAndNodePair {
 //    SPhysxAndNodePairAudible() : SPhysxAndNodePair() { SoundNode = NULL; }
 //    

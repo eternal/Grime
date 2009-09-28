@@ -28,12 +28,19 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
     }
     for (u32 i = 0; i < enemyObjects->size(); i++)
     {
-        Enemy* enemy = (*enemyObjects)[i];
-        f32 distance = (enemy->pair->SceneNode->getAbsolutePosition() - closestObject.HitPosition).getLength();
-        if (distance <= 32.0f)
-        {
-            enemy->health = 0;
+        try {
+            Enemy* enemy = (*enemyObjects)[i];
+            f32 distance = (enemy->pair->SceneNode->getAbsolutePosition() - closestObject.HitPosition).getLength();
+            if (distance <= 32.0f)
+            {
+                enemy->health = 0;
+            }
         }
+        catch (...)
+        {
+            std::cout << "Exception caught in Block constructor. Possible corruption of enemyArray" << std::endl;
+        }
+        
     }
     std::cout << "=========" << std::endl;
     if (closestObject.Object->getType() == EOT_TRIANGLE_MESH || closestObject.Object->getType() == EOT_BOX) {
@@ -86,5 +93,12 @@ void Block::ConvertToDynamic()
 }
 void Block::Update(s32 time)
 {
-    pair->updateTransformation();
+    try 
+    {
+        pair->updateTransformation();
+    }
+    catch (char *str)
+    {
+        std::cout << str << std::endl;
+    }
 }
