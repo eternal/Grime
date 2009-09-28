@@ -99,7 +99,8 @@ void Player::WeaponSelect(f32 delta)
             {
                 currentWeapon = NUMBER_OF_WEAPONS - 1;
             }
-            else {
+            else 
+            {
                 currentWeapon--;
             }
         }
@@ -117,7 +118,8 @@ bool Player::CurrentWeaponOnCooldown()
     {
         return false;
     }
-    else {
+    else 
+    {
         return true;
     }
 }
@@ -155,7 +157,8 @@ void Player::Jump()
         line.end.Y = -2000.0f;
         //access the physics engine to find the intersection point
         core::array<SRaycastHitData> rayArray = physxMan->raycastAllRigidObjects(line);
-        for (u32 i = 0; i < rayArray.size(); ++i) {
+        for (u32 i = 0; i < rayArray.size(); ++i) 
+        {
             SRaycastHitData ray = rayArray[i];
             if (ray.Object->getType() == EOT_TRIANGLE_MESH || ray.Object->getType() == EOT_BOX)
             {

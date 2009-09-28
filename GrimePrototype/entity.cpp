@@ -6,7 +6,7 @@ Entity::Entity() {
 //////////////////////////////////////////////////////////////////////////
 //TEMPORARY CODE
 Entity::Entity(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<SPhysxAndNodePair*>* objectArray)
-    {
+{
         vector3df pos = vector3df(0.0f,100.0f,0.0f);
         vector3df rot = vector3df(0.0f,0.0f,0.0f);
         vector3df scale = vector3df(2.0f,2.0f,2.0f);
@@ -26,8 +26,8 @@ Entity::Entity(scene::ISceneManager* sceneManager, IAnimatedMesh* mesh, IPhysxMa
         //pair->SceneNode->setMaterialTexture(0, driver->getTexture("media/dwarf2.JPG"));
         pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
         objects->push_back(pair);
-    }
+}
 
 Entity::~Entity(void)
-    {
-    }
+{
+}

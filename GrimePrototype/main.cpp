@@ -56,7 +56,10 @@ int main() {
     device = createDevice(driverType, resolution, 32, true, false, false, receiver);	
 #endif
 	if (device == 0)
+	{
 		return 1; // could not create selected driver.
+    }
+    
     receiver.device = device;
     //instantiate necessary globals
     driver = device->getVideoDriver();
@@ -68,7 +71,9 @@ int main() {
     srand((unsigned)time(0));
     
     if (!soundEngine || !driver || !smgr || !guienv)
+    {
         return 2; //fatal error
+    }
     
 	//set screen buffer resolution
 	dimension2du ScreenRTT = !driver->getVendorInfo().equals_ignore_case("NVIDIA Corporation") ? dimension2du(1024, 1024) : driver->getScreenSize();
@@ -77,8 +82,10 @@ int main() {
 	effect = new EffectHandler(device, "shaders", ScreenRTT, true);
     
     if (!effect)
+    {
         return 3; //critical error
-
+    }
+    
     //remove cursor from view
     device->getCursorControl()->setVisible(false);
     
@@ -93,7 +100,9 @@ int main() {
     physxManager  = createPhysxManager(device, sceneDesc);
     
     if(!physxManager)
+    {
         return 4; // physics engine failure
+    }
     
     game = new Game(smgr, soundEngine, physxManager, effect);
     receiver.game = game;
@@ -144,9 +153,6 @@ int main() {
         s32 elapsedTime = timeNow - lastTime;
         lastTime = timeNow;
                 
-        if (game->player->health <= 0) {
-            game->RestartLevel();
-        }
         //simulate physics
 	    physxManager->simulate(elapsedTime/1000.0f);
 	    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING

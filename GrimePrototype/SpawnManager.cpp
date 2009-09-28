@@ -33,7 +33,8 @@ void SpawnManager::Update( s32 time )
 {
     currentTimer += time;
     waveTimer += time;
-    if (currentTimer >= 100) {
+    if (currentTimer >= 100) 
+    {
         timeBetweenSpawns--;
         currentTimer = 0;
     }

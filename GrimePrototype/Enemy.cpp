@@ -8,7 +8,7 @@ Enemy::Enemy(void)
 }
 //normal constructor
 Enemy::Enemy(scene::ISceneManager* sceneManager,  irrklang::ISoundEngine* soundEngine,  IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* enemyArray, Player* player, vector3df position)
-    {
+{
     //set position and scale data
     vector3df pos = position;
     vector3df rot = vector3df(0.0f,0.0f,0.0f);
@@ -67,7 +67,8 @@ Enemy::~Enemy(void)
     sound->drop();
 }
 
-void Enemy::FaceTarget() {
+void Enemy::FaceTarget() 
+{
     vector3df targetPos, nodePos, selfPos;
     //grab positions from physics objects
     target->pair->PhysxObject->getPosition(targetPos);
@@ -111,7 +112,8 @@ void Enemy::Update(s32 time)
     {    
         if (this->IsStillAlive() && this->pair->PhysxObject && this->pair->SceneNode)
         {
-            try {
+            try 
+            {
                 this->pair->updateTransformation();  
 
                 sound->setPosition(this->pair->SceneNode->getAbsolutePosition());
@@ -136,7 +138,8 @@ void Enemy::Update(s32 time)
                     {
                         attackPhase = true;
                     }
-                    else {
+                    else 
+                    {
                         attackPhase = false;
                     }
                     if (soundReset)
@@ -195,7 +198,8 @@ void Enemy::Update(s32 time)
                 std::cout << "exception lol" << std::endl;
                 std::cout << "Enemy: " << &pair << std::endl;
                 active = false;
-                try {
+                try 
+                {
                     this->pair->SceneNode->setVisible(false);
                     this->pair->SceneNode->remove();
                 }
@@ -203,7 +207,8 @@ void Enemy::Update(s32 time)
                 {
                     std::cout << "Recovery failed: Mesh still in Scene Graph" << std::endl;
                 }
-                try {
+                try 
+                {
                     physxMan->removePhysxObject(this->pair->PhysxObject);
                 }
                 catch (...)
@@ -214,8 +219,10 @@ void Enemy::Update(s32 time)
             }
             
         }
-        else {                    
-            try {
+        else 
+        {                    
+            try 
+            {
                 physxMan->removePhysxObject(this->pair->PhysxObject);
                 this->pair->SceneNode->setVisible(false);
             }

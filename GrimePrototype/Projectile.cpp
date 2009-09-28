@@ -82,13 +82,15 @@ void Projectile::Update( s32 time )
             if (rayArray.size() > 0)
             {
                 closestObject = rayArray[0];
-                for (u32 i = 0; i < rayArray.size(); ++i) {
+                for (u32 i = 0; i < rayArray.size(); ++i) 
+                {
                     SRaycastHitData ray = rayArray[i];
                     if (ray.Object->getType() != EOT_SPHERE)
                     {
                         f32 dis = (ray.HitPosition - line.start).getLength();
                         f32 dis2 = (closestObject.HitPosition - line.start).getLength();
-                        if (dis < dis2) {
+                        if (dis < dis2) 
+                        {
                             closestObject = ray;
                         }
                     }

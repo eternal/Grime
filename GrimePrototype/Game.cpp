@@ -18,7 +18,8 @@ Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxM
     //scale to proper size
     vector3df roomScale(1200.0f,1200.0f,1200.0f);
     roomnode->setScale(vector3df(roomScale));
-    for (u32 i = 0; i < roomnode->getMaterialCount(); i++) {
+    for (u32 i = 0; i < roomnode->getMaterialCount(); i++) 
+    {
         roomnode->getMaterial(i).Lighting = true;
     }
     
@@ -26,7 +27,8 @@ Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxM
     roomnode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     
     //get the mesh buffers of the mesh and create physics representation
-    for (u32 i = 0 ; i < room->getMeshBufferCount(); i++) {
+    for (u32 i = 0 ; i < room->getMeshBufferCount(); i++) 
+    {
         //first calculate the mesh triangles and make physx object
         //IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(1.0f,1.0f,1.0f));
         IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), roomScale);
@@ -41,11 +43,13 @@ Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxM
     // Preload texture animators
     // just for prototype only
     c8 tmp[64];
-    for (s32 i = 1 ; i <= 10 ; ++i) {
+    for (s32 i = 1 ; i <= 10 ; ++i) 
+    {
         sprintf_s(tmp, "media/explosion/%02d.jpg", i);
         explosionTextures.push_back(smgr->getVideoDriver()->getTexture(tmp));
     }
-    for (s32 i = 1 ; i <= 6 ; ++i) {
+    for (s32 i = 1 ; i <= 6 ; ++i) 
+    {
         sprintf_s(tmp, "media/impact/%02d.jpg", i);
         impactTextures.push_back(smgr->getVideoDriver()->getTexture(tmp));
     }
@@ -82,7 +86,8 @@ Game::~Game(void)
 }
 
 // Creates a sphere at the specified position, of the specified size and with the specified intial velocity (useful for throwing it)
-SPhysxAndNodePair* Game::CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity) {
+SPhysxAndNodePair* Game::CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity) 
+{
 
     SPhysxAndNodePair* pair = new SPhysxAndNodePair;
     pair->PhysxObject = physxManager->createSphereObject(pos, core::vector3df(0,0,0), radius, density, initialVelocity);
@@ -90,10 +95,10 @@ SPhysxAndNodePair* Game::CreateSphere(const core::vector3df& pos, f32 radius, f3
     //pair->SceneNode->setMaterialTexture(0, driver->getTexture(textures[rand()%NUM_TEXTURES]));
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true); 
     return pair;
-
 }
 
-void Game::CreateCamera() {
+void Game::CreateCamera() 
+{
     //WASD Keymap
     SKeyMap* keyMap = new SKeyMap[5];
     keyMap[0].Action = EKA_MOVE_FORWARD;
@@ -210,6 +215,10 @@ void Game::CreateMuzzleFlash()
 
 void Game::Update( s32 time )
 {
+    if (player->health <= 0) 
+    {
+        this->RestartLevel();
+    }
     cleanupTimer += time;
     if (cleanupTimer >= 15000)
     {
@@ -219,7 +228,8 @@ void Game::Update( s32 time )
     cameraPair->updateTransformation();
     player->Update(time);
     spawnManager->Update(time);
-    for (u32 i = 0; i < enemyObjects.size(); i++) {
+    for (u32 i = 0; i < enemyObjects.size(); i++) 
+    {
         try 
         {
             enemyObjects[i]->Update(time);
@@ -303,7 +313,8 @@ void Game::WeaponFire()
                         std::cout << "Test Distance: " << dis << std::endl;
                         std::cout << "Current Closest: " << dis2 << std::endl;
 #endif
-                        if (dis < dis2) {
+                        if (dis < dis2) 
+                        {
                             closestObject = ray;
                         }
                     }
@@ -314,14 +325,16 @@ void Game::WeaponFire()
 #endif            
             IPhysxObject* objectHit = closestObject.Object;
             //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
-            if (objectHit) {
+            if (objectHit) 
+            {
                 //check for collisions with any of the types of bounding boxes the enemies use
                 //TO REFACTOR, PLACE IN GAME CLASS
                 if (objectHit->getType() == EOT_CONVEX_MESH || objectHit->getType() == EOT_BOX || objectHit->getType() == EOT_SPHERE) 
                 {
                     for (u32 i = 0 ; i < enemyObjects.size() ; ++i) 
                     {  // check it against the objects in our array to see if it matches
-                        if (enemyObjects[i]->pair->PhysxObject == objectHit) {
+                        if (enemyObjects[i]->pair->PhysxObject == objectHit) 
+                        {
                             Enemy* enemy = enemyObjects[i];
                             //add small pushback and texture explosion
                             s32 chance = GetRandom(4);
@@ -354,7 +367,8 @@ void Game::WeaponFire()
                                 catch (...)
                                 {
                                     std::cout << "Automatic removal failure" << std::endl;
-                                    try {
+                                    try 
+                                    {
                                         enemyObjects.erase(i); //preserve arrays
                                         enemy->active = false;
                                         enemy->pair->SceneNode->setVisible(false);
@@ -423,7 +437,8 @@ void Game::ConvertBlocks()
         {
             block->ConvertToDynamic();
         }
-        else {
+        else 
+        {
             block->ConvertToStatic();
         }
         
@@ -433,7 +448,8 @@ void Game::ConvertBlocks()
     //spawnManager->FinalWave();
 }
 //simple random number function
-s32 Game::GetRandom(s32 upper) {
+s32 Game::GetRandom(s32 upper) 
+{
     return (rand() % upper) + 1;
 }
 

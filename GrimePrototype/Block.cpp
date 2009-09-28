@@ -13,7 +13,8 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
     //core::array<SRaycastHitData> filteredRayArray;
     SRaycastHitData closestObject;
     closestObject = rayArray[0];
-    for (u32 i = 0; i < rayArray.size(); ++i) {
+    for (u32 i = 0; i < rayArray.size(); ++i) 
+    {
         SRaycastHitData ray = rayArray[i];
         if (ray.Object->getType() == EOT_TRIANGLE_MESH || ray.Object->getType() == EOT_BOX)
         {
@@ -21,14 +22,16 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
             f32 dis2 = (closestObject.HitPosition - line.start).getLength();
             std::cout << "Test Distance: " << dis << std::endl;
             std::cout << "Current Closest: " << dis2 << std::endl;
-            if (dis < dis2) {
+            if (dis < dis2) 
+            {
                 closestObject = ray;
             }
         }
     }
     for (u32 i = 0; i < enemyObjects->size(); i++)
     {
-        try {
+        try 
+        {
             Enemy* enemy = (*enemyObjects)[i];
             f32 distance = (enemy->pair->SceneNode->getAbsolutePosition() - closestObject.HitPosition).getLength();
             if (distance <= 32.0f)
@@ -43,7 +46,8 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
         
     }
     std::cout << "=========" << std::endl;
-    if (closestObject.Object->getType() == EOT_TRIANGLE_MESH || closestObject.Object->getType() == EOT_BOX) {
+    if (closestObject.Object->getType() == EOT_TRIANGLE_MESH || closestObject.Object->getType() == EOT_BOX) 
+    {
         vector3df scale(1,1,1);
         vector3df rot(0,0,0);
         closestObject.HitPosition.Y += scale.Y / 2;
