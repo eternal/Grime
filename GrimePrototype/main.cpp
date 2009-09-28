@@ -70,7 +70,7 @@ public:
 
             switch (event.KeyInput.Key) {
                 case KEY_KEY_H:
-                    game->FinalWave();
+                    game->ConvertBlocks();
                     break;
                 case KEY_KEY_J: {
                     game->CleanupArrays();
@@ -78,14 +78,16 @@ public:
                     break;
                 case KEY_KEY_K:
                     break;
-                case KEY_F9:
+                case KEY_F9: 
+                {
                     //screenshot                  
-                    driver->writeImageToFile(driver->createScreenShot(),"screenie.jpg",0);
-                    break;
-#ifdef DEBUG
-                case KEY_KEY_U:
-                    game->CreateMuzzleFlash();
+                    core::stringc filename = "GrimePrototype";
+                    filename += (unsigned)time(0);
+                    filename += ".jpg";
+                    driver->writeImageToFile(driver->createScreenShot(),filename,0);
+                }
                 break;
+#ifdef DEBUG
                 case KEY_KEY_G: {
                     Block* block = new Block(smgr, physxManager, &game->enemyObjects);
                     game->blockObjects.push_back(block);
@@ -265,8 +267,11 @@ int main() {
     gui::IGUIStaticText* textPrimitives = guienv->addStaticText(L"Primitives Drawn: ", rect<s32>(5, 618, 400, 800));
     textPrimitives->setOverrideColor(SColor(255,255,255,255));
     
-    gui::IGUIStaticText* textTime = guienv->addStaticText(L"Time: ", rect<s32>(1100,2,1200,200));
+    gui::IGUIStaticText* textTime = guienv->addStaticText(L"Time: ", rect<s32>(1100,2,1300,200));
     textTime->setOverrideColor(SColor(255,255,255,255));
+    gui::IGUIStaticText* textFPS = guienv->addStaticText(L"FPS: ", rect<s32>(1100,22,1200,200));
+    textFPS->setOverrideColor(SColor(255,255,255,255));
+
     
     //set gravity to a ridiculous amount due to scale
     core::vector3df gravity = vector3df(0.0f, -98.1f, 0.0f);
@@ -322,7 +327,8 @@ int main() {
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
 #endif // DEBUG
-            core::stringw strTime, strHealth, strCooldown, strPosition, strPrimitives, strTotalTime = "";
+            
+            core::stringw strTime, strHealth, strCooldown, strPosition, strPrimitives, strTotalTime, strFPS = "";
             strTime += game->spawnManager->timeBetweenSpawns;
             strHealth += game->player->health;
             strCooldown += game->player->CurrentCooldown();
@@ -338,6 +344,8 @@ int main() {
             strPrimitives += physxManager->getNumPhysxObjects();
             strTotalTime += "Time: ";
             strTotalTime += game->spawnManager->waveTimer / 1000.0f;
+            strFPS += "FPS: ";
+            strFPS += lastFPS;
             //_itow(player->health, temp2, 10);
             spawns->setText(strTime.c_str());
             health->setText(strHealth.c_str());
@@ -345,6 +353,7 @@ int main() {
             textPosition2->setText(strPosition.c_str());
             textPrimitives->setText(strPrimitives.c_str());
             textTime->setText(strTotalTime.c_str());
+            textFPS->setText(strFPS.c_str());
             guienv->drawAll();
 
             //done rendering
@@ -363,8 +372,10 @@ int main() {
 				lastFPS = fps;
 			}
 		}
-		else
+		else 
+		{
 			device->yield();
+	    }
 	}
 	device->drop();
 	return 0;

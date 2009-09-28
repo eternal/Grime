@@ -60,7 +60,7 @@ public:
     void RestartLevel();
     void WeaponFire();
     SPhysxAndNodePair* CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity);
-    void FinalWave();
+    void ConvertBlocks();
     
     void CleanupArrays();
     core::array<Enemy*> RebuildEnemies();

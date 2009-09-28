@@ -387,7 +387,7 @@ void Game::WeaponFire()
         }
     }
 }
-void Game::FinalWave() 
+void Game::ConvertBlocks() 
 {
     //convert blox to physxblocks
     for (u32 i = 0; i < blockObjects.size(); ++i)
