@@ -106,39 +106,24 @@ int main() {
     
     game = new Game(smgr, soundEngine, physxManager, effect);
     receiver.game = game;
+    
     //add crosshair to centre of screen (64x64 image so -32)
     guienv->addImage(driver->getTexture("media/crosshair2.png"), core::position2di(resolution.Width/2-32,resolution.Height/2-32));
 
     //grab bitmap font
     guienv->getSkin()->setFont(guienv->getFont("media/GillSans12.png"));
+    guienv->getSkin()->setColor(gui::EGDC_BUTTON_TEXT, SColor(255,255,255,255));
     
     gui::IGUIStaticText* levelText = guienv->addStaticText(L"Grime: Kitchen", core::rect<s32>(5,2,200,200));
-    levelText->setOverrideColor(video::SColor(255,255,255,255));
-    
     gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200909291248", core::rect<s32>(5,20,200,200));
-    buildText->setOverrideColor(video::SColor(255,255,255,255));  
-
-    gui::IGUIStaticText* textSpawns = guienv->addStaticText(L"Time Between Spawns: ", core::rect<s32>(5,38,400,200));
-    textSpawns->setOverrideColor(video::SColor(255,255,255,255));
-    
+    gui::IGUIStaticText* textSpawns = guienv->addStaticText(L"Time Between Spawns: ", core::rect<s32>(5,38,400,200));    
     gui::IGUIStaticText* textHealth = guienv->addStaticText(L"Health: ", core::rect<s32>(5,58,400,200));
-    textHealth->setOverrideColor(video::SColor(255,255,255,255));
-
     gui::IGUIStaticText* textCooldown = guienv->addStaticText(L"Cooldown: ", rect<s32>(5,700,400,800));
-    textCooldown->setOverrideColor(SColor(255,255,255,255));
-
     gui::IGUIStaticText* textPosition = guienv->addStaticText(L"Position: ", rect<s32>(5,725,400,800));
-    textPosition->setOverrideColor(SColor(255,255,255,255));
-    
     gui::IGUIStaticText* textPrimitives = guienv->addStaticText(L"Primitives Drawn: ", rect<s32>(5, 750, 400, 810));
-    textPrimitives->setOverrideColor(SColor(255,255,255,255));
-
     gui::IGUIStaticText* textTime = guienv->addStaticText(L"Time: ", rect<s32>(1100,2,1300,200));
-    textTime->setOverrideColor(SColor(255,255,255,255));
-    
     gui::IGUIStaticText* textFPS = guienv->addStaticText(L"FPS: ", rect<s32>(1100,22,1200,200));
-    textFPS->setOverrideColor(SColor(255,255,255,255));
-    	
+
     //set pre-loop data
 	int lastFPS = -1;
     s32 lastTime = device->getTimer()->getTime();
@@ -188,7 +173,6 @@ int main() {
             strTotalTime += game->spawnManager->waveTimer / 1000.0f;
             core::stringw strFPS = "FPS: ";
             strFPS += lastFPS;
-            //_itow(player->health, temp2, 10);
             textSpawns->setText(strTime.c_str());
             textHealth->setText(strHealth.c_str());
             textCooldown->setText(strCooldown.c_str());
