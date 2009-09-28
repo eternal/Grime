@@ -1,6 +1,6 @@
 //=============================================================================
 //  Grime Prototype main.cpp
-//  build 200909281238
+//  build 200909291248
 //=============================================================================
 #define DEBUG 1
 //#define FULLSCREEN 1
@@ -111,35 +111,31 @@ int main() {
 
     //grab bitmap font
     guienv->getSkin()->setFont(guienv->getFont("media/GillSans12.png"));
-    gui::IGUIStaticText* levelText = guienv->addStaticText(L"Grime Prototype: Kitchen", core::rect<s32>(5,2,200,200));
+    
+    gui::IGUIStaticText* levelText = guienv->addStaticText(L"Grime: Kitchen", core::rect<s32>(5,2,200,200));
     levelText->setOverrideColor(video::SColor(255,255,255,255));
-    gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200909281238", core::rect<s32>(5,20,200,200));
+    
+    gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200909291248", core::rect<s32>(5,20,200,200));
     buildText->setOverrideColor(video::SColor(255,255,255,255));  
 
-    gui::IGUIStaticText* generalText = guienv->addStaticText(L"Time Between Spawns: ", core::rect<s32>(5,38,400,200));
-    gui::IGUIStaticText* spawns = guienv->addStaticText(L"2500", core::rect<s32>(164,38,400,200));
-    generalText->setOverrideColor(video::SColor(255,255,255,255));
-    spawns->setOverrideColor(video::SColor(255,255,255,255));
+    gui::IGUIStaticText* textSpawns = guienv->addStaticText(L"Time Between Spawns: ", core::rect<s32>(5,38,400,200));
+    textSpawns->setOverrideColor(video::SColor(255,255,255,255));
+    
     gui::IGUIStaticText* textHealth = guienv->addStaticText(L"Health: ", core::rect<s32>(5,58,400,200));
-    gui::IGUIStaticText* health = guienv->addStaticText(L"100", core::rect<s32>(75,58,400,200));
     textHealth->setOverrideColor(video::SColor(255,255,255,255));
-    health->setOverrideColor(video::SColor(255,255,255,255));
 
-    gui::IGUIStaticText* textCooldown = guienv->addStaticText(L"Cooldown: ", rect<s32>(5,578,400,800));
-    gui::IGUIStaticText* cooldown = guienv->addStaticText(L"Cooldown", rect<s32>(105,578,400,800));
+    gui::IGUIStaticText* textCooldown = guienv->addStaticText(L"Cooldown: ", rect<s32>(5,700,400,800));
     textCooldown->setOverrideColor(SColor(255,255,255,255));
-    cooldown->setOverrideColor(SColor(255,255,255,255));
 
-    gui::IGUIStaticText* textPosition = guienv->addStaticText(L"Position: ", rect<s32>(5,598,400,800));
-    gui::IGUIStaticText* textPosition2 = guienv->addStaticText(L"Position", rect<s32>(105,598,400,800));
+    gui::IGUIStaticText* textPosition = guienv->addStaticText(L"Position: ", rect<s32>(5,725,400,800));
     textPosition->setOverrideColor(SColor(255,255,255,255));
-    textPosition2->setOverrideColor(SColor(255,255,255,255));
-
-    gui::IGUIStaticText* textPrimitives = guienv->addStaticText(L"Primitives Drawn: ", rect<s32>(5, 618, 400, 800));
+    
+    gui::IGUIStaticText* textPrimitives = guienv->addStaticText(L"Primitives Drawn: ", rect<s32>(5, 750, 400, 810));
     textPrimitives->setOverrideColor(SColor(255,255,255,255));
 
     gui::IGUIStaticText* textTime = guienv->addStaticText(L"Time: ", rect<s32>(1100,2,1300,200));
     textTime->setOverrideColor(SColor(255,255,255,255));
+    
     gui::IGUIStaticText* textFPS = guienv->addStaticText(L"FPS: ", rect<s32>(1100,22,1200,200));
     textFPS->setOverrideColor(SColor(255,255,255,255));
     	
@@ -170,32 +166,37 @@ int main() {
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
 #endif // DEBUG
             
-            core::stringw strTime, strHealth, strCooldown, strPosition, strPrimitives, strTotalTime, strFPS = "";
+            core::stringw strTime = "Time Between Spawns: "; 
             strTime += game->spawnManager->timeBetweenSpawns;
+            core::stringw strHealth = "Health: "; 
             strHealth += game->player->health;
+            core::stringw strCooldown = "Cooldown: "; 
             strCooldown += game->player->CurrentCooldown();
-            strPosition += "X: "; 
+            core::stringw strPosition = "X: "; 
             strPosition += game->cameraPair->camera->getAbsolutePosition().X;
             strPosition += " Y: ";
             strPosition += game->cameraPair->camera->getAbsolutePosition().Y; 
             strPosition += " Z: "; 
             strPosition += game->cameraPair->camera->getAbsolutePosition().Z;
-            strPrimitives += "Primitives Count: ";
+            core::stringw strPrimitives = "Primitives Count: ";
             strPrimitives += driver->getPrimitiveCountDrawn();
             strPrimitives += " PhysxObjects Count: ";
             strPrimitives += physxManager->getNumPhysxObjects();
-            strTotalTime += "Time: ";
+            strPrimitives += " \nEnemy Objects: ";
+            strPrimitives += game->enemyObjects.size();
+            core::stringw strTotalTime = "Time: ";
             strTotalTime += game->spawnManager->waveTimer / 1000.0f;
-            strFPS += "FPS: ";
+            core::stringw strFPS = "FPS: ";
             strFPS += lastFPS;
             //_itow(player->health, temp2, 10);
-            spawns->setText(strTime.c_str());
-            health->setText(strHealth.c_str());
-            cooldown->setText(strCooldown.c_str());
-            textPosition2->setText(strPosition.c_str());
+            textSpawns->setText(strTime.c_str());
+            textHealth->setText(strHealth.c_str());
+            textCooldown->setText(strCooldown.c_str());
+            textPosition->setText(strPosition.c_str());
             textPrimitives->setText(strPrimitives.c_str());
             textTime->setText(strTotalTime.c_str());
             textFPS->setText(strFPS.c_str());
+            
             guienv->drawAll();
 
             //done rendering

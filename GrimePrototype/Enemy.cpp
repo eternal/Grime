@@ -222,9 +222,19 @@ void Enemy::Update(s32 time)
         else 
         {                    
             try 
-            {
+            {   
+                for (u32 i = 0; i < enemyArray->size(); ++i)
+                {
+                    Enemy* enemy = (*enemyArray)[i];
+                    if (enemy->pair == this->pair)
+                    {
+                        enemyArray->erase(i);
+                        break;
+                    }                   
+                }
                 physxMan->removePhysxObject(this->pair->PhysxObject);
                 this->pair->SceneNode->setVisible(false);
+                this->pair->SceneNode->remove();
             }
             catch (...)
             {
