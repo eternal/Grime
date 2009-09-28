@@ -136,6 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
 				AdditionalDependencies="PhysXLoader.lib &quot;..\..\IrrPhysx-0.2\lib\IrrPhysx.lib&quot; &quot;..\..\Irrlicht\lib\Win32-visualstudio\Irrlicht.lib&quot; &quot;..\..\irrKlang-1.1.3\lib\Win32-visualStudio\irrKlang.lib&quot;"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
