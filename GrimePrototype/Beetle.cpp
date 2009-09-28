@@ -2,6 +2,15 @@
 
 Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* objectArray, Player* player, vector3df position /*= vector3df(-501.0f,100.0f,-230.0f)*/ )
 {
+
+
+    /*Bug
+        Standing - 11
+        Dead - 10
+        Standing>Walk - 10-18
+        Walk cycle - 19>34
+        attack cycle - 40-60*/
+        
     //set position and scale data
     vector3df pos = position;
     vector3df rot = vector3df(0.0f,0.0f,0.0f);

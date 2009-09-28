@@ -5,7 +5,8 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
     //set position and scale data
     vector3df pos = position;
     vector3df rot = vector3df(0.0f,0.0f,0.0f);
-    vector3df scale = vector3df(0.2f,0.2f,0.2f);
+    //vector3df scale = vector3df(0.2f,0.2f,0.2f);
+    vector3df scale = vector3df(3.0f,3.0f,3.0f);
     //set references
     this->smgr = sceneManager;
     this->physxMan = manager;
@@ -29,7 +30,8 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
     
     //add scene node to game
     this->node = sceneManager->addAnimatedMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
-    IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(2), scale);
+    //IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(2), scale); FOR USING SPIDER INSTEAD OF COCKROACH
+    IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(0), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, physxRot, 1000.0f);
     pair->SceneNode = node;
 
@@ -56,7 +58,7 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
 
     strength = 1;
     health = 1;
-    speed = 0.4f;
+    speed =1.0f;
 }
 
 Cockroach::~Cockroach(void)

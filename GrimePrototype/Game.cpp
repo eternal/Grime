@@ -119,7 +119,7 @@ void Game::CreateExplosion( vector3df position )
 
 void Game::CreateImpactEffect( vector3df position, vector3df normal )
 {
-    core::vector3df scale(5,5,1);
+    core::vector3df scale(50,50,1);
     // create texture animation for the nodes
     scene::ISceneNodeAnimator* textureAnim = smgr->createTextureAnimator(impactTextures, 25, false);
     // create deletion animator to automatically remove the nodes
@@ -183,7 +183,7 @@ void Game::Update( s32 time )
 {
     cameraPair->updateTransformation();
     player->Update(time);
-    //spawnManager->Update(time);
+    spawnManager->Update(time);
     for (u32 i = 0; i < enemyObjects.size(); i++) {
         enemyObjects[i]->Update(time);
         //effect->addEffectToNode(enemyObjects[i]->pair->SceneNode,(E_EFFECT_TYPE)5);

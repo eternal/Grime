@@ -13,12 +13,14 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     waveTimer = 0;
     minuteTimer = 0;
     timeBetweenSpawns = 2500;
+    spawnsActive = false;
     
     positionOne = vector3df(-789.5f,30.0f,1080.842f);
     positionTwo = vector3df(-1955.101f,30.0f,-1432.715f);
     positionThree = vector3df(950.0f,720.1f,-1125.0f);
     
-    cockroachMesh = smgr->getMesh("media/cockroack_rigged_a02.x");
+    //cockroachMesh = smgr->getMesh("media/cockroack_rigged_a02.x"); COMMENTED OUT UNTIL LOWPOLY MESH ARRIVES
+    cockroachMesh = smgr->getMesh("media/spiderupdated.x");
     spiderMesh = smgr->getMesh("media/spiderupdated.x");
     ratMesh = smgr->getMesh("media/rat.x");
     beetleMesh = smgr->getMesh("media/beetle2.x");
@@ -30,26 +32,37 @@ SpawnManager::~SpawnManager(void)
 void SpawnManager::Update( s32 time )
 {
     currentTimer += time;
-    spawnTimer += time;
     waveTimer += time;
-    minuteTimer += time;
     if (currentTimer >= 100) {
         timeBetweenSpawns--;
         currentTimer = 0;
     }
-    
-    if (spawnTimer >= timeBetweenSpawns)
+    if (!spawnsActive)
     {
-        SpawnWave();
-        SpawnWaveSpiders();
-        spawnTimer = 0;
+        if (waveTimer >= 30000)
+        {
+            spawnsActive = true;
+        }
+    }
+    if (spawnsActive)
+    {
+        spawnTimer += time;
+        minuteTimer += time;
+        if (spawnTimer >= timeBetweenSpawns)
+        {
+            SpawnWave();
+            SpawnWaveSpiders();
+            spawnTimer = 0;
+        }
+
+        if (minuteTimer >= 60000)
+        {
+            SpawnWaveBeetles();
+            minuteTimer = 0;
+        }
     }
     
-    if (minuteTimer >= 60000)
-    {
-        SpawnWaveBeetles();
-        minuteTimer = 0;
-    }
+   
     
 }
 void SpawnManager::SpawnWaveSpiders()

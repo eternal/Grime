@@ -231,7 +231,7 @@ int main() {
     guienv->getSkin()->setFont(guienv->getFont("media/GillSans12.png"));
     gui::IGUIStaticText* levelText = guienv->addStaticText(L"Grime Prototype: Kitchen", core::rect<s32>(5,2,200,200));
     levelText->setOverrideColor(video::SColor(255,255,255,255));
-    gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200909170234", core::rect<s32>(5,20,200,200));
+    gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200909281238", core::rect<s32>(5,20,200,200));
     buildText->setOverrideColor(video::SColor(255,255,255,255));  
 
     gui::IGUIStaticText* generalText = guienv->addStaticText(L"Time Between Spawns: ", core::rect<s32>(5,38,400,200));
@@ -255,6 +255,9 @@ int main() {
     
     gui::IGUIStaticText* textPrimitives = guienv->addStaticText(L"Primitives Drawn: ", rect<s32>(5, 618, 400, 800));
     textPrimitives->setOverrideColor(SColor(255,255,255,255));
+    
+    gui::IGUIStaticText* textTime = guienv->addStaticText(L"Time: ", rect<s32>(1100,2,1200,200));
+    textTime->setOverrideColor(SColor(255,255,255,255));
     
     //set gravity to a ridiculous amount due to scale
     core::vector3df gravity = vector3df(0.0f, -98.1f, 0.0f);
@@ -310,7 +313,7 @@ int main() {
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
 #endif // DEBUG
-            core::stringw strTime, strHealth, strCooldown, strPosition, strPrimitives = "";
+            core::stringw strTime, strHealth, strCooldown, strPosition, strPrimitives, strTotalTime = "";
             strTime += game->spawnManager->timeBetweenSpawns;
             strHealth += game->player->health;
             strCooldown += game->player->CurrentCooldown();
@@ -324,12 +327,15 @@ int main() {
             strPrimitives += driver->getPrimitiveCountDrawn();
             strPrimitives += " PhysxObjects Count: ";
             strPrimitives += physxManager->getNumPhysxObjects();
+            strTotalTime += "Time: ";
+            strTotalTime += game->spawnManager->waveTimer / 1000.0f;
             //_itow(player->health, temp2, 10);
             spawns->setText(strTime.c_str());
             health->setText(strHealth.c_str());
             cooldown->setText(strCooldown.c_str());
             textPosition2->setText(strPosition.c_str());
             textPrimitives->setText(strPrimitives.c_str());
+            textTime->setText(strTotalTime.c_str());
             guienv->drawAll();
 
             //done rendering

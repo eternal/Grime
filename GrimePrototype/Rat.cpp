@@ -2,10 +2,16 @@
 
 Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* objectArray, Player* player, vector3df position /*= vector3df(-501.0f,100.0f,-230.0f)*/ )
 {
+    /*Rat
+        Standing - 1-11
+        Initial walk - 12-28
+        Walk cycle - 28-39
+        Attack cycle - (42-54)*/
     //set position and scale data
     vector3df pos = position;
     vector3df rot = vector3df(0.0f,0.0f,0.0f);
     vector3df scale = vector3df(2.0f,2.0f,2.0f);
+    //set references
     //set references
     this->smgr = sceneManager;
     this->physxMan = manager;
@@ -23,6 +29,7 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     soundReset = false;
     soundResetTimer = 0.0f;
     soundWalkCurrentPosition = 0;
+
 
     IPhysxMesh* pmesh = physxMan->createConvexMesh(mesh->getMeshBuffer(1), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, rot, 1000.0f);

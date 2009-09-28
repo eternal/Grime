@@ -43,6 +43,8 @@ public:
     
     s32 waveTimer;
     
+    bool spawnsActive;
+    
     void Update( s32 time );
     void SpawnWave();
     void SpawnCockroach(vector3df position);
