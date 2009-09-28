@@ -31,7 +31,6 @@ public:
     ISoundEngine* soundEngine;
     IPhysxManager* physxManager;
     EffectHandler* effect;
-    
     Player* player;
     core::array<Enemy*> enemyObjects;
     core::array<Block*> blockObjects;

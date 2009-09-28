@@ -49,6 +49,32 @@ Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxM
         sprintf_s(tmp, "media/impact/%02d.jpg", i);
         impactTextures.push_back(smgr->getVideoDriver()->getTexture(tmp));
     }
+    //set gravity to a ridiculous amount due to scale
+    core::vector3df gravity = vector3df(0.0f, -98.1f, 0.0f);
+    physxManager->setGravity(gravity);
+
+    //TODO: FIX PHYSICS MESHING BUG, BANDAID FIX BELOW BY SENDING FIRST SPAWN OFF MAP
+    spawnManager->DIRTYMESHFIX();
+
+    //set black clear colour
+    effect->setClearColour(SColor(255, 0, 0, 0));
+    effect->setAmbientColor(SColor(255, 32, 32, 32));
+    //TODO: REDO LIGHTING, THIS WILL DO FOR PROTOTYPE
+    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
+    light->setLightType(ELT_POINT);
+    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(1229, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
+    light2->setLightType(ELT_POINT);
+    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-1250, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),2000.0f);
+    light3->setLightType(ELT_POINT);
+    //check which shader language to use
+
+//    const stringc shaderExt = (driver->getDriverType() == EDT_DIRECT3D9) ? ".hlsl" : ".glsl";
+
+    effect->addPostProcessingEffectFromFile(core::stringc("shaders/BloomP.hlsl"));
+    effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon.hlsl"));
+    
+    this->RebuildEnemies();
+    this->RestartLevel();
 }
 
 Game::~Game(void)

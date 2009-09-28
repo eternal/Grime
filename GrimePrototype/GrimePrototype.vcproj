@@ -212,6 +212,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EventReceiver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Game.cpp"
 				>
 			</File>
@@ -291,6 +295,10 @@
 			</File>
 			<File
 				RelativePath=".\entity.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EventReceiver.h"
 				>
 			</File>
 			<File
