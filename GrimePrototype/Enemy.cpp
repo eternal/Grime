@@ -239,7 +239,7 @@ void Enemy::Update(s32 time)
             catch (...)
             {
                 std::cout << "another exception" << std::endl;
-                std::cout << "Enemy: " << &pair << std::endl;
+                std::cout << "Enemy: " << &pair << std::endl; 
             }
             active = false;
         } 

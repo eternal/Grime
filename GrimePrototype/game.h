@@ -15,6 +15,7 @@
 #include "Block.h"
 #include "Projectile.h"
 #include "SpawnManager.h"
+#include "LODSceneNode.h"
 
 using namespace irr;
 using namespace core;

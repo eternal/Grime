@@ -57,6 +57,9 @@ bool EventReceiver::OnEvent(const SEvent& event)
                 case KEY_KEY_H:
                     game->ConvertBlocks();
                     break;
+                case KEY_KEY_K:
+                    //game->roomnode2->setLODOn(!game->roomnode2->getLODOn());
+                    break;
                 case KEY_KEY_J: 
                 {
                         game->CleanupArrays();

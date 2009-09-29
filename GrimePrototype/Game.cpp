@@ -9,10 +9,11 @@ Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxM
     this->soundEngine = soundEngine;
     this->physxManager = physxManager;
     this->effect = effect;
-    room = smgr->getMesh("media/level/kitchen retex final.b3d")->getMesh(0);
+    room = smgr->getMesh("media/level/kitchen retex final.b3d")->getMesh(1);
     
     //create scene node for mesh and place
     roomnode = smgr->addMeshSceneNode(room,0,-1,vector3df(0,0,0),vector3df(0,0,0));
+    //roomnode = smgr->addOctTreeSceneNode(room,0,-1,65534);
     //roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
 
     //scale to proper size
@@ -74,8 +75,8 @@ Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxM
 
 //    const stringc shaderExt = (driver->getDriverType() == EDT_DIRECT3D9) ? ".hlsl" : ".glsl";
 
-    effect->addPostProcessingEffectFromFile(core::stringc("shaders/BloomP.hlsl"));
-    effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon.hlsl"));
+    //effect->addPostProcessingEffectFromFile(core::stringc("shaders/BloomP.hlsl"));
+    //effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon.hlsl"));
     
     this->RebuildEnemies();
     this->RestartLevel();

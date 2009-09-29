@@ -311,6 +311,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LODSceneNode.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PairStructs.h"
 				>
 			</File>

@@ -133,7 +133,7 @@ int main() {
         s32 timeNow = device->getTimer()->getTime();
         s32 elapsedTime = timeNow - lastTime;
         lastTime = timeNow;
-                
+        
         //simulate physics
 	    physxManager->simulate(elapsedTime/1000.0f);
 	    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING
