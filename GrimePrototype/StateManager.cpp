@@ -109,7 +109,7 @@ void StateManager::LoadState(s32 state)
             roomnode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
             
             //get the mesh buffers of the mesh and create physics representation
-            for (u32 i = 0 ; i < room->getMeshBufferCount(); i++) 
+            for (u32 i = 0 ; i < room->getMeshBufferCount(); ++i) 
             {
                 //first calculate the mesh triangles and make physx object
                 //IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(1.0f,1.0f,1.0f));

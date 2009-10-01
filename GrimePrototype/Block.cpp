@@ -73,6 +73,7 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
         //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
         pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, blockPosition, rot, scale);
         pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
+        this->ConvertToDynamic();
     }
 }
 
