@@ -248,6 +248,10 @@
 				RelativePath=".\Spider.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\StateManager.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -340,6 +344,10 @@
 			</File>
 			<File
 				RelativePath=".\Spider.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StateManager.h"
 				>
 			</File>
 			<File

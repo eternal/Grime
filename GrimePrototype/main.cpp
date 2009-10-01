@@ -8,6 +8,7 @@
 #include <iostream>
 #include <IrrPhysx.h>
 #include <cstdlib>
+#include <iostream>
 #include <ctime> 
 #include "XEffects.h"
 #include <NxPhysics.h>
@@ -15,6 +16,7 @@
 #include "irrKlangSceneNode.h"
 #include "Game.h"
 #include "EventReceiver.h"
+#include "StateManager.h"
 
 using namespace irr;
 using namespace core;
@@ -41,6 +43,7 @@ IPhysxManager* physxManager = NULL;
 EffectHandler* effect = NULL;
 irrklang::ISoundEngine* soundEngine = NULL;
 Game* game = NULL;
+StateManager* stateManager = NULL;
 
 int main() {
 	video::E_DRIVER_TYPE driverType;
@@ -79,7 +82,7 @@ int main() {
 	dimension2du ScreenRTT = !driver->getVendorInfo().equals_ignore_case("NVIDIA Corporation") ? dimension2du(1024, 1024) : driver->getScreenSize();
 
 	//effects handler
-	effect = new EffectHandler(device, "shaders", ScreenRTT, true);
+	effect = new EffectHandler(device, "media/shaders", ScreenRTT, true);
     
     if (!effect)
     {
@@ -103,27 +106,13 @@ int main() {
     {
         return 4; // physics engine failure
     }
-    
-    game = new Game(smgr, soundEngine, physxManager, effect);
+    smgr->getFileSystem()->addZipFileArchive("media/kitchen.pk3");
+    game = new Game(device, soundEngine, physxManager, effect);
+    stateManager = new StateManager(device, physxManager, game);
     receiver.game = game;
+    receiver.stateManager = stateManager;
     
-    //add crosshair to centre of screen (64x64 image so -32)
-    guienv->addImage(driver->getTexture("media/crosshair2.png"), core::position2di(resolution.Width/2-32,resolution.Height/2-32));
-
-    //grab bitmap font
-    guienv->getSkin()->setFont(guienv->getFont("media/GillSans12.png"));
-    guienv->getSkin()->setColor(gui::EGDC_BUTTON_TEXT, SColor(255,255,255,255));
-    
-    gui::IGUIStaticText* levelText = guienv->addStaticText(L"Grime: Kitchen", core::rect<s32>(5,2,200,200));
-    gui::IGUIStaticText* buildText = guienv->addStaticText(L"Build: 200909291248", core::rect<s32>(5,20,200,200));
-    gui::IGUIStaticText* textSpawns = guienv->addStaticText(L"Time Between Spawns: ", core::rect<s32>(5,38,400,200));    
-    gui::IGUIStaticText* textHealth = guienv->addStaticText(L"Health: ", core::rect<s32>(5,58,400,200));
-    gui::IGUIStaticText* textCooldown = guienv->addStaticText(L"Cooldown: ", rect<s32>(5,700,400,800));
-    gui::IGUIStaticText* textPosition = guienv->addStaticText(L"Position: ", rect<s32>(5,725,400,800));
-    gui::IGUIStaticText* textPrimitives = guienv->addStaticText(L"Primitives Drawn: ", rect<s32>(5, 750, 400, 810));
-    gui::IGUIStaticText* textTime = guienv->addStaticText(L"Time: ", rect<s32>(1100,2,1300,200));
-    gui::IGUIStaticText* textFPS = guienv->addStaticText(L"FPS: ", rect<s32>(1100,22,1200,200));
-
+    stateManager->LoadState(EGS_MENU);
     //set pre-loop data
 	int lastFPS = -1;
     s32 lastTime = device->getTimer()->getTime();
@@ -139,7 +128,7 @@ int main() {
 	    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING
 	    physxManager->fetchResults();
         
-	    game->Update(elapsedTime);
+	    stateManager->Update(elapsedTime);
         //start drawing
         if (device->isWindowActive())
         {            
@@ -150,37 +139,7 @@ int main() {
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
 #endif // DEBUG
-            
-            core::stringw strTime = "Time Between Spawns: "; 
-            strTime += game->spawnManager->timeBetweenSpawns;
-            core::stringw strHealth = "Health: "; 
-            strHealth += game->player->health;
-            core::stringw strCooldown = "Cooldown: "; 
-            strCooldown += game->player->CurrentCooldown();
-            core::stringw strPosition = "X: "; 
-            strPosition += game->cameraPair->camera->getAbsolutePosition().X;
-            strPosition += " Y: ";
-            strPosition += game->cameraPair->camera->getAbsolutePosition().Y; 
-            strPosition += " Z: "; 
-            strPosition += game->cameraPair->camera->getAbsolutePosition().Z;
-            core::stringw strPrimitives = "Primitives Count: ";
-            strPrimitives += driver->getPrimitiveCountDrawn();
-            strPrimitives += " PhysxObjects Count: ";
-            strPrimitives += physxManager->getNumPhysxObjects();
-            strPrimitives += " \nEnemy Objects: ";
-            strPrimitives += game->enemyObjects.size();
-            core::stringw strTotalTime = "Time: ";
-            strTotalTime += game->spawnManager->waveTimer / 1000.0f;
-            core::stringw strFPS = "FPS: ";
-            strFPS += lastFPS;
-            textSpawns->setText(strTime.c_str());
-            textHealth->setText(strHealth.c_str());
-            textCooldown->setText(strCooldown.c_str());
-            textPosition->setText(strPosition.c_str());
-            textPrimitives->setText(strPrimitives.c_str());
-            textTime->setText(strTotalTime.c_str());
-            textFPS->setText(strFPS.c_str());
-            
+                        
             guienv->drawAll();
 
             //done rendering

@@ -103,6 +103,12 @@ bool EventReceiver::OnEvent(const SEvent& event)
                 case KEY_KEY_I:
                     game->RestartLevel();
                     break;
+                case KEY_KEY_O:
+                    stateManager->LoadState(EGS_GAME);
+                    break;
+                case KEY_KEY_P:
+                    stateManager->LoadState(EGS_MENU);
+                    break;
                 case KEY_KEY_V:
                     // Toggle the debug data visibility
                     game->physxManager->setDebugDataVisible(!game->physxManager->isDebugDataVisible());

@@ -1,85 +1,15 @@
 #include "Game.h"
 //#define WEAPONDEBUG 1
 
-Game::Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, EffectHandler* effect)
+Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* physxManager, EffectHandler* effect)
 {
     blockFinalToggle = false;
     cleanupTimer = 0;
-    this->smgr = smgr;
+    this->smgr = device->getSceneManager();
     this->soundEngine = soundEngine;
     this->physxManager = physxManager;
     this->effect = effect;
-    room = smgr->getMesh("media/level/kitchen retex final.b3d")->getMesh(1);
-    
-    //create scene node for mesh and place
-    roomnode = smgr->addMeshSceneNode(room,0,-1,vector3df(0,0,0),vector3df(0,0,0));
-    //roomnode = smgr->addOctTreeSceneNode(room,0,-1,65534);
-    //roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
-
-    //scale to proper size
-    vector3df roomScale(1200.0f,1200.0f,1200.0f);
-    roomnode->setScale(vector3df(roomScale));
-    for (u32 i = 0; i < roomnode->getMaterialCount(); i++) 
-    {
-        roomnode->getMaterial(i).Lighting = true;
-    }
-    
-    //normalize mesh's normals as it has been scaled
-    roomnode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-    
-    //get the mesh buffers of the mesh and create physics representation
-    for (u32 i = 0 ; i < room->getMeshBufferCount(); i++) 
-    {
-        //first calculate the mesh triangles and make physx object
-        //IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), vector3df(1.0f,1.0f,1.0f));
-        IPhysxMesh* triMesh = physxManager->createTriangleMesh(room->getMeshBuffer(i), roomScale);
-        //secondly add the object to the world
-        physxManager->createTriangleMeshObject(triMesh,vector3df(0.0f,0.0f,0.0f));
-    }
-    
-    startPosition = vector3df(0.0f,20.0f,0.0f);
-    this->CreateCamera();
-    player = new Player(smgr, soundEngine, physxManager, cameraPair, effect);
-    spawnManager = new SpawnManager(smgr, soundEngine, physxManager, &enemyObjects, player);
-    // Preload texture animators
-    // just for prototype only
-    c8 tmp[64];
-    for (s32 i = 1 ; i <= 10 ; ++i) 
-    {
-        sprintf_s(tmp, "media/explosion/%02d.jpg", i);
-        explosionTextures.push_back(smgr->getVideoDriver()->getTexture(tmp));
-    }
-    for (s32 i = 1 ; i <= 6 ; ++i) 
-    {
-        sprintf_s(tmp, "media/impact/%02d.jpg", i);
-        impactTextures.push_back(smgr->getVideoDriver()->getTexture(tmp));
-    }
-    //set gravity to a ridiculous amount due to scale
-    core::vector3df gravity = vector3df(0.0f, -98.1f, 0.0f);
-    physxManager->setGravity(gravity);
-
-    //TODO: FIX PHYSICS MESHING BUG, BANDAID FIX BELOW BY SENDING FIRST SPAWN OFF MAP
-    spawnManager->DIRTYMESHFIX();
-
-    //set black clear colour
-    effect->setClearColour(SColor(255, 0, 0, 0));
-    effect->setAmbientColor(SColor(255, 32, 32, 32));
-    //TODO: REDO LIGHTING, THIS WILL DO FOR PROTOTYPE
-    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
-    light->setLightType(ELT_POINT);
-    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(1229, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
-    light2->setLightType(ELT_POINT);
-    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-1250, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),2000.0f);
-    light3->setLightType(ELT_POINT);
-    //check which shader language to use
-
-//    const stringc shaderExt = (driver->getDriverType() == EDT_DIRECT3D9) ? ".hlsl" : ".glsl";
-
-    //effect->addPostProcessingEffectFromFile(core::stringc("shaders/BloomP.hlsl"));
-    //effect->addPostProcessingEffectFromFile(core::stringc("shaders/Toon.hlsl"));
-    
-    this->RebuildEnemies();
-    this->RestartLevel();
+    this->guienv = device->getGUIEnvironment();
 }
 
 Game::~Game(void)
@@ -213,7 +143,58 @@ void Game::CreateMuzzleFlash()
     bill->addAnimator(anim);
     anim->drop();
 }
+void Game::LoadLevel()
+{
+    //roomnode = smgr->addOctTreeSceneNode(room,0,-1,65534);
+    //roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
+    //scale to proper size
+    
+    startPosition = vector3df(0.0f,30.1f,0.0f);
+    this->CreateCamera();
+    player = new Player(smgr, soundEngine, physxManager, cameraPair, effect);
+    spawnManager = new SpawnManager(smgr, soundEngine, physxManager, &enemyObjects, player);
+    // Preload texture animators
+    // just for prototype only
+    c8 tmp[64];
+    explosionTextures.clear();
+    impactTextures.clear();
+    for (s32 i = 1 ; i <= 10 ; ++i) 
+    {
+        sprintf_s(tmp, "media/explosion/%02d.jpg", i);
+        explosionTextures.push_back(smgr->getVideoDriver()->getTexture(tmp));
+    }
+    for (s32 i = 1 ; i <= 6 ; ++i) 
+    {
+        sprintf_s(tmp, "media/impact/%02d.jpg", i);
+        impactTextures.push_back(smgr->getVideoDriver()->getTexture(tmp));
+    }
+    //set gravity to a ridiculous amount due to scale
+    core::vector3df gravity = vector3df(0.0f, -98.1f, 0.0f);
+    physxManager->setGravity(gravity);
 
+    //TODO: FIX PHYSICS MESHING BUG, BANDAID FIX BELOW BY SENDING FIRST SPAWN OFF MAP
+    spawnManager->DIRTYMESHFIX();
+
+    //set black clear colour
+    effect->setClearColour(SColor(255, 0, 0, 0));
+    effect->setAmbientColor(SColor(255, 32, 32, 32));
+
+    //TODO: REDO LIGHTING, THIS WILL DO FOR PROTOTYPE
+    ILightSceneNode* light = smgr->addLightSceneNode(0,vector3df(97, 150, 23),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
+    light->setLightType(ELT_POINT);
+    ILightSceneNode* light2 = smgr->addLightSceneNode(0,vector3df(1229, 150, 26),SColorf(0.3f, 0.3f, 0.3f, 0.5f),1600.0f);
+    light2->setLightType(ELT_POINT);
+    ILightSceneNode* light3 = smgr->addLightSceneNode(0,vector3df(-1250, 150, 186),SColorf(0.3f, 0.3f, 0.3f, 0.5f),2000.0f);
+    light3->setLightType(ELT_POINT);
+    //check which shader language to use
+
+//    const stringc shaderExt = (driver->getDriverType() == EDT_DIRECT3D9) ? ".hlsl" : ".glsl";
+
+    effect->addPostProcessingEffectFromFile(core::stringc("media/shaders/BloomP.hlsl"));
+    effect->addPostProcessingEffectFromFile(core::stringc("media/shaders/Toon.hlsl"));
+    this->RebuildEnemies();
+    this->RestartLevel();
+}
 void Game::Update( s32 time )
 {
     if (player->health <= 0) 

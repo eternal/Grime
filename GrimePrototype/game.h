@@ -25,13 +25,14 @@ using namespace video;
 class Game
 {
 public:
-    Game(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, EffectHandler* effect);
+    Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* physxManager, EffectHandler* effect);
     ~Game(void);
     
     ISceneManager* smgr;
     ISoundEngine* soundEngine;
     IPhysxManager* physxManager;
     EffectHandler* effect;
+    gui::IGUIEnvironment* guienv;
     Player* player;
     core::array<Enemy*> enemyObjects;
     core::array<Block*> blockObjects;
@@ -46,6 +47,7 @@ public:
     core::array<video::ITexture*> explosionTextures;
     core::array<video::ITexture*> impactTextures;
     
+    
     vector3df startPosition;
     bool blockFinalToggle;
     
@@ -53,6 +55,7 @@ public:
     void CreateImpactEffect(vector3df position, vector3df normal);
     void CreateMuzzleFlash();
     void CreateCamera();
+    void LoadLevel();
     
     void Update(s32 time);
     

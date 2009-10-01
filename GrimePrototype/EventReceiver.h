@@ -1,6 +1,7 @@
 #pragma once
 #include <irrlicht.h>
 #include "Game.h"
+#include "StateManager.h"
 #include <ctime>
 
 class EventReceiver :
@@ -12,6 +13,7 @@ public:
     ~EventReceiver(void);
     
     Game* game;
+    StateManager* stateManager;
     IrrlichtDevice* device;
     
     bool OnEvent(const SEvent& event);
