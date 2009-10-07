@@ -70,7 +70,7 @@ void Game::CreateExplosion( vector3df position )
     scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(60,60), position);
     // Setup the material
     bill->setMaterialFlag(video::EMF_LIGHTING, false);
-    bill->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/explosion/01.jpg"));
+    bill->setMaterialTexture(0, explosionTextures[0]);
     bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
     // Add the animator
     bill->addAnimator(anim);

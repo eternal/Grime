@@ -60,7 +60,7 @@ void Projectile::Update( s32 time )
             scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(40,40), this->pair->SceneNode->getAbsolutePosition());
             // Setup the material
             bill->setMaterialFlag(video::EMF_LIGHTING, false);
-            bill->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/explosion/01.jpg"));
+            bill->setMaterialTexture(0, explosionTextures[0]);
             bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
             // Add the animator
             bill->addAnimator(anim);
@@ -139,7 +139,7 @@ void Projectile::Detonate()
     scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(300,300), this->pair->SceneNode->getAbsolutePosition());
     // Setup the material
     bill->setMaterialFlag(video::EMF_LIGHTING, false);
-    bill->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/explosion/01.jpg"));
+    bill->setMaterialTexture(0, explosionTextures[0]);
     bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
     // Add the animator
     bill->addAnimator(anim);
