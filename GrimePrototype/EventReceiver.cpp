@@ -17,12 +17,15 @@ EventReceiver::~EventReceiver(void)
 }
 
 bool EventReceiver::OnEvent(const SEvent& event) 
-{       
-    if (event.EventType == EET_KEY_INPUT_EVENT) 
+{    
+    switch (stateManager->currentState)
     {
-
-        switch (event.KeyInput.Key) 
-        { 
+        case EGS_GAME:
+        {
+            if (event.EventType == EET_KEY_INPUT_EVENT) 
+            {
+                switch (event.KeyInput.Key) 
+                { 
                 case KEY_ADD:   
                     game->spawnManager->timeBetweenSpawns+= 100;
                     break;
@@ -33,27 +36,27 @@ bool EventReceiver::OnEvent(const SEvent& event)
                     //jump
                     game->player->Jump();
                     break;
-        }
-        //if the key is held down, return and ignore
-        if (event.KeyInput.PressedDown) return false;
+                }
+                //if the key is held down, return and ignore
+                if (event.KeyInput.PressedDown) return false;
 
-        switch (event.KeyInput.Key) 
-        {
-                case KEY_F9: 
+                switch (event.KeyInput.Key) 
                 {
+                case KEY_F9: 
+                    {
                         //screenshot                  
                         core::stringc filename = "GrimePrototype";
                         filename += (unsigned)time(0);
                         filename += ".jpg";
                         this->device->getVideoDriver()->writeImageToFile(device->getVideoDriver()->createScreenShot(),filename,0);
-                }
+                    }
                     break;
                 case KEY_KEY_G: 
-                {
-                    Block* block = new Block(game->smgr, game->physxManager, &game->enemyObjects);
-                    game->blockObjects.push_back(block);
-                }
-                break;  
+                    {
+                        Block* block = new Block(game->smgr, game->physxManager, &game->enemyObjects);
+                        game->blockObjects.push_back(block);
+                    }
+                    break;  
                 case KEY_KEY_H:
                     game->ConvertBlocks();
                     break;
@@ -61,52 +64,49 @@ bool EventReceiver::OnEvent(const SEvent& event)
                     //game->roomnode2->setLODOn(!game->roomnode2->getLODOn());
                     break;
                 case KEY_KEY_J: 
-                {
+                    {
                         game->CleanupArrays();
-                }
-                break;                           
+                    }
+                    break;                           
                 case KEY_KEY_1: 
-                {
-                    game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
-                }
-                break;
+                    {
+                        game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
+                    }
+                    break;
                 case KEY_KEY_2: 
-                {
-                    game->spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
-                }
-                break;
+                    {
+                        game->spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
+                    }
+                    break;
                 case KEY_KEY_3: 
-                {
-                    game->spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
-                }
-                break;
+                    {
+                        game->spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
+                    }
+                    break;
                 case KEY_KEY_4: 
-                {
-                    game->spawnManager->SpawnRat(vector3df(0.0f,100.0f,0.0f));
-                }
-                break; 
+                    {
+                        game->spawnManager->SpawnRat(vector3df(0.0f,100.0f,0.0f));
+                    }
+                    break; 
                 case KEY_KEY_8: 
-                {
-                    game->spawnManager->SpawnSpider(game->spawnManager->positionOne);
-                }
-                break;
+                    {
+                        game->spawnManager->SpawnSpider(game->spawnManager->positionOne);
+                    }
+                    break;
                 case KEY_KEY_9: 
-                {
-                    game->spawnManager->SpawnSpider(game->spawnManager->positionTwo);
-                }
-                break;
+                    {
+                        game->spawnManager->SpawnSpider(game->spawnManager->positionTwo);
+                    }
+                    break;
                 case KEY_KEY_0: 
-                {
-                    game->spawnManager->SpawnSpider(game->spawnManager->positionThree);
-                }
-                break;
+                    {
+                        game->spawnManager->SpawnSpider(game->spawnManager->positionThree);
+                    }
+                    break;
                 case KEY_KEY_I:
                     game->RestartLevel();
                     break;
                 case KEY_KEY_O:
-                    stateManager->LoadState(EGS_GAME);
-                    break;
-                case KEY_KEY_P:
                     stateManager->LoadState(EGS_MENU);
                     break;
                 case KEY_KEY_V:
@@ -123,50 +123,71 @@ bool EventReceiver::OnEvent(const SEvent& event)
                     //close the device and exit
                     device->closeDevice();
                     break;
+                }
+            } 
+            else if (event.EventType == EET_MOUSE_INPUT_EVENT) 
+            {
+                if (event.MouseInput.isLeftPressed())
+                {
+                    game->WeaponFire();
+
+                }
+                switch (event.MouseInput.Event) 
+                {
+                case EMIE_MOUSE_WHEEL: 
+                    {
+                        game->player->WeaponSelect(event.MouseInput.Wheel);
+                    }
+                    break;
+                case EMIE_LMOUSE_PRESSED_DOWN: 
+                    {
+
+                    }
+                    break;
+                case EMIE_LMOUSE_LEFT_UP: 
+                    {
+
+                    }
+                    break;             
+                case EMIE_RMOUSE_PRESSED_DOWN: 
+                    {
+
+                    }
+                    break;
+                case EMIE_RMOUSE_LEFT_UP: 
+                    {
+
+                    }
+                    break;
+                }          
+            } 
+            else if (event.EventType == EET_GUI_EVENT) 
+            {
+                //gui events
+                return false;
+            }
+            return false;
         }
-    } 
-    else if (event.EventType == EET_MOUSE_INPUT_EVENT) 
-    {
-        if (event.MouseInput.isLeftPressed())
+        case EGS_MENU:
         {
-            game->WeaponFire();
+            if (event.EventType == EET_KEY_INPUT_EVENT) 
+            {
+                //if the key is held down, return and ignore
+                if (event.KeyInput.PressedDown) return false;
 
-        }
-        switch (event.MouseInput.Event) 
-        {
-            case EMIE_MOUSE_WHEEL: 
-            {
-                game->player->WeaponSelect(event.MouseInput.Wheel);
-            }
-            break;
-            case EMIE_LMOUSE_PRESSED_DOWN: 
-            {
-
-            }
-            break;
-            case EMIE_LMOUSE_LEFT_UP: 
-            {
-
-            }
-            break;             
-            case EMIE_RMOUSE_PRESSED_DOWN: 
-            {
-
-            }
-            break;
-            case EMIE_RMOUSE_LEFT_UP: 
-            {
+                switch (event.KeyInput.Key) 
+                {
+                case KEY_KEY_O: 
+                {
+                    this->stateManager->LoadState(EGS_GAME);
+                }
+                }
             
             }
-            break;
-        }          
-    } 
-    else if (event.EventType == EET_GUI_EVENT) 
-    {
-        //gui events
-        return false;
+        }
     }
-    return false;
+   
+    
 }
 
 void EventReceiver::Setup( Game* game, IrrlichtDevice* device )
