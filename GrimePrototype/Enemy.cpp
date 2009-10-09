@@ -57,6 +57,7 @@ Enemy::Enemy(scene::ISceneManager* sceneManager,  irrklang::ISoundEngine* soundE
     attackTimer = 0;
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+    pair->SceneNode->setAutomaticCulling(EAC_FRUSTUM_BOX);
 }
 
 Enemy::~Enemy(void)

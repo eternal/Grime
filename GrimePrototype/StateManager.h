@@ -27,7 +27,7 @@ public:
     s32 currentState;
     core::dimension2du resolution;
     
-    ISceneNode* roomnode;
+    //ISceneNode* roomnode;
     IMesh* room;
 
     gui::IGUIStaticText* levelText;
@@ -46,4 +46,5 @@ public:
     
     void LoadState(s32 state);
     void Update(s32 time);
+    void NodeInit(IMeshSceneNode* node, vector3df scale);
 };
