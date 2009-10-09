@@ -102,7 +102,7 @@ void Game::CreateImpactEffect( vector3df position, vector3df normal )
     node->setRotation(mat.getRotationDegrees());
     // Set up the material
     node->setMaterialFlag(video::EMF_LIGHTING, false);
-    node->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/impact/01.jpg"));
+    node->setMaterialTexture(0, impactTextures[0]);
     node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
     // Add the animators
     node->addAnimator(textureAnim);
@@ -112,7 +112,7 @@ void Game::CreateImpactEffect( vector3df position, vector3df normal )
     scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(NULL, core::dimension2d<f32>(scale.X,scale.Y), position);
     // Set up the material
     bill->setMaterialFlag(video::EMF_LIGHTING, false);
-    bill->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/impact/01.jpg"));
+    bill->setMaterialTexture(0, impactTextures[0]);
     bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
     // Add the animators
     bill->addAnimator(textureAnim);
@@ -132,7 +132,7 @@ void Game::CreateMuzzleFlash()
     scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(smgr->getActiveCamera(), core::dimension2d<f32>(10,10), position);
     // Setup the material
     bill->setMaterialFlag(video::EMF_LIGHTING, false);
-    bill->setMaterialTexture(0, smgr->getVideoDriver()->getTexture("media/explosion/01.jpg"));
+    bill->setMaterialTexture(0, explosionTextures[0]);
     bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
     // Add the animator
     bill->addAnimator(anim);
@@ -144,11 +144,7 @@ void Game::CreateMuzzleFlash()
     anim->drop();
 }
 void Game::LoadLevel()
-{
-    //roomnode = smgr->addOctTreeSceneNode(room,0,-1,65534);
-    //roomnode->setMaterialType((video::E_MATERIAL_TYPE)newMaterialType1);
-    //scale to proper size
-    
+{    
     startPosition = vector3df(0.0f,30.1f,0.0f);
     this->CreateCamera();
     player = new Player(smgr, soundEngine, physxManager, cameraPair, effect);
