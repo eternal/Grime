@@ -204,7 +204,7 @@ void StateManager::LoadState(s32 state)
             //NodeInit(nodeFridge, roomScale);
             NodeInit(nodeBenchUpper, roomScale);
             NodeInit(nodeBenchLower, roomScale);
-           // NodeInit(nodeMicrowave, roomScale);
+            //NodeInit(nodeMicrowave, roomScale);
             //NodeInit(nodeMirror, roomScale);
             //NodeInit(nodePlant, roomScale);
             NodeInit(nodeSink, roomScale);
