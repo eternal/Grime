@@ -129,6 +129,13 @@ void Projectile::Update( s32 time )
 
 void Projectile::Detonate()
 {
+    try {
+        physxManager->removePhysxObject(pair->PhysxObject);
+    }
+    catch (...)
+    {
+        ///TODO: CLEAN PROJECTILE ARRAY
+    }
 #ifdef WEAPONDEBUG
     std::cout << "IMPACT" << std::endl;
 #endif    
@@ -153,6 +160,5 @@ void Projectile::Detonate()
     this->DamageTargets(pair->SceneNode->getAbsolutePosition(), radius, power);
     physxManager->createExplosion(pair->SceneNode->getAbsolutePosition(), radius * 3.0f, power * 1000000.0f, power * 1000000.0f, 0.2f);
     this->active = false;
-    this->pair->SceneNode->setVisible(false);
-    physxManager->removePhysxObject(pair->PhysxObject);
+    this->pair->SceneNode->setVisible(false);    
 }

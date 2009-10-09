@@ -56,7 +56,7 @@ int main() {
 #ifndef FULLSCREEN    
 	device = createDevice(driverType, resolution, 32, false, false, false, &receiver);
 #else
-    device = createDevice(driverType, resolution, 32, true, false, false, receiver);	
+    device = createDevice(driverType, resolution, 32, true, false, false, &receiver);	
 #endif
 	if (device == 0)
 	{
@@ -95,7 +95,7 @@ int main() {
     // Set some Physx scene description parameters to optimise raycasting
     SSceneDesc sceneDesc;
     // Set the bounding box of the physx "scene"
-    sceneDesc.MaxBounds = core::aabbox3df(core::vector3df(-2300,-200,-2000), core::vector3df(2000,800,2000));
+    sceneDesc.MaxBounds = core::aabbox3df(core::vector3df(-2300,-200,-2000), core::vector3df(2000,1500,2000));
     sceneDesc.BoundPlanes = true;
     // Y axis up
     sceneDesc.UpAxis = 1;

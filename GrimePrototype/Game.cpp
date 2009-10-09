@@ -5,6 +5,7 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
 {
     blockFinalToggle = false;
     cleanupTimer = 0;
+    updateTimer = 0;
     this->smgr = device->getSceneManager();
     this->soundEngine = soundEngine;
     this->physxManager = physxManager;
@@ -226,6 +227,7 @@ void Game::Update( s32 time )
     {
         blockObjects[i]->Update(time);
     }
+    
 }
 
 void Game::RestartLevel() {
@@ -395,7 +397,7 @@ void Game::WeaponFire()
             core::vector3df vel = cameraPair->camera->getTarget() - cameraPair->camera->getPosition();
             vel.normalize();
             t = t + vel * 20.0f;
-            vel*=1000.0f;
+            vel *= 1000.0f;
 
             projectileObjects.push_back(new Projectile(smgr,soundEngine,physxManager, CreateSphere(t, 10.0f, 1000.0f, &vel), &projectileObjects, explosionTextures, &enemyObjects));
         }

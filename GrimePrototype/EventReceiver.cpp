@@ -18,7 +18,7 @@ EventReceiver::~EventReceiver(void)
 
 bool EventReceiver::OnEvent(const SEvent& event) 
 {    
-    if (stateManager)
+    if (game)
     {
         if (stateManager->smgr)
         {
@@ -189,7 +189,7 @@ bool EventReceiver::OnEvent(const SEvent& event)
             }
         }
     }
-
+ return false;
 }
     
 

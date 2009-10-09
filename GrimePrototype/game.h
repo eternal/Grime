@@ -43,6 +43,7 @@ public:
     IMesh* room;
     
     s32 cleanupTimer;
+    s32 updateTimer;
     
     core::array<video::ITexture*> explosionTextures;
     core::array<video::ITexture*> impactTextures;
