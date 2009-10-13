@@ -57,7 +57,7 @@ bool EventReceiver::OnEvent(const SEvent& event)
                             break;
                         case KEY_KEY_G: 
                             {
-                                Block* block = new Block(game->smgr, game->physxManager, &game->enemyObjects);
+                                Block* block = new Block(game->smgr, game->physxManager, &game->enemyObjects, &game->blockObjects);
                                 game->blockObjects.push_back(block);
                             }
                             break;  

@@ -20,10 +20,10 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     positionThree = vector3df(950.0f,720.1f,-1125.0f);
     
     //cockroachMesh = smgr->getMesh("media/cockroack_rigged_a02.x"); COMMENTED OUT UNTIL LOWPOLY MESH ARRIVES
-    cockroachMesh = smgr->getMesh("media/spiderupdated.x");
-    spiderMesh = smgr->getMesh("media/spiderupdated.x");
-    ratMesh = smgr->getMesh("media/rat.x");
-    beetleMesh = smgr->getMesh("media/beetle2.x");
+    cockroachMesh = smgr->getMesh("media/roachlowpoly.x");
+    spiderMesh = smgr->getMesh("media/spiderlowpoly.x");
+    ratMesh = smgr->getMesh("media/ratlowpoly.x");
+    beetleMesh = smgr->getMesh("media/buglowpoly.x");
 }
 SpawnManager::~SpawnManager(void)
 {
@@ -147,10 +147,10 @@ void SpawnManager::SpawnRat( vector3df position )
 
 void SpawnManager::DIRTYMESHFIX()
 {
-    enemyObjects->push_back( new Enemy(smgr, soundEngine, spiderMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
-    enemyObjects->push_back( new Enemy(smgr, soundEngine, cockroachMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
-    enemyObjects->push_back( new Enemy(smgr, soundEngine, beetleMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
-    enemyObjects->push_back( new Enemy(smgr, soundEngine, ratMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
+    enemyObjects->push_back( new Spider(smgr, soundEngine, spiderMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
+    enemyObjects->push_back( new Cockroach(smgr, soundEngine, cockroachMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
+    enemyObjects->push_back( new Beetle(smgr, soundEngine, beetleMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
+    enemyObjects->push_back( new Rat(smgr, soundEngine, ratMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
 }
 
 irr::core::vector3df SpawnManager::RandomPoint()

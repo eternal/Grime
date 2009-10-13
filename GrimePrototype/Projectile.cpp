@@ -129,13 +129,8 @@ void Projectile::Update( s32 time )
 
 void Projectile::Detonate()
 {
-    try {
-        physxManager->removePhysxObject(pair->PhysxObject);
-    }
-    catch (...)
-    {
-        ///TODO: CLEAN PROJECTILE ARRAY
-    }
+    physxManager->removePhysxObject(pair->PhysxObject);
+
 #ifdef WEAPONDEBUG
     std::cout << "IMPACT" << std::endl;
 #endif    

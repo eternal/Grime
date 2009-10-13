@@ -201,7 +201,7 @@ void Game::Update( s32 time )
     cleanupTimer += time;
     if (cleanupTimer >= 15000)
     {
-        enemyObjects = this->RebuildEnemies();
+        this->CleanupArrays();
         cleanupTimer = 0;
     }
     cameraPair->updateTransformation();
@@ -221,7 +221,16 @@ void Game::Update( s32 time )
     }
     for (u32 i = 0; i < projectileObjects.size(); i++)
     {
-        projectileObjects[i]->Update(time);
+        try 
+        {
+            projectileObjects[i]->Update(time);
+        }
+        catch (...)
+        {
+            this->CleanupArrays();
+            std::cerr << "Exception handled, arrays cleaned: enemies, projectiles" << std::endl;
+        }
+        
     }
     for (u32 i = 0; i < blockObjects.size(); ++i)
     {
@@ -254,6 +263,20 @@ void Game::RestartLevel() {
     spawnManager->timeBetweenSpawns = 2500;
     player->health = 100;
 }
+void Game::WeaponCloseRaycast(core::line3df line)
+{
+    core::array<SRaycastHitData> rayArray = physxManager->raycastAllRigidObjects(line);
+    for (u32 i = 0; i < rayArray.size(); i++)
+    {
+        SRaycastHitData ray = rayArray[i];
+        if (ray.Object->getType() != EOT_SPHERE && ray.Object->getType() != EOT_TRIANGLE_MESH)
+        {   
+            vector3df currentVelocity;
+            ray.Object->getLinearVelocity(currentVelocity);
+            ray.Object->setLinearVelocity(currentVelocity + ((line.end - line.start).normalize() * 600.0f));
+        }
+    }
+}
 void Game::WeaponFire()
 {
     if (!(player->CurrentWeaponOnCooldown()))
@@ -265,7 +288,7 @@ void Game::WeaponFire()
 #endif
         if (player->GetWeapon() == WEAPON_BLOCKGUN)
         {
-            Block* block = new Block(smgr, physxManager, &enemyObjects);
+            Block* block = new Block(smgr, physxManager, &enemyObjects, &blockObjects);
             blockObjects.push_back(block);
         }
         else if (player->GetWeapon() == WEAPON_PISTOL)
@@ -364,24 +387,6 @@ void Game::WeaponFire()
                         }
                     }	
                 }                    
-                //// If it's a sphere we blow it up
-                //else if (objectHit->getType() == EOT_SPHERE) 
-                //{
-                //    for (u32 i = 0 ; i < objects.size() ; ++i) 
-                //    {  // check it against the objects in our array to see if it matches
-                //        if (objects[i]->PhysxObject == objectHit) {
-                //            core::vector3df pos;
-                //            objects[i]->PhysxObject->getPosition(pos);
-                //            createExplosion(pos);
-                //            objectHit->setLinearVelocity(line.getVector().normalize() * 600.0f);
-                //            //physxManager->removePhysxObject(objects[i]->PhysxObject);
-                //            //objects[i]->SceneNode->remove();
-                //            //delete objects[i];
-                //            //objects.erase(i);
-                //            break;
-                //        }
-                //    }	
-                //}
                 //for any other objects except for the camera
                 else if (objectHit != cameraPair->PhysxObject) 
                 {
@@ -403,7 +408,29 @@ void Game::WeaponFire()
         }
         else if (player->GetWeapon() == WEAPON_CLOSE)
         {
-            physxManager->createExplosion(player->pair->SceneNode->getAbsolutePosition(), 100.0f, 300000000.0f, 100000000000.0f, 1.0f);
+            //physxManager->createExplosion(player->pair->SceneNode->getAbsolutePosition(), 100.0f, 300000000.0f, 100000000000.0f, 1.0f);
+            core::line3df line;
+            line.start = cameraPair->camera->getPosition();
+            //put the end of the line off in the distance
+            line.end = line.start + (cameraPair->camera->getTarget() - line.start).normalize() * 100.0f;
+            //access the physics engine to find the intersection point
+            vector3df origin = line.end;
+            //simulate spray;
+            for (s32 i = -50; i < 50; i += 25)
+            {
+                for (s32 j = -50; j < 50; j += 25)
+                {
+                    for (s32 k = -50; k < 50; k+= 25)
+                    {
+                        line.end = origin;
+                        line.end.X += i;
+                        line.end.Y += j;
+                        line.end.Z += k;
+                        WeaponCloseRaycast(line);
+                    }
+                }
+            }
+
         }
     }
 }
@@ -432,7 +459,25 @@ s32 Game::GetRandom(s32 upper)
 {
     return (rand() % upper) + 1;
 }
-
+core::array<Projectile*> Game::RebuildProjectiles()
+{
+    core::array<Projectile*> projectileRebuild;
+    for (u32 i = 0; i < projectileObjects.size(); i++)
+    {
+        try
+        {
+            Projectile* projectile = projectileObjects[i];
+            projectile->pair->PhysxObject->getType();
+            projectileRebuild.push_back(projectile);
+        }
+        catch (...)
+        {
+            std::cout << "Physx object corrupted or missing: cleaning projectile from array" << std::endl;	
+        }
+    }
+    std::cout << "Projectile array rebuilt." << std::endl;
+    return projectileRebuild;
+}
 core::array<Enemy*> Game::RebuildEnemies()
 {
     core::array<Enemy*> enemiesRebuild;
@@ -459,4 +504,8 @@ void Game::CleanupArrays()
     enemies = this->RebuildEnemies();
     this->enemyObjects.clear();
     this->enemyObjects = enemies;
+    core::array<Projectile*> projectiles;
+    projectiles = this->RebuildProjectiles();
+    this->projectileObjects.clear();
+    this->projectileObjects = projectiles;
 }

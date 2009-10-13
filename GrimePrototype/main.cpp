@@ -118,33 +118,42 @@ int main() {
     s32 lastTime = device->getTimer()->getTime();
 	while(device->run())
 	{
+        if (device->isWindowActive())
+        {          
 	    //find time between renders
         s32 timeNow = device->getTimer()->getTime();
         s32 elapsedTime = timeNow - lastTime;
         lastTime = timeNow;
         
+        //s32 realTime = device->getTimer()->getRealTime();
         //simulate physics
 	    physxManager->simulate(elapsedTime/1000.0f);
 	    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING
 	    physxManager->fetchResults();
+        //std::cout << "Time taken to simulate: " <<  device->getTimer()->getRealTime() - realTime << std::endl;
         
-	    stateManager->Update(elapsedTime);
-        //start drawing
-        if (device->isWindowActive())
-        {            
+        //s32 realTimeUpdates = device->getTimer()->getRealTime();
+        stateManager->Update(elapsedTime);
+        //std::cout << "Time taken to update: " <<  device->getTimer()->getRealTime() - realTimeUpdates << std::endl;
+
+        //start drawing  
 			driver->beginScene(true, true, video::SColor(255,200,200,200));
-	
+            //s32 realTimeEffect = device->getTimer()->getRealTime();
 			effect->update();
-	
+            //std::cout << "Time taken to draw: " <<  device->getTimer()->getRealTime() - realTimeEffect << std::endl;
+
+	        //s32 realtimedebug = device->getTimer()->getRealTime();
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
 #endif // DEBUG
-                        
+            //std::cout << "Time taken to draw debug: " <<  device->getTimer()->getRealTime() - realtimedebug << std::endl;     
+            //s32 realtimegui = device->getTimer()->getRealTime();
             guienv->drawAll();
-
+            //std::cout << "Time taken to draw debug: " <<  device->getTimer()->getRealTime() - realtimegui << std::endl;     
+            
             //done rendering
 			driver->endScene();
-
+            //std::cout << "Scene render time: " << device->getTimer()->getRealTime() - realTimeEffect << std::endl;
 			int fps = driver->getFPS();
 
 			if (lastFPS != fps)

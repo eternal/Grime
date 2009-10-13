@@ -1,9 +1,10 @@
 #include "Block.h"
 
-Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects)
+Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockObjects)
 {
     this->smgr = smgr;
     this->physxManager = physxManager;
+    this->blockObjects = blockObjects;
     core::line3df line;
     line.start = smgr->getActiveCamera()->getPosition();
     //put the end of the line off in the distance 
@@ -57,23 +58,37 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
         f32 blockPositionX = round_(blockPosition.X/30) * 30;
         f32 blockPositionZ = round_(blockPosition.Z/40) * 40;
         ///TODO FIX Y QUANTISE
-        //f32 blockPositionY = round_(blockPosition.Y/30) * 30;
+        f32 blockPositionY = floor(blockPosition.Y/25) * 25;
         blockPosition.X = blockPositionX;
         blockPosition.Z = blockPositionZ;
-        vector3df blockPhysicsPosition = blockPosition;
-        blockPhysicsPosition.Y -= scale.Y / 2;
-        blockPhysicsPosition.X += scale.X / 6.25f;
-        pair = new SPhysxAndBlockPair;
-        pair->blockOffset.Y = 0.0f;
-        //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
-        cubeMesh = smgr->getMesh("media/block.obj");
-        //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
-        //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
-        pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), blockPhysicsPosition);
-        //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
-        pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, blockPosition, rot, scale);
-        pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
-        this->ConvertToDynamic();
+        blockPosition.Y = blockPositionY + 6.55f;
+        bool spotTaken = false;
+        for (u32 i = 0; i < blockObjects->size(); i++)
+        {
+            Block* block = (*blockObjects)[i];
+            vector3df blockObjectsPosition = block->pair->SceneNode->getAbsolutePosition();
+            if (blockObjectsPosition == blockPosition)
+            {
+                spotTaken = true;
+            }
+        }
+        if (!spotTaken)
+        {
+            vector3df blockPhysicsPosition = blockPosition;
+            blockPhysicsPosition.Y -= scale.Y / 2;
+            blockPhysicsPosition.X += scale.X / 6.25f;
+            pair = new SPhysxAndBlockPair;
+            pair->blockOffset.Y = 0.0f;
+            //IMesh* cubeMesh = smgr->getMesh("media/cube.obj");
+            cubeMesh = smgr->getMesh("media/block.obj");
+            //pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, temp, vector3df(0,0,0), scale);
+            //pair->PhysxObject = physxManager->createBoxObject(intersection, core::vector3df(0,0,0), scale/2.0f, 30000000.0f, &(vector3df(0,0,0)));                        
+            pair->PhysxObject = physxManager->createTriangleMeshObject(physxManager->createTriangleMesh(cubeMesh->getMeshBuffer(0), scale), blockPhysicsPosition);
+            //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
+            pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, blockPosition, rot, scale);
+            pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
+            //this->ConvertToDynamic();
+        }
     }
 }
 
