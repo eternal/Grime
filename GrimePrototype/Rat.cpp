@@ -30,9 +30,8 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     soundResetTimer = 0.0f;
     soundWalkCurrentPosition = 0;
 
-
     IPhysxMesh* pmesh = physxMan->createConvexMesh(mesh->getMeshBuffer(1), scale);
-    pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, rot, 1000.0f);
+    pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, rot, 30000000.0f);
     //avoid rolling around
     pair->PhysxObject->setAngularDamping(1000.0f);
     pair->PhysxObject->setLinearDamping(400.0f);
@@ -74,7 +73,11 @@ void Rat::Update( s32 time )
         {
             try 
             {
-                this->pair->updateTransformation();  
+                vector3df pos;
+                this->pair->PhysxObject->getPosition(pos);
+                pos.Y = 20.0f;
+                this->pair->PhysxObject->setPosition(pos);
+                this->pair->updateTransformation();
 
                 sound->setPosition(this->pair->SceneNode->getAbsolutePosition());
 

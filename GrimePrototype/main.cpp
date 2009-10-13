@@ -123,15 +123,17 @@ int main() {
         s32 elapsedTime = timeNow - lastTime;
         lastTime = timeNow;
         
-        //s32 realTime = device->getTimer()->getRealTime();
+        u32 realTime = device->getTimer()->getRealTime();
         //simulate physics
 	    physxManager->simulate(elapsedTime/1000.0f);
 	    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING
 	    physxManager->fetchResults();
+	    u32 physicsSimulateTime = device->getTimer()->getRealTime() - realTime;
         //std::cout << "Time taken to simulate: " <<  device->getTimer()->getRealTime() - realTime << std::endl;
         
-        //s32 realTimeUpdates = device->getTimer()->getRealTime();
+        u32 realTimeUpdates = device->getTimer()->getRealTime();
         stateManager->Update(elapsedTime);
+        u32 updatesTime = device->getTimer()->getRealTime() - realTimeUpdates;
         //std::cout << "Time taken to update: " <<  device->getTimer()->getRealTime() - realTimeUpdates << std::endl;
 
         //start drawing  
@@ -139,7 +141,10 @@ int main() {
         { 
 			driver->beginScene(true, true, video::SColor(255,200,200,200));
             //s32 realTimeEffect = device->getTimer()->getRealTime();
+            u32 realTimeEffect = device->getTimer()->getRealTime();
 			effect->update();
+			//smgr->drawAll();
+			u32 effectTime = device->getTimer()->getRealTime() - realTimeEffect;
             //std::cout << "Time taken to draw: " <<  device->getTimer()->getRealTime() - realTimeEffect << std::endl;
 
 	        //s32 realtimedebug = device->getTimer()->getRealTime();
@@ -148,7 +153,16 @@ int main() {
 #endif // DEBUG
             //std::cout << "Time taken to draw debug: " <<  device->getTimer()->getRealTime() - realtimedebug << std::endl;     
             //s32 realtimegui = device->getTimer()->getRealTime();
+            stringw debugstring = "Simulate: ";
+            debugstring += physicsSimulateTime;
+            debugstring += " Update: ";
+            debugstring += updatesTime;
+            debugstring += " Draw: ";
+            debugstring += effectTime;
+            //wprintf(debugstring.c_str());
+            gui::IGUIStaticText* debug = guienv->addStaticText(debugstring.c_str(), rect<s32>(1175,725,1275,800));
             guienv->drawAll();
+            debug->remove();
             //std::cout << "Time taken to draw debug: " <<  device->getTimer()->getRealTime() - realtimegui << std::endl;     
             
             //done rendering

@@ -61,14 +61,13 @@ Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
    
-    strength = 3;
+    strength = 6;
     health = 3;
     speed = 1.0f;
  
     this->node->setFrameLoop(19,34);
     
     this->blockDestroyTimer = 0;
-    
 }
 
 Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* objectArray, Player* player, vector3df position /*= vector3df(-501.0f,100.0f,-230.0f)*/ )
@@ -135,6 +134,7 @@ void Beetle::Update(s32 time)
                                     this->pair->PhysxObject->setLinearVelocity(directionToBlock * 5.0f);
                                     this->pair->updateTransformation();
                                     this->pair->PhysxObject->getPosition(position);
+                                    
                                     Block* block = (*blockArray)[i];
                                     block->active = false;
                                     block->pair->SceneNode->remove();
@@ -177,7 +177,14 @@ void Beetle::Update(s32 time)
                         sound->setIsPaused(false);
                         soundReset = true;
                         //     pair->SoundNode->setPlayOnceMode();
-                        target->health -= strength; 
+                        u32 critChance = (rand() % 4) + 1;
+                        if (critChance == 1)
+                        {
+                            target->health -= strength * 2;
+                        }
+                        else {
+                            target->health -= strength;
+                        } 
                         attackTimer = 0;
 
                     }
