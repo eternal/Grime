@@ -5,6 +5,7 @@
 #include "Rat.h"
 #include "Spider.h"
 #include "Player.h"
+#include "Block.h"
 
 enum ENEMY_TYPES{
     ENEMY_COCKROACH,
@@ -17,12 +18,13 @@ enum ENEMY_TYPES{
 class SpawnManager
 {
 public:
-    SpawnManager(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, Player* player);
+    SpawnManager(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockArray, Player* player);
     ~SpawnManager(void);
     
     ISceneManager* smgr;
     IPhysxManager* physxManager;
     core::array<Enemy*>* enemyObjects;
+    core::array<Block*>* blockArray;
     ISoundEngine* soundEngine;
     Player* player;
     

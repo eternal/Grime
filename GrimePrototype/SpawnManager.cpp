@@ -1,10 +1,11 @@
 #include "SpawnManager.h"
 
-SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, Player* player )
+SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockArray, Player* player )
 {
     this->smgr = smgr;
     this->physxManager = physxManager;
     this->enemyObjects = enemyObjects;
+    this->blockArray = blockArray;
     this->timeBetweenSpawns = timeBetweenSpawns;
     this->soundEngine = soundEngine;
     this->player = player;
@@ -129,7 +130,7 @@ void SpawnManager::SpawnCockroach( vector3df position )
 
 void SpawnManager::SpawnBeetle( vector3df position )
 {
-    Enemy* enemy = new Beetle(smgr, soundEngine, beetleMesh, physxManager, enemyObjects, player, position);
+    Enemy* enemy = new Beetle(smgr, soundEngine, beetleMesh, physxManager, enemyObjects, blockArray, player, position);
     enemyObjects->push_back(enemy);
 }
 
@@ -149,7 +150,7 @@ void SpawnManager::DIRTYMESHFIX()
 {
     enemyObjects->push_back( new Spider(smgr, soundEngine, spiderMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
     enemyObjects->push_back( new Cockroach(smgr, soundEngine, cockroachMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
-    enemyObjects->push_back( new Beetle(smgr, soundEngine, beetleMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
+    enemyObjects->push_back( new Beetle(smgr, soundEngine, beetleMesh, physxManager, enemyObjects, blockArray, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
     enemyObjects->push_back( new Rat(smgr, soundEngine, ratMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
 }
 

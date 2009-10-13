@@ -117,9 +117,7 @@ int main() {
 	int lastFPS = -1;
     s32 lastTime = device->getTimer()->getTime();
 	while(device->run())
-	{
-        if (device->isWindowActive())
-        {          
+	{         
 	    //find time between renders
         s32 timeNow = device->getTimer()->getTime();
         s32 elapsedTime = timeNow - lastTime;
@@ -137,6 +135,8 @@ int main() {
         //std::cout << "Time taken to update: " <<  device->getTimer()->getRealTime() - realTimeUpdates << std::endl;
 
         //start drawing  
+        if (device->isWindowActive())
+        { 
 			driver->beginScene(true, true, video::SColor(255,200,200,200));
             //s32 realTimeEffect = device->getTimer()->getRealTime();
 			effect->update();

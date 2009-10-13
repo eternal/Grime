@@ -11,6 +11,8 @@ public:
     void ConvertToStatic();
     void ConvertToDynamic();
     
+    bool active;
+    
     core::array<Block*>* blockObjects;
     SPhysxAndBlockPair* pair;
     ISceneManager* smgr;

@@ -2,6 +2,7 @@
 
 Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockObjects)
 {
+    this->active = true;
     this->smgr = smgr;
     this->physxManager = physxManager;
     this->blockObjects = blockObjects;
@@ -87,13 +88,14 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
             //pair->SceneNode = smgr->addCubeSceneNode(1, 0, -1, intersection, rot, scale);
             pair->SceneNode = smgr->addMeshSceneNode(cubeMesh, 0, -1, blockPosition, rot, scale);
             pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
-            //this->ConvertToDynamic();
+            this->ConvertToDynamic();
         }
     }
 }
 
 Block::~Block(void)
 {
+
 }
 void Block::ConvertToStatic() 
 {
@@ -113,12 +115,15 @@ void Block::ConvertToDynamic()
 }
 void Block::Update(s32 time)
 {
-    try 
+    if (active)
     {
-        pair->updateTransformation();
-    }
-    catch (char *str)
-    {
-        std::cout << str << std::endl;
+        try 
+        {
+            pair->updateTransformation();
+        }
+        catch (...)
+        {
+            std::cout << "Block update transformation exception caught" << std::endl;
+        }
     }
 }

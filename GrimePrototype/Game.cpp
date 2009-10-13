@@ -149,7 +149,7 @@ void Game::LoadLevel()
     startPosition = vector3df(0.0f,30.1f,0.0f);
     this->CreateCamera();
     player = new Player(smgr, soundEngine, physxManager, cameraPair, effect);
-    spawnManager = new SpawnManager(smgr, soundEngine, physxManager, &enemyObjects, player);
+    spawnManager = new SpawnManager(smgr, soundEngine, physxManager, &enemyObjects, &blockObjects, player);
     // Preload texture animators
     // just for prototype only
     c8 tmp[64];
