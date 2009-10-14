@@ -18,7 +18,7 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     
     positionOne = vector3df(-789.5f,30.0f,1080.842f);
     positionTwo = vector3df(-1955.101f,30.0f,-1432.715f);
-    positionThree = vector3df(950.0f,720.1f,-1125.0f);
+    positionThree = vector3df(580.0f,720.1f,-1125.0f);
     
     //cockroachMesh = smgr->getMesh("media/cockroack_rigged_a02.x"); COMMENTED OUT UNTIL LOWPOLY MESH ARRIVES
     cockroachMesh = smgr->getMesh("media/roachlowpoly.x");
