@@ -2,6 +2,7 @@
 
 Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* objectArray, Player* player, vector3df position /*= vector3df(-501.0f,100.0f,-230.0f)*/ )
 {
+    
     /*Rat
         Standing - 1-11
         Initial walk - 12-28
@@ -29,12 +30,14 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     soundReset = false;
     soundResetTimer = 0.0f;
     soundWalkCurrentPosition = 0;
+    immuneToBlockCrush = true;
 
     IPhysxMesh* pmesh = physxMan->createConvexMesh(mesh->getMeshBuffer(1), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, rot, 30000000.0f);
     //avoid rolling around
     pair->PhysxObject->setAngularDamping(1000.0f);
     pair->PhysxObject->setLinearDamping(400.0f);
+    pair->PhysxObject->setUserData(&immuneToBlockCrush);
     //add scene node to game
     this->node = sceneManager->addAnimatedMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
     pair->SceneNode = node;

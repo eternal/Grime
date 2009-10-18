@@ -34,12 +34,14 @@ Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
     vector3df physxRot = rot;
     //physxRot.X -= 90.0f;
     //physxRot.Y -= 45.0f;
+    immuneToBlockCrush = true;
 
     //add scene node to game
     this->node = sceneManager->addAnimatedMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
     IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(0), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, physxRot, 1000.0f);
     pair->SceneNode = node;
+    pair->PhysxObject->setUserData(&immuneToBlockCrush);
 
     //avoid rolling around
     pair->PhysxObject->setAngularDamping(1000.0f);

@@ -27,13 +27,14 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
     vector3df physxRot = rot;
     physxRot.X -= 90.0f;
     physxRot.Y -= 45.0f;
-    
+    immuneToBlockCrush = false;
     this->node = sceneManager->addMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
     IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(2), scale);
     //IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(0), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, physxRot, 1000.0f);
     //pair->PhysxObject = physxMan->createBoxObject(pos,physxRot, scale * 10, 1000.0f);
     pair->SceneNode = node;
+    pair->PhysxObject->setUserData(&immuneToBlockCrush);
     
     pair->PhysxObject->setRotation(physxRot);
     pair->SceneNode->setRotation(physxRot);

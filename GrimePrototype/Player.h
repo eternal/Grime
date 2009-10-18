@@ -53,6 +53,9 @@ class Player : public Entity
         
         irrklang::ISound* sound;
         s32 currentWeapon;   
+        
+        s32 blockAmmunitionTimer;
+        
         s32 weaponCooldown[NUMBER_OF_WEAPONS];
         
         s32 weaponAmmunition[NUMBER_OF_WEAPONS];

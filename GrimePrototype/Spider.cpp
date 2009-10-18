@@ -26,6 +26,7 @@ Spider::Spider( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
     soundReset = false;
     soundResetTimer = 0.0f;
     soundWalkCurrentPosition = 0;
+    immuneToBlockCrush = true;
 
     IPhysxMesh* pmesh = physxMan->createConvexMesh(mesh->getMeshBuffer(0), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, rot, 1000.0f);
@@ -34,6 +35,7 @@ Spider::Spider( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
     //add scene node to game
     this->node = sceneManager->addAnimatedMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
     pair->SceneNode = node;
+    pair->PhysxObject->setUserData(&immuneToBlockCrush);
     //pair->SoundNode = new CIrrKlangSceneNode(soundEngine, node, smgr, 1);
     //pair->SoundNode->setSoundFileName("media/sounds/Bang1.wav");
     // pair->SoundNode->setPlayOnceMode();

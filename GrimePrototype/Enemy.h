@@ -39,6 +39,8 @@ class Enemy : public Entity
         f32 speed;
         f32 health;
         
+        bool immuneToBlockCrush;
+        
         bool active;
         bool attackPhase;
         bool attackPhaseActive;

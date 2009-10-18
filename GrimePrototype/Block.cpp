@@ -38,7 +38,11 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
             f32 distance = (enemy->pair->SceneNode->getAbsolutePosition() - closestObject.HitPosition).getLength();
             if (distance <= 32.0f)
             {
-                enemy->health = 0;
+                if (!(enemy->immuneToBlockCrush))
+                {
+                    enemy->health = 0;
+                }
+
             }
         }
         catch (...)

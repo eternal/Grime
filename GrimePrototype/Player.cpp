@@ -12,6 +12,8 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     this->pair->PhysxObject->getPosition(pos);
     this->sound = soundEngine->play3D("media/sounds/Run1.wav", pos, true, true, true);
     health = 100;
+    blockAmmunitionTimer = 0;
+    
     currentWeapon = WEAPON_PISTOL;
     for (u32 i = 0; i < NUMBER_OF_WEAPONS; i++)
     {
@@ -207,6 +209,14 @@ void Player::Update(s32 time)
             weaponCooldown[i] -= time;
         }
     }
+    
+    blockAmmunitionTimer += time;
+    if (blockAmmunitionTimer >= 5000)
+    {
+        weaponAmmunition[WEAPON_BLOCKGUN]++;
+        blockAmmunitionTimer = 0;
+    }
+    
     vector3df pos, rot;
     pair->PhysxObject->getPosition(pos);
     pair->PhysxObject->getRotation(rot);

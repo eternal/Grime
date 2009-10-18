@@ -80,6 +80,7 @@ void SpawnManager::Update( s32 time )
                 {
                     onCooldown = true;
                     timeBetweenSpawns = 2000;
+                    player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
                     phase++;
                 }
                 //6min
@@ -87,6 +88,7 @@ void SpawnManager::Update( s32 time )
                 {
                     onCooldown = true;
                     timeBetweenSpawns = 1500;
+                    player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
                     phase++;
                     
                 }
@@ -94,6 +96,7 @@ void SpawnManager::Update( s32 time )
                 if (waveTimer >= 540000 && phase == 2)
                 {
                     onCooldown = true;
+                    player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
                     timeBetweenSpawns = 1000;
                     phase++;
                 }                

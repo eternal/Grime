@@ -30,6 +30,7 @@ Enemy::Enemy(scene::ISceneManager* sceneManager,  irrklang::ISoundEngine* soundE
     soundReset = false;
     soundResetTimer = 0.0f;
     soundWalkCurrentPosition = 0;
+    immuneToBlockCrush = false;
     
     IPhysxMesh* pmesh = physxMan->createConvexMesh(mesh->getMeshBuffer(0), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, rot, 1000.0f);

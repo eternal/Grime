@@ -28,6 +28,8 @@ void StateManager::Update(s32 time)
             strHealth += game->player->health;
             core::stringw strCooldown = "Cooldown: "; 
             strCooldown += game->player->CurrentCooldown();
+            strCooldown += " Ammunition: ";
+            strCooldown += game->player->weaponAmmunition[WEAPON_BLOCKGUN];
             core::stringw strPosition = "X: "; 
             strPosition += game->cameraPair->camera->getAbsolutePosition().X;
             strPosition += " Y: ";
