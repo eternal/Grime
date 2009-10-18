@@ -49,12 +49,13 @@ void Game::CreateCamera()
     cameraPair = new SPhysxAndCameraPair;
     //add the irrlicht fps camera scene node, modify the keymap to play with WASD
     cameraPair->camera = smgr->addCameraSceneNodeFPS(NULL, 50, 0.1f, -1, keyMap, 4, true);
+    cameraPair->camera->setFOV(PI / 2.0f);
     cameraPair->camera->setPosition(startPosition);
     cameraPair->camera->setTarget(core::vector3df(0.0f,32.0f,5.0f));
     cameraPair->SceneNode = cameraPair->camera;
     vector3df physxStartPos = startPosition;
     physxStartPos.Y += 100.0f;
-    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 15.0f, 30000.0f);
+    cameraPair->PhysxObject = physxManager->createSphereObject(startPosition, core::vector3df(0,0,0), 15.0f, 90000.0f);
     cameraPair->PhysxObject->setAngularDamping(1000.0f); // Stops the sphere from rolling
     cameraPair->PreviousPosition = startPosition;
     cameraPair->CameraOffset = core::vector3df(0,10,0);
@@ -277,19 +278,20 @@ void Game::WeaponCloseRaycast(core::line3df line)
         }
     }
 }
-void Game::WeaponFire()
+
+void Game::WeaponFire(s32 weapon)
 {
-    if (!(player->CurrentWeaponOnCooldown()))
+    if ((player->weaponCooldown[weapon]) <= 0)
     {
-        CreateMuzzleFlash();
-        player->AddCoolDown();
-#ifdef WEAPONDEBUG
-        std::cout << "Fire" << std::endl;
-#endif
-        if (player->GetWeapon() == WEAPON_BLOCKGUN)
+        player->AddCoolDown(weapon);
+        if (weapon == WEAPON_BLOCKGUN)
         {
-            Block* block = new Block(smgr, physxManager, &enemyObjects, &blockObjects);
-            blockObjects.push_back(block);
+            if (player->weaponAmmunition[WEAPON_BLOCKGUN] > 0)
+            {
+                Block* block = new Block(smgr, physxManager, &enemyObjects, &blockObjects);
+                blockObjects.push_back(block);
+            }
+            player->weaponAmmunition[WEAPON_BLOCKGUN]--;
         }
         else if (player->GetWeapon() == WEAPON_PISTOL)
         {
@@ -312,10 +314,10 @@ void Game::WeaponFire()
                     {
                         f32 dis = (ray.HitPosition - line.start).getLength();
                         f32 dis2 = (closestObject.HitPosition - line.start).getLength();
-#ifdef WEAPONDEBUG
+    #ifdef WEAPONDEBUG
                         std::cout << "Test Distance: " << dis << std::endl;
                         std::cout << "Current Closest: " << dis2 << std::endl;
-#endif
+    #endif
                         if (dis < dis2) 
                         {
                             closestObject = ray;
@@ -323,9 +325,9 @@ void Game::WeaponFire()
                     }
                 }
             }
-#ifdef WEAPONDEBUG            
+    #ifdef WEAPONDEBUG            
             std::cout << "===========" << std::endl;
-#endif            
+    #endif            
             IPhysxObject* objectHit = closestObject.Object;
             //IPhysxObject* objectHit = physxManager->raycastClosestObject(line, &intersection, &normal);
             if (objectHit) 
@@ -430,7 +432,33 @@ void Game::WeaponFire()
                     }
                 }
             }
-
+        }
+    }
+}
+void Game::WeaponFire()
+{
+    if (!(player->CurrentWeaponOnCooldown()))
+    {
+        //player->AddCoolDown();
+        CreateMuzzleFlash();
+#ifdef WEAPONDEBUG
+        std::cout << "Fire" << std::endl;
+#endif
+        if (player->GetWeapon() == WEAPON_BLOCKGUN)
+        {
+            WeaponFire(WEAPON_BLOCKGUN);
+        }
+        else if (player->GetWeapon() == WEAPON_PISTOL)
+        {
+            WeaponFire(WEAPON_PISTOL);
+        }
+        else if (player->GetWeapon() == WEAPON_RPG)
+        {
+            WeaponFire(WEAPON_RPG);
+        }
+        else if (player->GetWeapon() == WEAPON_CLOSE)
+        {
+            WeaponFire(WEAPON_CLOSE);
         }
     }
 }

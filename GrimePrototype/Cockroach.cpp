@@ -28,14 +28,16 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
     physxRot.X -= 90.0f;
     physxRot.Y -= 45.0f;
     
-    //add scene node to game
-    this->node = sceneManager->addAnimatedMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
+    this->node = sceneManager->addMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
     IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(2), scale);
     //IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(0), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, physxRot, 1000.0f);
     //pair->PhysxObject = physxMan->createBoxObject(pos,physxRot, scale * 10, 1000.0f);
     pair->SceneNode = node;
-
+    
+    pair->PhysxObject->setRotation(physxRot);
+    pair->SceneNode->setRotation(physxRot);
+    
     //avoid rolling around
     pair->PhysxObject->setAngularDamping(1000.0f);
     //pair->SoundNode = new CIrrKlangSceneNode(soundEngine, node, smgr, 1);
@@ -49,15 +51,15 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
     sound->setMaxDistance(500.0f);
     sound->setPlayPosition(randNum);
 
-    this->node->setAnimationSpeed(25.0f);
+//    this->node->setJointMode(EJUOR_NONE);
     //set walking frame loop
-    this->node->setFrameLoop(11,23);
+//    this->node->setFrameLoop(1,1);
 
     attackTimer = 0;
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
 
-    strength = 2;
+    strength = 4;
     health = 1;
     speed =1.0f;
 }
@@ -65,6 +67,22 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
 Cockroach::~Cockroach(void)
 {
 }
+
+void Cockroach::FaceTarget()
+{
+    vector3df targetPos, nodePos, selfPos;
+    //grab positions from physics objects
+    target->pair->PhysxObject->getPosition(targetPos);
+    this->pair->PhysxObject->getPosition(selfPos);
+    //find vector self->target
+    nodePos = selfPos - targetPos;
+    vector3df selfRot = nodePos.getHorizontalAngle();
+    selfRot.X = -90.0f;
+    selfRot.Z = 0.0f;
+    this->pair->PhysxObject->setRotation(selfRot);
+    this->pair->SceneNode->setRotation(selfRot);
+}
+
 void Cockroach::Update(s32 time)
 {
     if (active)
@@ -73,7 +91,8 @@ void Cockroach::Update(s32 time)
         {
             try 
             {
-                this->pair->updateTransformation();  
+                //this->node->setFrameLoop(1,1);
+                this->pair->updateTransformation();
 
                 sound->setPosition(this->pair->SceneNode->getAbsolutePosition());
 
@@ -93,8 +112,9 @@ void Cockroach::Update(s32 time)
                     //get magnitude
                     distanceToTarget = direction.getLength();
                     //std::cout << distanceToTarget << std::endl;
-                    if (distanceToTarget < 50)
+                    if (distanceToTarget < 70)
                     {
+                        std::cout << distanceToTarget << std::endl;
                         attackPhase = true;
                     }
                     else 
@@ -105,7 +125,7 @@ void Cockroach::Update(s32 time)
                     {
                         soundResetTimer += time;
                     }
-                    if (distanceToTarget < 30)
+                    if (distanceToTarget < 60)
                     {
                         attackTimer += time;
                     }
@@ -136,7 +156,7 @@ void Cockroach::Update(s32 time)
                         soundResetTimer = 0;
                         soundReset = false;
                     }
-                    CheckPhase();
+                    //CheckPhase();
                     //normalise vector
                     direction.normalize();
                     //normalise with respect to time elapsed since last update
@@ -144,11 +164,14 @@ void Cockroach::Update(s32 time)
                     direction.Y = 0; //no flying mr bug
                     //find and apply the change
                     resultant = position + direction;
-                    //check for floating point errors that were appearing            
-                    if (!(_isnan(resultant.X)))
+                    //check for floating point errors that were appearing    
+                    if (!(distanceToTarget <= 56.0f))
                     {
-                        this->pair->PhysxObject->setPosition(resultant);
-                        this->pair->updateTransformation();
+                        if (!(_isnan(resultant.X)))
+                        {
+                            this->pair->PhysxObject->setPosition(resultant);
+                            this->pair->updateTransformation();
+                        }   
                     }
                 }
             }

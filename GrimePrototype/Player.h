@@ -40,6 +40,7 @@ class Player : public Entity
         int GetWeapon();
         bool CurrentWeaponOnCooldown();
         void AddCoolDown();
+        void AddCoolDown(s32 weapon);
         s32 CurrentCooldown();
         void Jump();
 
@@ -53,6 +54,8 @@ class Player : public Entity
         irrklang::ISound* sound;
         s32 currentWeapon;   
         s32 weaponCooldown[NUMBER_OF_WEAPONS];
+        
+        s32 weaponAmmunition[NUMBER_OF_WEAPONS];
         
         s32 health;
 };

@@ -62,7 +62,6 @@ int main() {
 	{
 		return 1; // could not create selected driver.
     }
-    
     receiver.device = device;
     //instantiate necessary globals
     driver = device->getVideoDriver();
@@ -83,7 +82,7 @@ int main() {
 
 	//effects handler
 	effect = new EffectHandler(device, "media/shaders", ScreenRTT, true);
-    
+
     if (!effect)
     {
         return 3; //critical error
@@ -135,7 +134,6 @@ int main() {
         stateManager->Update(elapsedTime);
         u32 updatesTime = device->getTimer()->getRealTime() - realTimeUpdates;
         //std::cout << "Time taken to update: " <<  device->getTimer()->getRealTime() - realTimeUpdates << std::endl;
-
         //start drawing  
         if (device->isWindowActive())
         { 
@@ -146,7 +144,7 @@ int main() {
 			//smgr->drawAll();
 			u32 effectTime = device->getTimer()->getRealTime() - realTimeEffect;
             //std::cout << "Time taken to draw: " <<  device->getTimer()->getRealTime() - realTimeEffect << std::endl;
-
+            receiver.Update(elapsedTime);
 	        //s32 realtimedebug = device->getTimer()->getRealTime();
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            

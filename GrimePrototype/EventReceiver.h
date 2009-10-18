@@ -16,7 +16,11 @@ public:
     StateManager* stateManager;
     IrrlichtDevice* device;
     
+    bool leftPressed;
+    bool rightPressed;
+    
     bool OnEvent(const SEvent& event);
     void Setup(Game* game, IrrlichtDevice* device);
-    
+    void Update(s32 time);
+
 };

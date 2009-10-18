@@ -13,8 +13,10 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     spawnTimer = 0;
     waveTimer = 0;
     minuteTimer = 0;
+    cooldownTimer = 0;
     timeBetweenSpawns = 2500;
     spawnsActive = false;
+    onCooldown = false;
     
     positionOne = vector3df(-789.5f,30.0f,1080.842f);
     positionTwo = vector3df(-1955.101f,30.0f,-1432.715f);
@@ -29,43 +31,54 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
 SpawnManager::~SpawnManager(void)
 {
 }
-
 void SpawnManager::Update( s32 time )
 {
-    currentTimer += time;
-    waveTimer += time;
-    if (currentTimer >= 100) 
+    if (!onCooldown)
     {
-        timeBetweenSpawns--;
-        currentTimer = 0;
-    }
-    if (!spawnsActive)
-    {
-        if (waveTimer >= 30000)
+        if (enemyObjects->size() <= 50)
         {
-            spawnsActive = true;
-        }
-    }
-    if (spawnsActive)
-    {
-        spawnTimer += time;
-        minuteTimer += time;
-        if (spawnTimer >= timeBetweenSpawns)
-        {
-            SpawnWave();
-            SpawnWaveSpiders();
-            spawnTimer = 0;
-        }
+            currentTimer += time;
+            waveTimer += time;
+            if (currentTimer >= 100) 
+            {
+                timeBetweenSpawns--;
+                currentTimer = 0;
+            }
+            if (!spawnsActive)
+            {
+                if (waveTimer >= 60000)
+                {
+                    spawnsActive = true;
+                }
+            }
+            if (spawnsActive)
+            {
+                spawnTimer += time;
+                minuteTimer += time;
+                if (spawnTimer >= timeBetweenSpawns)
+                {
+                    SpawnWave();
+                    SpawnWaveSpiders();
+                    spawnTimer = 0;
+                }
 
-        if (minuteTimer >= 60000)
+                if (minuteTimer >= 60000)
+                {
+                    SpawnWaveBeetles();
+                    minuteTimer = 0;
+                }
+            }
+        }
+    }   
+    else
+    {
+        cooldownTimer += time;
+        if (cooldownTimer >= 30000)
         {
-            SpawnWaveBeetles();
-            minuteTimer = 0;
+            onCooldown = false;
+            cooldownTimer = 0;
         }
     }
-    
-   
-    
 }
 void SpawnManager::SpawnWaveSpiders()
 {

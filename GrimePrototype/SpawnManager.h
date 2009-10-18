@@ -45,7 +45,10 @@ public:
     
     s32 waveTimer;
     
+    s32 cooldownTimer;
+    
     bool spawnsActive;
+    bool onCooldown;
     
     void Update( s32 time );
     void SpawnWave();

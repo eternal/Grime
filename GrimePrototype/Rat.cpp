@@ -57,9 +57,9 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     attackTimer = 0;
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-    strength = 10;
+    strength = 20;
     health = 25;
-    speed = 1.2f;
+    speed = 1.0f;
 }
 Rat::~Rat(void)
 {
@@ -96,9 +96,10 @@ void Rat::Update( s32 time )
                     direction = playerPos - position;   
                     //get magnitude
                     distanceToTarget = direction.getLength();
-                    //std::cout << distanceToTarget << std::endl;
-                    if (distanceToTarget < 50)
+                    
+                    if (distanceToTarget < 200)
                     {
+                        std::cout << distanceToTarget << std::endl;
                         attackPhase = true;
                     }
                     else 
@@ -109,7 +110,7 @@ void Rat::Update( s32 time )
                     {
                         soundResetTimer += time;
                     }
-                    if (distanceToTarget < 30)
+                    if (distanceToTarget < 110)
                     {
                         attackTimer += time;
                     }
@@ -149,10 +150,13 @@ void Rat::Update( s32 time )
                     //find and apply the change
                     resultant = position + direction;
                     //check for floating point errors that were appearing            
-                    if (!(_isnan(resultant.X)))
+                    if (distanceToTarget >= 100.0f)
                     {
-                        this->pair->PhysxObject->setPosition(resultant);
-                        this->pair->updateTransformation();
+                        if (!(_isnan(resultant.X)))
+                        {
+                            this->pair->PhysxObject->setPosition(resultant);
+                            this->pair->updateTransformation();
+                        }
                     }
                 }
             }

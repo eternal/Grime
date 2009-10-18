@@ -63,6 +63,7 @@ public:
     s32 GetRandom(s32 upper);
     void RestartLevel();
     void WeaponFire();
+    void WeaponFire(s32 weapon);
     SPhysxAndNodePair* CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity);
     void ConvertBlocks();
     

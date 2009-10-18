@@ -18,6 +18,12 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
         weaponCooldown[i] = 0;
     }
     
+    for (u32 i =0; i < NUMBER_OF_WEAPONS; i++)
+    {
+        weaponAmmunition[i] = 0;
+    }
+    weaponAmmunition[WEAPON_BLOCKGUN] = 25;
+    
     //preload meshes
     smgr->getMesh("media/gun3.obj");
     smgr->getMesh("media/RPG1.obj");
@@ -83,7 +89,7 @@ void Player::WeaponSelect(f32 delta)
         {
             currentWeapon++;
             tempDelta--;
-            if (currentWeapon == NUMBER_OF_WEAPONS)
+            if (currentWeapon == NUMBER_OF_WEAPONS - 1)
             {
                 currentWeapon = 0;
             }
@@ -97,7 +103,7 @@ void Player::WeaponSelect(f32 delta)
             reverseDelta--;
             if (currentWeapon == 0)
             {
-                currentWeapon = NUMBER_OF_WEAPONS - 1;
+                currentWeapon = NUMBER_OF_WEAPONS - 2;
             }
             else 
             {
@@ -139,13 +145,33 @@ void Player::AddCoolDown()
     }
     else if (this->currentWeapon == WEAPON_BLOCKGUN)
     {
-        this->weaponCooldown[WEAPON_BLOCKGUN] = 2000;
+        this->weaponCooldown[WEAPON_BLOCKGUN] = 1000;
+    }
+}
+void Player::AddCoolDown(s32 weapon) 
+{
+    if (weapon == WEAPON_PISTOL)
+    {
+        this->weaponCooldown[WEAPON_PISTOL] = 250;
+    }
+    else if (weapon == WEAPON_RPG)
+    {
+        this->weaponCooldown[WEAPON_RPG] = 3000;
+    }
+    else if (weapon == WEAPON_CLOSE)
+    {
+        this->weaponCooldown[WEAPON_CLOSE] = 10000;
+    }
+    else if (weapon == WEAPON_BLOCKGUN)
+    {
+        this->weaponCooldown[WEAPON_BLOCKGUN] = 1000;
     }
 }
 s32 Player::CurrentCooldown()
 {
     return weaponCooldown[currentWeapon];
 }
+
 void Player::Jump()
 {
     if (this->pair->camera)

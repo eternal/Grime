@@ -4,16 +4,44 @@ EventReceiver::EventReceiver()
 {
     this->game = NULL;
     this->device = NULL;
+    leftPressed = false;
+    rightPressed = false;
 }
 
 EventReceiver::EventReceiver(Game* game, IrrlichtDevice* device)
 {
     this->game = game;
     this->device = device;
+    leftPressed = false;
+    rightPressed = false;
 }
 
 EventReceiver::~EventReceiver(void)
 {
+}
+
+void EventReceiver::Update(s32 time)
+{
+    if (game)
+    {
+        if (stateManager->smgr)
+        {
+            switch (stateManager->currentState)
+            {
+                case EGS_GAME:
+                {
+                    if (leftPressed)
+                    {
+                        game->WeaponFire();
+                    }
+                    if (rightPressed)
+                    {
+                        game->WeaponFire(WEAPON_BLOCKGUN);
+                    }
+                }
+             }
+    }
+}
 }
 
 bool EventReceiver::OnEvent(const SEvent& event) 
@@ -68,7 +96,12 @@ bool EventReceiver::OnEvent(const SEvent& event)
                             {
                                 game->CleanupArrays();
                             }
-                            break;                           
+                            break;
+                        case KEY_KEY_P:
+                            {
+                                game->spawnManager->onCooldown = true;
+                            }   
+                            break;                      
                         case KEY_KEY_1: 
                             {
                                 game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
@@ -130,8 +163,19 @@ bool EventReceiver::OnEvent(const SEvent& event)
                     {
                         if (event.MouseInput.isLeftPressed())
                         {
-                            game->WeaponFire();
-
+                            leftPressed = true;
+                        }
+                        else
+                        {
+                            leftPressed = false;
+                        }
+                        if (event.MouseInput.isRightPressed())
+                        {
+                            rightPressed = true;
+                        }
+                        else
+                        {
+                            rightPressed = false;
                         }
                         switch (event.MouseInput.Event) 
                         {

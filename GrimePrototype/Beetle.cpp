@@ -61,7 +61,7 @@ Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
    
-    strength = 6;
+    strength = 12;
     health = 3;
     speed = 1.0f;
  
@@ -116,13 +116,13 @@ void Beetle::Update(s32 time)
                     if (closestObject->getType() == EOT_BOX)
                     {
                         f32 distanceToBlock = (position - intersect).getLength();
-                        std::cout << "Distance: " << distanceToBlock << std::endl;
+                        //std::cout << "Distance: " << distanceToBlock << std::endl;
                         if (distanceToBlock < 75)
                         {
                             blockDestroyTimer += time;
-                            std::cout << blockDestroyTimer << std::endl;
+                            //std::cout << blockDestroyTimer << std::endl;
                         }
-                        if (blockDestroyTimer >= 4000)
+                        if (blockDestroyTimer >= 2000)
                         {
                             for (u32 i = 0; i < blockArray->size(); i++)
                             {
@@ -131,7 +131,7 @@ void Beetle::Update(s32 time)
                                     vector3df directionToBlock = (position - intersect).normalize();
                                     directionToBlock.Y = 0;
                                     this->pair->PhysxObject->setPosition(position + directionToBlock * 50.0f);
-                                    this->pair->PhysxObject->setLinearVelocity(directionToBlock * 5.0f);
+                                    this->pair->PhysxObject->setLinearVelocity(directionToBlock * 20.0f);
                                     this->pair->updateTransformation();
                                     this->pair->PhysxObject->getPosition(position);
                                     
@@ -148,10 +148,11 @@ void Beetle::Update(s32 time)
                         }
                     }
                     
-                    //std::cout << distanceToTarget << std::endl;
-                    if (distanceToTarget < 50)
+                    
+                    if (distanceToTarget < 80)
                     {
                         attackPhase = true;
+                        //std::cout << distanceToTarget << std::endl;    
                     }
                     else 
                     {
@@ -161,7 +162,7 @@ void Beetle::Update(s32 time)
                     {
                         soundResetTimer += time;
                     }
-                    if (distanceToTarget < 30)
+                    if (distanceToTarget < 65)
                     {
                         attackTimer += time;
                     }
