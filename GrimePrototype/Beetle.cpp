@@ -218,8 +218,8 @@ void Beetle::Update(s32 time)
             }
             catch (...)
             {
-                std::cout << "exception" << std::endl;
-                std::cout << "Enemy: " << &pair << std::endl;
+                std::cerr << "exception" << std::endl;
+                std::cerr << "Enemy: " << &pair << std::endl;
                 active = false;
                 try 
                 {
@@ -228,7 +228,7 @@ void Beetle::Update(s32 time)
                 }
                 catch (...)
                 {
-                    std::cout << "Recovery failed: Mesh still in Scene Graph" << std::endl;
+                    std::cerr << "Recovery failed: Mesh still in Scene Graph" << std::endl;
                 }
                 try 
                 {
@@ -236,7 +236,7 @@ void Beetle::Update(s32 time)
                 }
                 catch (...)
                 {
-                    std::cout << "Recovery failed: Mesh still in Physics Graph" << std::endl;
+                    std::cerr << "Recovery failed: Mesh still in Physics Graph" << std::endl;
                 }
 
             }
@@ -261,8 +261,8 @@ void Beetle::Update(s32 time)
             }
             catch (...)
             {
-                std::cout << "another exception" << std::endl;
-                std::cout << "Enemy: " << &pair << std::endl; 
+                std::cerr << "another exception" << std::endl;
+                std::cerr << "Enemy: " << &pair << std::endl; 
             }
             active = false;
         } 

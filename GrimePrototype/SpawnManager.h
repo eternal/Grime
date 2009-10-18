@@ -47,6 +47,8 @@ public:
     
     s32 cooldownTimer;
     
+    s32 phase;
+    
     bool spawnsActive;
     bool onCooldown;
     

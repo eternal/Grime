@@ -43,11 +43,11 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
         }
         catch (...)
         {
-            std::cout << "Exception caught in Block constructor. Possible corruption of enemyArray" << std::endl;
+            std::cerr << "Exception caught in Block constructor. Possible corruption of enemyArray" << std::endl;
         }
         
     }
-    std::cout << "=========" << std::endl;
+   // std::cout << "=========" << std::endl;
     if (closestObject.Object->getType() == EOT_TRIANGLE_MESH || closestObject.Object->getType() == EOT_BOX) 
     {
         vector3df scale(1,1,1);
@@ -123,7 +123,7 @@ void Block::Update(s32 time)
         }
         catch (...)
         {
-            std::cout << "Block update transformation exception caught" << std::endl;
+            std::cerr << "Block update transformation exception caught" << std::endl;
         }
     }
 }

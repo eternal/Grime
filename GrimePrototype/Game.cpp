@@ -239,6 +239,16 @@ void Game::Update( s32 time )
     }
     
 }
+void Game::ClearEnemies()
+{
+    for (u32 i = 0; i < enemyObjects.size(); i++)
+    {
+        Enemy* enemy = enemyObjects[i];
+        physxManager->removePhysxObject(enemy->pair->PhysxObject);
+        enemy->pair->SceneNode->remove();
+        delete enemy;
+    }
+}
 
 void Game::RestartLevel() {
     for (u32 i = 0; i < enemyObjects.size(); i++)
@@ -371,7 +381,7 @@ void Game::WeaponFire(s32 weapon)
                                 }                       
                                 catch (...)
                                 {
-                                    std::cout << "Automatic removal failure" << std::endl;
+                                    std::cerr << "Automatic removal failure" << std::endl;
                                     try 
                                     {
                                         enemyObjects.erase(i); //preserve arrays
@@ -381,7 +391,7 @@ void Game::WeaponFire(s32 weapon)
                                     }
                                     catch (...)
                                     {
-                                        std::cout << "Recovery failure. Adverse effects may be experienced." << std::endl;
+                                        std::cerr << "Recovery failure. Adverse effects may be experienced." << std::endl;
                                     }
                                 }
                             }
@@ -500,10 +510,10 @@ core::array<Projectile*> Game::RebuildProjectiles()
         }
         catch (...)
         {
-            std::cout << "Physx object corrupted or missing: cleaning projectile from array" << std::endl;	
+            std::cerr << "Physx object corrupted or missing: cleaning projectile from array" << std::endl;	
         }
     }
-    std::cout << "Projectile array rebuilt." << std::endl;
+    std::cerr << "Projectile array rebuilt." << std::endl;
     return projectileRebuild;
 }
 core::array<Enemy*> Game::RebuildEnemies()
@@ -519,10 +529,10 @@ core::array<Enemy*> Game::RebuildEnemies()
         }
         catch (...)
         {
-            std::cout << "Physx object corrupted or missing: cleaning enemy from array" << std::endl;
+            std::cerr << "Physx object corrupted or missing: cleaning enemy from array" << std::endl;
         }
     }
-    std::cout << "Enemy array rebuilt." << std::endl;
+    std::cerr << "Enemy array rebuilt." << std::endl;
     return enemiesRebuild;
 }
 

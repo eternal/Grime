@@ -99,7 +99,7 @@ void Rat::Update( s32 time )
                     
                     if (distanceToTarget < 200)
                     {
-                        std::cout << distanceToTarget << std::endl;
+                        //std::cout << distanceToTarget << std::endl;
                         attackPhase = true;
                     }
                     else 
@@ -162,8 +162,8 @@ void Rat::Update( s32 time )
             }
             catch (...)
             {
-                std::cout << "exception lol" << std::endl;
-                std::cout << "Enemy: " << &pair << std::endl;
+                std::cerr << "exception lol" << std::endl;
+                std::cerr << "Enemy: " << &pair << std::endl;
                 active = false;
                 try 
                 {
@@ -172,7 +172,7 @@ void Rat::Update( s32 time )
                 }
                 catch (...)
                 {
-                    std::cout << "Recovery failed: Mesh still in Scene Graph" << std::endl;
+                    std::cerr << "Recovery failed: Mesh still in Scene Graph" << std::endl;
                 }
                 try 
                 {
@@ -180,7 +180,7 @@ void Rat::Update( s32 time )
                 }
                 catch (...)
                 {
-                    std::cout << "Recovery failed: Mesh still in Physics Graph" << std::endl;
+                    std::cerr << "Recovery failed: Mesh still in Physics Graph" << std::endl;
                 }
 
             }
@@ -205,8 +205,8 @@ void Rat::Update( s32 time )
             }
             catch (...)
             {
-                std::cout << "another exception" << std::endl;
-                std::cout << "Enemy: " << &pair << std::endl; 
+                std::cerr << "another exception" << std::endl;
+                std::cerr << "Enemy: " << &pair << std::endl; 
             }
             active = false;
         } 

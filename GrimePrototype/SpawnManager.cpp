@@ -14,6 +14,7 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     waveTimer = 0;
     minuteTimer = 0;
     cooldownTimer = 0;
+    phase = 0;
     timeBetweenSpawns = 2500;
     spawnsActive = false;
     onCooldown = false;
@@ -45,7 +46,8 @@ void SpawnManager::Update( s32 time )
                 currentTimer = 0;
             }
             if (!spawnsActive)
-            {
+            {   
+                //setup phase
                 if (waveTimer >= 60000)
                 {
                     spawnsActive = true;
@@ -53,6 +55,11 @@ void SpawnManager::Update( s32 time )
             }
             if (spawnsActive)
             {
+                if (phase == 3)
+                {
+                    SpawnRat(vector3df(0.0f,0.0f,0.0f));
+                    phase++;
+                }
                 spawnTimer += time;
                 minuteTimer += time;
                 if (spawnTimer >= timeBetweenSpawns)
@@ -67,13 +74,32 @@ void SpawnManager::Update( s32 time )
                     SpawnWaveBeetles();
                     minuteTimer = 0;
                 }
+                //wavetimer - 60s = current time
+                //3 min mark
+                if (waveTimer >= 240000 && phase == 0)
+                {
+                    onCooldown = true;
+                    phase++;
+                }
+                //6min
+                if (waveTimer >= 420000 && phase == 1)
+                {
+                    onCooldown = true;
+                    phase++;
+                }
+                //9 min rat phase
+                if (waveTimer >= 600000 && phase == 2)
+                {
+                    onCooldown = true;
+                    phase++;
+                }                
             }
         }
     }   
     else
     {
         cooldownTimer += time;
-        if (cooldownTimer >= 30000)
+        if (cooldownTimer >= 60000)
         {
             onCooldown = false;
             cooldownTimer = 0;

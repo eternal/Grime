@@ -140,6 +140,11 @@ bool EventReceiver::OnEvent(const SEvent& event)
                         case KEY_KEY_I:
                             game->RestartLevel();
                             break;
+                        case KEY_KEY_C:
+                        {
+                            game->ClearEnemies();
+                        }
+                        break;
                         case KEY_KEY_O:
                             stateManager->LoadState(EGS_MENU);
                             break;

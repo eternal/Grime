@@ -71,5 +71,6 @@ public:
     core::array<Enemy*> RebuildEnemies();
     core::array<Projectile*> RebuildProjectiles();
     void WeaponCloseRaycast(core::line3df line);
+    void ClearEnemies();
 };
 

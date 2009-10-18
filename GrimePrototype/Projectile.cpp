@@ -38,7 +38,7 @@ void Projectile::DamageTargets(vector3df pos, f32 radius, s32 power)
         }
         catch (...)
         {
-            std::cout << "Exception caught in Projectile::DamageTargets. Possible corruption of enemyArray." << std::endl;
+            std::cerr << "Exception caught in Projectile::DamageTargets. Possible corruption of enemyArray." << std::endl;
         }
         
     }
