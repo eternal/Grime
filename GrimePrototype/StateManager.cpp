@@ -26,6 +26,15 @@ void StateManager::Update(s32 time)
             core::stringw strHealth = "";
             strHealth += game->player->health;
             
+            if (game->gameOver)
+            {
+                deadOverlay->setColor(SColor(255,255,255,255));
+            }
+            else
+            {
+                deadOverlay->setColor(SColor(0,255,255,255));
+            }
+            
             if (game->player->damagedTimer > 0)
             {
                 game->player->damagedTimer -= time;

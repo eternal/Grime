@@ -48,6 +48,7 @@ public:
     core::array<video::ITexture*> explosionTextures;
     core::array<video::ITexture*> impactTextures;
     
+    bool gameOver;
     
     vector3df startPosition;
     bool blockFinalToggle;

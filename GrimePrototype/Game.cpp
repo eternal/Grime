@@ -11,6 +11,7 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
     this->physxManager = physxManager;
     this->effect = effect;
     this->guienv = device->getGUIEnvironment();
+    gameOver = false;
 }
 
 Game::~Game(void)
@@ -198,50 +199,56 @@ void Game::Update( s32 time )
     if (player->health <= 0) 
     {
         //defeat
-        this->RestartLevel();
+        this->gameOver = true;
+        this->smgr->getActiveCamera()->setInputReceiverEnabled(false);
+        //this->RestartLevel();
     }
-    if (player->ratKilled)
+    else 
     {
-        //victory
-    }
-    cleanupTimer += time;
-    if (cleanupTimer >= 25000)
-    {
-        this->CleanupArrays();
-        cleanupTimer = 0;
-    }
-    cameraPair->updateTransformation();
-    player->Update(time);
-    spawnManager->Update(time);
-    for (u32 i = 0; i < enemyObjects.size(); i++) 
-    {
-        try 
+        if (player->ratKilled)
         {
-            enemyObjects[i]->Update(time);
+            //victory
         }
-        catch (...)
-        {
-            enemyObjects = this->RebuildEnemies();
-            std::cerr << "Exception Handled in Game::Update. Enemies array rebuilt" << std::endl;
-        }
-    }
-    for (u32 i = 0; i < projectileObjects.size(); i++)
-    {
-        try 
-        {
-            projectileObjects[i]->Update(time);
-        }
-        catch (...)
+        cleanupTimer += time;
+        if (cleanupTimer >= 25000)
         {
             this->CleanupArrays();
-            std::cerr << "Exception handled, arrays cleaned: enemies, projectiles" << std::endl;
+            cleanupTimer = 0;
         }
-        
+        cameraPair->updateTransformation();
+        player->Update(time);
+        spawnManager->Update(time);
+        for (u32 i = 0; i < enemyObjects.size(); i++) 
+        {
+            try 
+            {
+                enemyObjects[i]->Update(time);
+            }
+            catch (...)
+            {
+                enemyObjects = this->RebuildEnemies();
+                std::cerr << "Exception Handled in Game::Update. Enemies array rebuilt" << std::endl;
+            }
+        }
+        for (u32 i = 0; i < projectileObjects.size(); i++)
+        {
+            try 
+            {
+                projectileObjects[i]->Update(time);
+            }
+            catch (...)
+            {
+                this->CleanupArrays();
+                std::cerr << "Exception handled, arrays cleaned: enemies, projectiles" << std::endl;
+            }
+
+        }
+        for (u32 i = 0; i < blockObjects.size(); ++i)
+        {
+            blockObjects[i]->Update(time);
+        }
     }
-    for (u32 i = 0; i < blockObjects.size(); ++i)
-    {
-        blockObjects[i]->Update(time);
-    }
+    
     
 }
 void Game::ClearEnemies()
@@ -279,12 +286,16 @@ void Game::RestartLevel()
     player->pair->PhysxObject->setLinearVelocity(vector3df(0.0f,0.0f,0.0f));
     player->pair->updateTransformation();
 
+    this->gameOver = false;
+    this->smgr->getActiveCamera()->setInputReceiverEnabled(true);
+    
     spawnManager->timeBetweenSpawns = 2500;
     spawnManager->cooldownTimer = 0;
     spawnManager->waveTimer = 0;
     spawnManager->phase = 0;
     spawnManager->spawnsActive = false;
     player->health = 100;
+    player->weaponAmmunition[WEAPON_BLOCKGUN] = 25;
 }
 void Game::WeaponCloseRaycast(core::line3df line)
 {

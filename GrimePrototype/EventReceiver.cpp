@@ -185,7 +185,10 @@ bool EventReceiver::OnEvent(const SEvent& event)
                             break;
                         case EMIE_LMOUSE_PRESSED_DOWN: 
                             {
-
+                                if (game->gameOver)
+                                {
+                                    game->RestartLevel();
+                                }
                             }
                             break;
                         case EMIE_LMOUSE_LEFT_UP: 
@@ -195,7 +198,10 @@ bool EventReceiver::OnEvent(const SEvent& event)
                             break;             
                         case EMIE_RMOUSE_PRESSED_DOWN: 
                             {
-
+                                if (game->gameOver)
+                                {
+                                    game->RestartLevel();
+                                }
                             }
                             break;
                         case EMIE_RMOUSE_LEFT_UP: 
