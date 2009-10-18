@@ -57,6 +57,7 @@ class Player : public Entity
         bool ratKilled;
         
         s32 blockAmmunitionTimer;
+        s32 damagedTimer;
         
         s32 weaponCooldown[NUMBER_OF_WEAPONS];
         

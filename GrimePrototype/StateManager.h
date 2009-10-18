@@ -47,6 +47,7 @@ public:
     gui::IGUIImage* crosshair;
     
     gui::IGUIImage* damageOverlay;
+    gui::IGUIImage* deadOverlay;
 
     gui::IGUIImage* imgHealth;
     gui::IGUIImage* imgBlock;          

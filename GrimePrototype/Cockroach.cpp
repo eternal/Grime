@@ -143,6 +143,7 @@ void Cockroach::Update(s32 time)
                         soundReset = true;
                         //     pair->SoundNode->setPlayOnceMode();
                         target->health -= strength; 
+                        target->damagedTimer = 255;
                         attackTimer = 0;
 
                     }

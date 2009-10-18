@@ -26,6 +26,17 @@ void StateManager::Update(s32 time)
             core::stringw strHealth = "";
             strHealth += game->player->health;
             
+            if (game->player->damagedTimer > 0)
+            {
+                game->player->damagedTimer -= time;
+                if (game->player->damagedTimer <= 0)
+                {
+                    game->player->damagedTimer = 0;
+                }
+                f32 opacity = ((f32)game->player->damagedTimer / 510.0f) *255.0f;
+                damageOverlay->setColor(SColor((u32)opacity, 255,255,255));
+            }
+
             if (game->player->weaponCooldown[WEAPON_RPG] <= 0)
             {
                 imgRPG->setColor(SColor(255,255,255,255));
@@ -176,7 +187,11 @@ void StateManager::LoadState(s32 state)
             imgRPG = guienv->addImage(driver->getTexture("media/gui/RPG.png"), core::position2di(395,711));
             imgAmmo = guienv->addImage(driver->getTexture("media/gui/Ammo.png"), core::position2di(301,716));
             
-            damageOverlay = guienv->addImage(driver->getTexture("media/gui/"), core::position2di(0,0));
+            damageOverlay = guienv->addImage(driver->getTexture("media/gui/RED2.png"), core::position2di(-200,-125));
+            damageOverlay->setColor(SColor(0,255,255,255));
+            
+            deadOverlay = guienv->addImage(driver->getTexture("media/gui/RED.png"), core::position2di(0,0));
+            deadOverlay->setColor(SColor(0,255,255,255));
             
             //grab bitmap font
             guienv->getSkin()->setFont(guienv->getFont("media/GillSans12.png"));

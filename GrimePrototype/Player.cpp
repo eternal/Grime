@@ -14,6 +14,7 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     this->sound = soundEngine->play3D("media/sounds/Run1.wav", pos, true, true, true);
     health = 100;
     blockAmmunitionTimer = 0;
+    damagedTimer = 0;
     
     currentWeapon = WEAPON_PISTOL;
     for (u32 i = 0; i < NUMBER_OF_WEAPONS; i++)

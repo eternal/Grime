@@ -151,6 +151,7 @@ void Spider::Update(s32 time)
                         soundReset = true;
                         //pair->SoundNode->setPlayOnceMode();
                         target->health -= strength;
+                        target->damagedTimer = 255;
                         //attack logic
                         target->pair->PhysxObject->setLinearVelocity((-direction.normalize()) * 100.0f);
                         attackTimer = 0;

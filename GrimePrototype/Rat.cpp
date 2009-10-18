@@ -154,6 +154,7 @@ void Rat::Update( s32 time )
                         soundReset = true;
                         //     pair->SoundNode->setPlayOnceMode();
                         target->health -= strength; 
+                        target->damagedTimer = 510;
                         direction.Y += 50.0f;
                         target->pair->PhysxObject->setLinearVelocity(direction.normalize() * 200.0f);
                         target->pair->updateTransformation();

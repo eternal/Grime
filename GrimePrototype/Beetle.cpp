@@ -210,7 +210,8 @@ void Beetle::Update(s32 time)
                         }
                         else {
                             target->health -= strength;
-                        } 
+                        }
+                        target->damagedTimer = 510;
                         attackTimer = 0;
 
                     }
