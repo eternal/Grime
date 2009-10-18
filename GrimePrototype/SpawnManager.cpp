@@ -26,6 +26,11 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     spawnPosition[CUPBOARD_LOWER] = vector3df(-789.5f,30.0f,1080.842f);
     spawnPosition[FRIDGE_LOWER] = vector3df(164.0f, 30.0f, 1439.0f);
     
+    for (u32 i =0; i < NUMBER_OF_POSITIONS; i++)
+    {
+        spawnLocationCooldown[i] = 0;
+    }
+    
     //cockroachMesh = smgr->getMesh("media/cockroack_rigged_a02.x"); COMMENTED OUT UNTIL LOWPOLY MESH ARRIVES
     cockroachMesh = smgr->getMesh("media/roachlowpoly.x");
     spiderMesh = smgr->getMesh("media/spiderlowpoly.x");
@@ -37,6 +42,13 @@ SpawnManager::~SpawnManager(void)
 }
 void SpawnManager::Update( s32 time )
 {
+    for (u32 i = 0; i < NUMBER_OF_POSITIONS; i++)
+    {
+        if (spawnLocationCooldown[i] >= 0)
+        {
+            spawnLocationCooldown[i] -= time;
+        }
+    }
     if (!onCooldown)
     {
         if (enemyObjects->size() <= 50)
@@ -196,41 +208,49 @@ irr::core::vector3df SpawnManager::RandomPoint()
 {
     s32 randomNum = getRandom(NUMBER_OF_POSITIONS);
     randomNum--;
-    switch (randomNum)
+    if (spawnLocationCooldown[randomNum] <= 0)
     {
+        switch (randomNum)
+        {
         case BASIN_HIGH:
             return spawnPosition[BASIN_HIGH];
-        break;
+            break;
         case MICROWAVE_HIGH:
             return spawnPosition[MICROWAVE_HIGH];
-        break;
+            break;
         case MICROWAVE_LOWER:
-        {
-            vector3df position = spawnPosition[MICROWAVE_LOWER];
-            position.Z = (float)(-308 - getRandom(582));
-            return position;
-        }
-        break;
+            {
+                vector3df position = spawnPosition[MICROWAVE_LOWER];
+                position.Z = (float)(-308 - getRandom(582));
+                return position;
+            }
+            break;
         case STOVE_LOWER:
-        {
-            vector3df position = spawnPosition[STOVE_LOWER];
-            position.X = (float)(-805 - getRandom(1150));
-            return position;
-        }
-        break;
+            {
+                vector3df position = spawnPosition[STOVE_LOWER];
+                position.X = (float)(-805 - getRandom(1150));
+                return position;
+            }
+            break;
         case CUPBOARD_LOWER:
             return spawnPosition[CUPBOARD_LOWER];
-        break;
+            break;
         case FRIDGE_LOWER:
-        {
-            vector3df position = spawnPosition[FRIDGE_LOWER];
-            position.X = (float)(164 + getRandom(931));
-            return position;
-        }
-        break; 
+            {
+                vector3df position = spawnPosition[FRIDGE_LOWER];
+                position.X = (float)(164 + getRandom(931));
+                return position;
+            }
+            break; 
         default:
             return spawnPosition[MICROWAVE_HIGH];
-        break;  
+            break;  
+        }
+        spawnLocationCooldown[randomNum] = 500;
+    }
+    else
+    {
+        return RandomPoint(); //potential for infinite loop but unlikely with current spawns and cooldown
     }
 }
 void SpawnManager::FinalWave() 

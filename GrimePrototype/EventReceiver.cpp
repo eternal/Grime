@@ -122,6 +122,11 @@ bool EventReceiver::OnEvent(const SEvent& event)
                                 game->spawnManager->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
                             }
                             break; 
+                        case KEY_KEY_5:
+                            {
+                                game->spawnManager->SpawnCockroach(game->spawnManager->RandomPoint());
+                            }
+                        break;
                         case KEY_KEY_I:
                             game->RestartLevel();
                             break;

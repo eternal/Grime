@@ -45,6 +45,7 @@ public:
     IAnimatedMesh* beetleMesh;
     
     vector3df spawnPosition[NUMBER_OF_POSITIONS];
+    s32 spawnLocationCooldown[NUMBER_OF_POSITIONS];
     
     s32 timeBetweenSpawns;
     s32 currentTimer;

@@ -256,6 +256,14 @@ bool Enemy::IsStillAlive()
     }
     else 
     {
-        return true;
+        if (this->pair->SceneNode->getPosition().Y <= -100.0f)
+        {
+            health =0;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     } 
 }
