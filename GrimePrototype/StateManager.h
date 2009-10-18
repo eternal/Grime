@@ -41,6 +41,9 @@ public:
     gui::IGUIStaticText* textFPS;
     gui::IGUIStaticText* textNotifications;
     
+    gui::IGUIStaticText* menuNew;
+    gui::IGUIStaticText* menuExit;
+    
     gui::IGUIImage* imgBoxCooldowns;
     gui::IGUIImage* imgBoxHealth;
     

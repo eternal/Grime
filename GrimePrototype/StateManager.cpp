@@ -141,6 +141,16 @@ void StateManager::Update(s32 time)
         break;
         case EGS_MENU:
         {
+            if (game->newGameSelected)
+            {
+                menuNew->setOverrideColor(SColor(255,255,255,255));
+                menuExit->setOverrideColor(SColor(255,128,255,255));
+            }
+            else
+            {
+                menuExit->setOverrideColor(SColor(255,255,255,255));
+                menuNew->setOverrideColor(SColor(255,128,255,255));
+            }
         }
         break;
     }
@@ -179,6 +189,15 @@ void StateManager::LoadState(s32 state)
             levelText = guienv->addStaticText(L"Grime: Kitchen", core::rect<s32>(5,2,200,200));
             this->currentState = EGS_MENU;
             
+            gui::IGUIImage* backdrop = guienv->addImage(driver->getTexture("media/menu/mainmenu.png"), core::position2di(0,0));
+            
+            menuNew = guienv->addStaticText(L"New Game", core::rect<s32>(120,300,800,1006));
+            menuNew->setOverrideFont(guienv->getFont("media/gui/Font60.png"));
+            menuNew->setOverrideColor(SColor(255,128,255,255));
+            
+            menuExit = guienv->addStaticText(L"Exit", core::rect<s32>(700,300,1000,1006));
+            menuExit->setOverrideFont(guienv->getFont("media/gui/Font60.png"));
+            menuExit->setOverrideColor(SColor(255,128,255,255));
         }
         break;
         case EGS_GAME:

@@ -49,6 +49,7 @@ public:
     core::array<video::ITexture*> impactTextures;
     
     bool gameOver;
+    bool newGameSelected;
     
     vector3df startPosition;
     bool blockFinalToggle;

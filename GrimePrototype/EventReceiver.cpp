@@ -227,12 +227,44 @@ bool EventReceiver::OnEvent(const SEvent& event)
 
                         switch (event.KeyInput.Key) 
                         {
-                        case KEY_KEY_O: 
+                        //case KEY_KEY_O: 
+                        //    {
+                        //        this->stateManager->LoadState(EGS_GAME);
+                        //    }
+                        case KEY_LEFT:
+                            game->newGameSelected = !game->newGameSelected;
+                        break;
+
+                        case KEY_RIGHT:
+                            game->newGameSelected = !game->newGameSelected;
+                            break;
+                        case KEY_UP:
+                            game->newGameSelected = !game->newGameSelected;
+                            break;
+                        case KEY_DOWN:
+                            game->newGameSelected = !game->newGameSelected;
+                            break;
+                        case KEY_RETURN:
+                            if (game->newGameSelected)
                             {
                                 this->stateManager->LoadState(EGS_GAME);
                             }
-                        }
-
+                            else
+                            {
+                                device->closeDevice();
+                            }
+                            break;
+                        case KEY_SPACE:
+                            if (game->newGameSelected)
+                            {
+                                this->stateManager->LoadState(EGS_GAME);
+                            }
+                            else
+                            {
+                                device->closeDevice();
+                            }
+                            break;
+                       }
                     }
                 }
             }

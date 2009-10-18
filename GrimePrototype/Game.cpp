@@ -12,6 +12,7 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
     this->effect = effect;
     this->guienv = device->getGUIEnvironment();
     gameOver = false;
+    newGameSelected = true;
 }
 
 Game::~Game(void)
