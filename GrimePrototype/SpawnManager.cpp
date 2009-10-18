@@ -122,7 +122,7 @@ void SpawnManager::Update( s32 time )
     {
         cooldownTimer += time;
         std::cout << cooldownTimer << std::endl;
-        if (cooldownTimer >= 6000)
+        if (cooldownTimer >= 60000)
         {
             onCooldown = false;
             std::cout << phase << std::endl;
@@ -232,6 +232,9 @@ irr::core::vector3df SpawnManager::RandomPointLower()
             position.X = (float)(164 + getRandom(931));
             return position;
         }
+        break;
+    default:
+        return spawnPosition[CUPBOARD_LOWER];
         break; 
     }
 }

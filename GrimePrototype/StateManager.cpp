@@ -1,6 +1,5 @@
 #include "StateManager.h"
 
-
 StateManager::StateManager(IrrlichtDevice* device, IPhysxManager* physxManager, Game* game)
 {
     this->smgr = device->getSceneManager();
@@ -116,8 +115,8 @@ void StateManager::LoadState(s32 state)
         case EGS_GAME:
         {
             //add crosshair to centre of screen (64x64 image so -32)
-            guienv->addImage(driver->getTexture("media/crosshair2.png"), core::position2di(resolution.Width/2-32,resolution.Height/2-32));
-
+            gui::IGUIImage* image = guienv->addImage(driver->getTexture("media/crosshair2.png"), core::position2di(resolution.Width/2-32,resolution.Height/2-32));
+            image->setColor(SColor(10,255,255,255));
             //grab bitmap font
             guienv->getSkin()->setFont(guienv->getFont("media/GillSans12.png"));
             guienv->getSkin()->setColor(gui::EGDC_BUTTON_TEXT, SColor(255,255,255,255));

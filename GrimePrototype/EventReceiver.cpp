@@ -127,6 +127,10 @@ bool EventReceiver::OnEvent(const SEvent& event)
                                 game->spawnManager->SpawnCockroach(game->spawnManager->RandomPoint());
                             }
                         break;
+                        case KEY_KEY_0:
+                            game->spawnManager->waveTimer = 530000;
+                            game->spawnManager->phase = 3;
+                        break;
                         case KEY_KEY_I:
                             game->RestartLevel();
                             break;

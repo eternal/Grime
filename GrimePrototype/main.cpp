@@ -78,9 +78,11 @@ int main() {
     }
     
 	//set screen buffer resolution
-	dimension2du ScreenRTT = !driver->getVendorInfo().equals_ignore_case("NVIDIA Corporation") ? dimension2du(1024, 1024) : driver->getScreenSize();
-
+	//dimension2du ScreenRTT = !driver->getVendorInfo().equals_ignore_case("NVIDIA Corporation") ? dimension2du(1024, 1024) : driver->getScreenSize();
+    dimension2du ScreenRTT = driver->getScreenSize();
+    
 	//effects handler
+	smgr->getFileSystem()->addZipFileArchive("media/kitchen.pk3");
 	effect = new EffectHandler(device, "media/shaders", ScreenRTT, true);
 
     if (!effect)
@@ -105,7 +107,6 @@ int main() {
     {
         return 4; // physics engine failure
     }
-    smgr->getFileSystem()->addZipFileArchive("media/kitchen.pk3");
     game = new Game(device, soundEngine, physxManager, effect);
     stateManager = new StateManager(device, physxManager, game);
     receiver.game = game;
