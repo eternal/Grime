@@ -59,9 +59,9 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
 
-    strength = 4;
+    strength = 3;
     health = 1;
-    speed =1.0f;
+    speed = 1.3f;
 }
 
 Cockroach::~Cockroach(void)

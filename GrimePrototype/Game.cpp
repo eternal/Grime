@@ -404,9 +404,9 @@ void Game::WeaponFire(s32 weapon)
             core::vector3df vel = cameraPair->camera->getTarget() - cameraPair->camera->getPosition();
             vel.normalize();
             t = t + vel * 20.0f;
-            vel *= 1000.0f;
+            vel *= 800.0f;
 
-            projectileObjects.push_back(new Projectile(smgr,soundEngine,physxManager, CreateSphere(t, 10.0f, 1000.0f, &vel), &projectileObjects, explosionTextures, &enemyObjects));
+            projectileObjects.push_back(new Projectile(smgr,soundEngine,physxManager, CreateSphere(t, 10.0f, 10000.0f, &vel), &projectileObjects, explosionTextures, &enemyObjects));
         }
         else if (player->GetWeapon() == WEAPON_CLOSE)
         {

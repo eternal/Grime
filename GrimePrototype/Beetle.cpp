@@ -63,7 +63,7 @@ Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
    
     strength = 12;
     health = 3;
-    speed = 1.0f;
+    speed = 0.9f;
  
     this->node->setFrameLoop(19,34);
     
