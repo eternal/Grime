@@ -204,6 +204,38 @@ void SpawnManager::DIRTYMESHFIX()
     enemyObjects->push_back( new Rat(smgr, soundEngine, ratMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
 }
 
+irr::core::vector3df SpawnManager::RandomPointLower()
+{
+    s32 randomNum = getRandom(NUMBER_OF_POSITIONS - 2) - 1;
+    switch (randomNum)
+    {
+    case MICROWAVE_LOWER:
+        {
+            vector3df position = spawnPosition[MICROWAVE_LOWER];
+            position.Z = (float)(-308 - getRandom(582));
+            return position;
+        }
+        break;
+    case STOVE_LOWER:
+        {
+            vector3df position = spawnPosition[STOVE_LOWER];
+            position.X = (float)(-805 - getRandom(1150));
+            return position;
+        }
+        break;
+    case CUPBOARD_LOWER:
+        return spawnPosition[CUPBOARD_LOWER];
+        break;
+    case FRIDGE_LOWER:
+        {
+            vector3df position = spawnPosition[FRIDGE_LOWER];
+            position.X = (float)(164 + getRandom(931));
+            return position;
+        }
+        break; 
+    }
+}
+
 irr::core::vector3df SpawnManager::RandomPoint()
 {
     s32 randomNum = getRandom(NUMBER_OF_POSITIONS);
@@ -250,7 +282,7 @@ irr::core::vector3df SpawnManager::RandomPoint()
     }
     else
     {
-        return RandomPoint(); //potential for infinite loop but unlikely with current spawns and cooldown
+        return RandomPointLower();
     }
 }
 void SpawnManager::FinalWave() 

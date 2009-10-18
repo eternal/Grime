@@ -79,4 +79,5 @@ public:
     
     vector3df RandomPoint();
     void FinalWave();
+    vector3df RandomPointLower();
 };

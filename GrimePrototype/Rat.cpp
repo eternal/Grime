@@ -68,6 +68,30 @@ Rat::~Rat(void)
 {
 }
 
+void Rat::CheckPhase() 
+{
+    if (attackPhase)
+    {
+        if (attackPhaseActive)
+        {
+
+        }
+        else
+        {
+            this->node->setFrameLoop(42,54);
+            attackPhaseActive = true;
+        }
+    }
+    else
+    {
+        if (attackPhaseActive)
+        {
+            this->node->setFrameLoop(28,39);
+            attackPhaseActive = false;
+        }
+    }
+}
+
 void Rat::Update( s32 time )
 {
     if (active)

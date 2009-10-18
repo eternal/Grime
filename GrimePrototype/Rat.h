@@ -9,4 +9,5 @@ public:
     ~Rat(void);
     
     void Update(s32 time);
+    void CheckPhase();
 };

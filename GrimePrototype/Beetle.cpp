@@ -8,7 +8,6 @@ Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
         Standing>Walk - 10-18
         Walk cycle - 19>34
         attack cycle - 40-60*/
-        
     //set position and scale data
     vector3df pos = position;
     vector3df rot = vector3df(0.0f,0.0f,0.0f);
@@ -57,7 +56,7 @@ Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
     sound->setPlayPosition(randNum);
 
     this->node->setAnimationSpeed(25.0f);
-    //set walking frame loop
+    this->node->setFrameLoop(19,34);
 
     attackTimer = 0;
     //since mesh was scaled, normalise normals
@@ -79,6 +78,30 @@ Beetle::Beetle( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soun
 Beetle::~Beetle(void)
 {
 
+}
+
+void Beetle::CheckPhase() 
+{
+    if (attackPhase)
+    {
+        if (attackPhaseActive)
+        {
+
+        }
+        else
+        {
+            this->node->setFrameLoop(40,60);
+            attackPhaseActive = true;
+        }
+    }
+    else
+    {
+        if (attackPhaseActive)
+        {
+            this->node->setFrameLoop(19,34);
+            attackPhaseActive = false;
+        }
+    }
 }
 
 void Beetle::Update(s32 time)

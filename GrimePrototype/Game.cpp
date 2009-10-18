@@ -200,7 +200,7 @@ void Game::Update( s32 time )
         this->RestartLevel();
     }
     cleanupTimer += time;
-    if (cleanupTimer >= 15000)
+    if (cleanupTimer >= 25000)
     {
         this->CleanupArrays();
         cleanupTimer = 0;

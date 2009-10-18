@@ -48,7 +48,7 @@ class Enemy : public Entity
         
         virtual void FaceTarget();
         void CheckPhase();
-        
+
         s32 attackTimer;
         f32 soundResetTimer;
         u32 soundWalkCurrentPosition;

@@ -12,4 +12,5 @@ public:
     core::array<Block*>* blockArray;
     u32 blockDestroyTimer;
     void Update(s32 time);
+    void CheckPhase();
 };
