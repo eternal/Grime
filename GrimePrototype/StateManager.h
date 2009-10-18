@@ -39,7 +39,7 @@ public:
     gui::IGUIStaticText* textPrimitives;
     gui::IGUIStaticText* textTime;
     gui::IGUIStaticText* textFPS;
-
+    gui::IGUIStaticText* textNotifications;
 
     StateManager(IrrlichtDevice* device, IPhysxManager* physxManager, Game* game);
     ~StateManager(void);

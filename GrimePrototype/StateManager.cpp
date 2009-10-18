@@ -46,6 +46,21 @@ void StateManager::Update(s32 time)
             strTotalTime += game->spawnManager->waveTimer / 1000.0f;
             core::stringw strFPS = "FPS: ";
             strFPS += driver->getFPS();
+            core::stringw strNotify = "Phase: ";
+            strNotify += game->spawnManager->phase;
+            if (game->spawnManager->onCooldown)
+            {
+                if (game->spawnManager->phase > 0)
+                {
+                    strNotify += "\nRest Time Remaining: ";
+                }
+                else
+                {
+                    strNotify += "\nSetup Time Remaining: ";
+                }
+                strNotify += (60000 - game->spawnManager->cooldownTimer) / 1000;
+            }
+            
             textSpawns->setText(strTime.c_str());
             textHealth->setText(strHealth.c_str());
             textCooldown->setText(strCooldown.c_str());
@@ -53,6 +68,7 @@ void StateManager::Update(s32 time)
             textPrimitives->setText(strPrimitives.c_str());
             textTime->setText(strTotalTime.c_str());
             textFPS->setText(strFPS.c_str());
+            textNotifications->setText(strNotify.c_str());
         }
         break;
         case EGS_MENU:
@@ -107,7 +123,7 @@ void StateManager::LoadState(s32 state)
             guienv->getSkin()->setColor(gui::EGDC_BUTTON_TEXT, SColor(255,255,255,255));
             
             levelText = guienv->addStaticText(L"Grime: Kitchen", core::rect<s32>(5,2,200,200));
-            buildText = guienv->addStaticText(L"Build: 200909291248", core::rect<s32>(5,20,200,200));
+            buildText = guienv->addStaticText(L"Build: 200910181838", core::rect<s32>(5,20,200,200));
             textSpawns = guienv->addStaticText(L"Time Between Spawns: ", core::rect<s32>(5,38,400,200));    
             textHealth = guienv->addStaticText(L"Health: ", core::rect<s32>(5,58,400,200));
             textCooldown = guienv->addStaticText(L"Cooldown: ", rect<s32>(5,700,400,800));
@@ -115,6 +131,7 @@ void StateManager::LoadState(s32 state)
             textPrimitives = guienv->addStaticText(L"Primitives Drawn: ", rect<s32>(5, 750, 400, 810));
             textTime = guienv->addStaticText(L"Time: ", rect<s32>(1100,2,1300,200));
             textFPS = guienv->addStaticText(L"FPS: ", rect<s32>(1100,22,1200,200));
+            textNotifications = guienv->addStaticText(L"Phase: ", rect<s32>(1000,400,1200,600));
 
             //room = smgr->getMesh("media/level/kitchen retex final.b3d")->getMesh(1);
             
