@@ -119,15 +119,15 @@ void StateManager::LoadState(s32 state)
             vector3df roomScale(1200.0f,1200.0f,1200.0f);
             vector3df roomTranslate(0.0f,0.0f,0.0f);
             vector3df roomRotate(90.0f,0.0f,0.0f);
-            IMesh* meshRoom = smgr->getMesh("media/roomplace.b3d")->getMesh(0);
-            IMesh* meshFridge = smgr->getMesh("media/fridge.b3d")->getMesh(0);
-            IMesh* meshBenchUpper = smgr->getMesh("media/kitchenbenchupper.b3d")->getMesh(0);
-            IMesh* meshBenchLower = smgr->getMesh("media/kitchenbenchlower.b3d")->getMesh(0);
-            IMesh* meshMicrowave = smgr->getMesh("media/kitchenmicrowave.b3d")->getMesh(0);
-            IMesh* meshMirror = smgr->getMesh("media/kitchenmirror.b3d")->getMesh(0);
-            IMesh* meshPlant = smgr->getMesh("media/kitchenplant.b3d")->getMesh(0);
-            IMesh* meshSink = smgr->getMesh("media/kitchensink.b3d")->getMesh(0);
-            IMesh* meshPantry = smgr->getMesh("media/pantry.b3d")->getMesh(0);
+            IMesh* meshRoom = smgr->getMesh("media/level/roomplace.b3d")->getMesh(0);
+            IMesh* meshFridge = smgr->getMesh("media/level/fridge.b3d")->getMesh(0);
+            IMesh* meshBenchUpper = smgr->getMesh("media/level/kitchenbenchupper.b3d")->getMesh(0);
+            IMesh* meshBenchLower = smgr->getMesh("media/level/kitchenbenchlower.b3d")->getMesh(0);
+            IMesh* meshMicrowave = smgr->getMesh("media/level/kitchenmicrowave.b3d")->getMesh(0);
+            IMesh* meshMirror = smgr->getMesh("media/level/kitchenmirror.b3d")->getMesh(0);
+            IMesh* meshPlant = smgr->getMesh("media/level/kitchenplant.b3d")->getMesh(0);
+            IMesh* meshSink = smgr->getMesh("media/level/kitchensink.b3d")->getMesh(0);
+            IMesh* meshPantry = smgr->getMesh("media/level/pantry.b3d")->getMesh(0);
 
             IMeshSceneNode* nodeRoom = smgr->addMeshSceneNode(meshRoom, 0, -1, roomTranslate, roomRotate, roomScale);
             //IMeshSceneNode* nodeFridge = smgr->addMeshSceneNode(meshFridge, 0, -1, roomTranslate, roomRotate, roomScale);
@@ -138,6 +138,7 @@ void StateManager::LoadState(s32 state)
             //IMeshSceneNode* nodePlant = smgr->addMeshSceneNode(meshPlant, 0, -1, roomTranslate, roomRotate, roomScale);
             IMeshSceneNode* nodeSink = smgr->addMeshSceneNode(meshSink, 0, -1, roomTranslate, roomRotate, roomScale);
             IMeshSceneNode* nodePantry = smgr->addMeshSceneNode(meshPantry, 0, -1, roomTranslate, roomRotate, roomScale);
+           
             
             IMeshSceneNode* nodePlantTwo = smgr->addMeshSceneNode(meshPlant, 0, -1, vector3df(-120.0f,0.0f,-10.0f), vector3df(90.0f,0.0f,0.0f), vector3df(100.0f,100.0f,100.0f));
             for (u32 i = 0 ; i < nodePlantTwo->getMesh()->getMeshBufferCount(); ++i) 
@@ -199,7 +200,7 @@ void StateManager::LoadState(s32 state)
             }
             nodeMirror->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
             nodeMirror->setAutomaticCulling(EAC_BOX);
-            
+
             NodeInit(nodeRoom, roomScale);
             //NodeInit(nodeFridge, roomScale);
             NodeInit(nodeBenchUpper, roomScale);

@@ -66,9 +66,10 @@ void Player::SetWeapon(u32 weapon)
     else if (weapon == WEAPON_PISTOL)
     {
         pair->gun = smgr->addMeshSceneNode(smgr->getMesh("media/weapon.obj")->getMesh(0), pair->SceneNode);
-        pair->gun->setPosition(core::vector3df(1.5f,-3.2f,1.0f));
+        pair->gun->setPosition(core::vector3df(2.2f,-3.2f,1.2f));
         pair->gun->setRotation(core::vector3df(0.0f,180.0,0.0f));
         pair->gun->setScale(core::vector3df(0.5f,0.5f,0.5f));
+        pair->gun->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);
         pair->gun->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     }
     else if (weapon == WEAPON_RPG)
