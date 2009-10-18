@@ -15,6 +15,17 @@ enum ENEMY_TYPES{
     NUMBER_OF_ENEMIES
 };
 
+enum ENEMY_SPAWN_POSITIONS
+{
+    BASIN_HIGH,
+    MICROWAVE_HIGH,
+    MICROWAVE_LOWER,
+    STOVE_LOWER,
+    CUPBOARD_LOWER,
+    FRIDGE_LOWER,
+    NUMBER_OF_POSITIONS
+};
+
 class SpawnManager
 {
 public:
@@ -33,9 +44,7 @@ public:
     IAnimatedMesh* ratMesh;
     IAnimatedMesh* beetleMesh;
     
-    vector3df positionOne;
-    vector3df positionTwo;
-    vector3df positionThree;
+    vector3df spawnPosition[NUMBER_OF_POSITIONS];
     
     s32 timeBetweenSpawns;
     s32 currentTimer;

@@ -19,9 +19,12 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     spawnsActive = false;
     onCooldown = false;
     
-    positionOne = vector3df(-789.5f,30.0f,1080.842f);
-    positionTwo = vector3df(-1955.101f,30.0f,-1432.715f);
-    positionThree = vector3df(580.0f,720.1f,-1125.0f);
+    spawnPosition[BASIN_HIGH] = vector3df(1401.0f, 680.1f, 0.0f);
+    spawnPosition[MICROWAVE_HIGH] = vector3df(580.0f, 680.0f, -1125.0f);
+    spawnPosition[MICROWAVE_LOWER] = vector3df(1627, 30.0f, -890.0f);
+    spawnPosition[STOVE_LOWER] = vector3df(-805.0f, 30.0f, -1400.0f);
+    spawnPosition[CUPBOARD_LOWER] = vector3df(-789.5f,30.0f,1080.842f);
+    spawnPosition[FRIDGE_LOWER] = vector3df(164.0f, 30.0f, 1439.0f);
     
     //cockroachMesh = smgr->getMesh("media/cockroack_rigged_a02.x"); COMMENTED OUT UNTIL LOWPOLY MESH ARRIVES
     cockroachMesh = smgr->getMesh("media/roachlowpoly.x");
@@ -58,7 +61,7 @@ void SpawnManager::Update( s32 time )
                 }
                 if (phase == 3)
                 {
-                    SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
+                    FinalWave();
                     phase++;
                 }
                 spawnTimer += time;
@@ -107,7 +110,7 @@ void SpawnManager::Update( s32 time )
     {
         cooldownTimer += time;
         std::cout << cooldownTimer << std::endl;
-        if (cooldownTimer >= 60000)
+        if (cooldownTimer >= 6000)
         {
             onCooldown = false;
             std::cout << phase << std::endl;
@@ -117,7 +120,7 @@ void SpawnManager::Update( s32 time )
 }
 void SpawnManager::SpawnWaveSpiders()
 {
-    s32 randomNum = getRandom(30);
+    s32 randomNum = getRandom(15);
     if (randomNum == 1)
     {
         SpawnSpider(RandomPoint());
@@ -125,9 +128,9 @@ void SpawnManager::SpawnWaveSpiders()
 }
 void SpawnManager::SpawnWaveBeetles() 
 {
-    SpawnBeetle(positionOne);
-    SpawnBeetle(positionTwo);
-    SpawnBeetle(positionThree);
+    SpawnBeetle(RandomPoint());
+    SpawnBeetle(RandomPoint());
+    SpawnBeetle(RandomPoint());
 }
 void SpawnManager::SpawnWave()
 {
@@ -140,28 +143,15 @@ void SpawnManager::SpawnWave()
     }
     else if (rand1 == 2)
     {
-        int rand2 = getRandom(3);
-        if (rand2 == 1)
-        {
-            SpawnCockroach(positionOne);
-            SpawnCockroach(positionTwo);
-        }
-        if (rand2 == 2)
-        {
-            SpawnCockroach(positionOne);
-            SpawnCockroach(positionThree);
-        }
-        if (rand2 == 3)
-        {
-            SpawnCockroach(positionThree);
-            SpawnCockroach(positionTwo);
-        }
+        SpawnCockroach(RandomPoint());
+        SpawnCockroach(RandomPoint());
+        
     }
     else if (rand1 == 3)
     {
-        SpawnCockroach(positionOne);
-        SpawnCockroach(positionTwo);
-        SpawnCockroach(positionThree);
+        SpawnCockroach(RandomPoint());
+        SpawnCockroach(RandomPoint());
+        SpawnCockroach(RandomPoint());
     }
 }
 
@@ -204,22 +194,47 @@ void SpawnManager::DIRTYMESHFIX()
 
 irr::core::vector3df SpawnManager::RandomPoint()
 {
-    s32 randomNum = getRandom(3);
-    if (randomNum == 1)
+    s32 randomNum = getRandom(NUMBER_OF_POSITIONS);
+    randomNum--;
+    switch (randomNum)
     {
-        return positionOne;
-    }
-    else if (randomNum == 2)
-    {
-        return positionTwo;
-    }
-    else
-    {
-        return positionThree;
+        case BASIN_HIGH:
+            return spawnPosition[BASIN_HIGH];
+        break;
+        case MICROWAVE_HIGH:
+            return spawnPosition[MICROWAVE_HIGH];
+        break;
+        case MICROWAVE_LOWER:
+        {
+            vector3df position = spawnPosition[MICROWAVE_LOWER];
+            position.Z = (float)(-308 - getRandom(582));
+            return position;
+        }
+        break;
+        case STOVE_LOWER:
+        {
+            vector3df position = spawnPosition[STOVE_LOWER];
+            position.X = (float)(-805 - getRandom(1150));
+            return position;
+        }
+        break;
+        case CUPBOARD_LOWER:
+            return spawnPosition[CUPBOARD_LOWER];
+        break;
+        case FRIDGE_LOWER:
+        {
+            vector3df position = spawnPosition[FRIDGE_LOWER];
+            position.X = (float)(164 + getRandom(931));
+            return position;
+        }
+        break; 
+        default:
+            return spawnPosition[MICROWAVE_HIGH];
+        break;  
     }
 }
 void SpawnManager::FinalWave() 
 {
     //spawn rat
-    SpawnRat(positionOne);
+    this->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
 }

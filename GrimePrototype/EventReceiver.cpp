@@ -122,21 +122,6 @@ bool EventReceiver::OnEvent(const SEvent& event)
                                 game->spawnManager->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
                             }
                             break; 
-                        case KEY_KEY_8: 
-                            {
-                                game->spawnManager->SpawnSpider(game->spawnManager->positionOne);
-                            }
-                            break;
-                        case KEY_KEY_9: 
-                            {
-                                game->spawnManager->SpawnSpider(game->spawnManager->positionTwo);
-                            }
-                            break;
-                        case KEY_KEY_0: 
-                            {
-                                game->spawnManager->SpawnSpider(game->spawnManager->positionThree);
-                            }
-                            break;
                         case KEY_KEY_I:
                             game->RestartLevel();
                             break;
