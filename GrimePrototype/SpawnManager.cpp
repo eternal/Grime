@@ -51,13 +51,14 @@ void SpawnManager::Update( s32 time )
                 if (waveTimer >= 60000)
                 {
                     spawnsActive = true;
+                    std::cout << phase << std::endl;
                 }
             }
             if (spawnsActive)
             {
                 if (phase == 3)
                 {
-                    SpawnRat(vector3df(0.0f,0.0f,0.0f));
+                    SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
                     phase++;
                 }
                 spawnTimer += time;
@@ -86,6 +87,7 @@ void SpawnManager::Update( s32 time )
                 {
                     onCooldown = true;
                     phase++;
+                    
                 }
                 //9 min rat phase
                 if (waveTimer >= 600000 && phase == 2)
@@ -99,9 +101,11 @@ void SpawnManager::Update( s32 time )
     else
     {
         cooldownTimer += time;
+        std::cout << cooldownTimer << std::endl;
         if (cooldownTimer >= 60000)
         {
             onCooldown = false;
+            std::cout << phase << std::endl;
             cooldownTimer = 0;
         }
     }

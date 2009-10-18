@@ -119,7 +119,7 @@ bool EventReceiver::OnEvent(const SEvent& event)
                             break;
                         case KEY_KEY_4: 
                             {
-                                game->spawnManager->SpawnRat(vector3df(0.0f,100.0f,0.0f));
+                                game->spawnManager->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
                             }
                             break; 
                         case KEY_KEY_8: 

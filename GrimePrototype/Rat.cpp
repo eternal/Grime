@@ -58,7 +58,7 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     strength = 20;
-    health = 25;
+    health = 50;
     speed = 1.0f;
 }
 Rat::~Rat(void)
@@ -127,6 +127,9 @@ void Rat::Update( s32 time )
                         soundReset = true;
                         //     pair->SoundNode->setPlayOnceMode();
                         target->health -= strength; 
+                        direction.Y += 50.0f;
+                        target->pair->PhysxObject->setLinearVelocity(direction.normalize() * 200.0f);
+                        target->pair->updateTransformation();
                         attackTimer = 0;
 
                     }

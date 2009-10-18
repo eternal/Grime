@@ -525,7 +525,15 @@ core::array<Enemy*> Game::RebuildEnemies()
         {
             Enemy* enemy = enemyObjects[i];
             enemy->pair->PhysxObject->getType(); //throwaway function to check enemy works
-            enemiesRebuild.push_back(enemy);
+            //extra hack section for removal of enemies below map
+            if (enemy->pair->SceneNode->getAbsolutePosition().Y >= -100.0f)
+            {
+                enemiesRebuild.push_back(enemy);   
+            }
+            else
+            {
+                std::cerr << "Mesh below map, skipped" << std::endl;
+            }
         }
         catch (...)
         {
