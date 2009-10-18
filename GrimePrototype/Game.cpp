@@ -197,7 +197,12 @@ void Game::Update( s32 time )
 {
     if (player->health <= 0) 
     {
+        //defeat
         this->RestartLevel();
+    }
+    if (player->ratKilled)
+    {
+        //victory
     }
     cleanupTimer += time;
     if (cleanupTimer >= 25000)
@@ -271,9 +276,14 @@ void Game::RestartLevel()
     blockObjects.clear();
 
     player->pair->PhysxObject->setPosition(startPosition);
+    player->pair->PhysxObject->setLinearVelocity(vector3df(0.0f,0.0f,0.0f));
     player->pair->updateTransformation();
 
     spawnManager->timeBetweenSpawns = 2500;
+    spawnManager->cooldownTimer = 0;
+    spawnManager->waveTimer = 0;
+    spawnManager->phase = 0;
+    spawnManager->spawnsActive = false;
     player->health = 100;
 }
 void Game::WeaponCloseRaycast(core::line3df line)

@@ -217,7 +217,12 @@ void Rat::Update( s32 time )
 
         }
         else 
-        {                    
+        { 
+            if (!(this->IsStillAlive()))
+            {
+                this->target->ratKilled = true;
+            }
+                               
             try 
             {   
                 for (u32 i = 0; i < enemyArray->size(); ++i)

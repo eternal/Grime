@@ -121,7 +121,7 @@ void SpawnManager::Update( s32 time )
     else
     {
         cooldownTimer += time;
-        std::cout << cooldownTimer << std::endl;
+        //std::cout << cooldownTimer << std::endl;
         if (cooldownTimer >= 60000)
         {
             onCooldown = false;

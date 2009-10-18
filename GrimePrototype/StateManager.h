@@ -34,12 +34,25 @@ public:
     gui::IGUIStaticText* buildText;
     gui::IGUIStaticText* textSpawns;    
     gui::IGUIStaticText* textHealth;
-    gui::IGUIStaticText* textCooldown;
+    gui::IGUIStaticText* textAmmo;
     gui::IGUIStaticText* textPosition;
     gui::IGUIStaticText* textPrimitives;
     gui::IGUIStaticText* textTime;
     gui::IGUIStaticText* textFPS;
     gui::IGUIStaticText* textNotifications;
+    
+    gui::IGUIImage* imgBoxCooldowns;
+    gui::IGUIImage* imgBoxHealth;
+    
+    gui::IGUIImage* crosshair;
+    
+    gui::IGUIImage* damageOverlay;
+
+    gui::IGUIImage* imgHealth;
+    gui::IGUIImage* imgBlock;          
+    gui::IGUIImage* imgKnockback;
+    gui::IGUIImage* imgRPG;
+    gui::IGUIImage* imgAmmo;
 
     StateManager(IrrlichtDevice* device, IPhysxManager* physxManager, Game* game);
     ~StateManager(void);
