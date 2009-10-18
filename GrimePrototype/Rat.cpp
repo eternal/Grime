@@ -10,7 +10,7 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     //set position and scale data
     vector3df pos = position;
     vector3df rot = vector3df(0.0f,0.0f,0.0f);
-    vector3df scale = vector3df(2.0f,2.0f,2.0f);
+    vector3df scale = vector3df(1.8f,1.8f,1.8f);
     //set references
     //set references
     this->smgr = sceneManager;

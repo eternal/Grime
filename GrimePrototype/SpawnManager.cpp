@@ -38,24 +38,24 @@ void SpawnManager::Update( s32 time )
     {
         if (enemyObjects->size() <= 50)
         {
-            currentTimer += time;
             waveTimer += time;
-            if (currentTimer >= 100) 
-            {
-                timeBetweenSpawns--;
-                currentTimer = 0;
-            }
             if (!spawnsActive)
             {   
                 //setup phase
-                if (waveTimer >= 60000)
-                {
-                    spawnsActive = true;
-                    std::cout << phase << std::endl;
-                }
+                spawnsActive = true;
+                onCooldown = true;
             }
             if (spawnsActive)
             {
+                if (timeBetweenSpawns >= 800)
+                {
+                    currentTimer += time;
+                    if (currentTimer >= 280) 
+                    {
+                        timeBetweenSpawns--;
+                        currentTimer = 0;
+                    }
+                }
                 if (phase == 3)
                 {
                     SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
@@ -75,24 +75,26 @@ void SpawnManager::Update( s32 time )
                     SpawnWaveBeetles();
                     minuteTimer = 0;
                 }
-                //wavetimer - 60s = current time
                 //3 min mark
-                if (waveTimer >= 240000 && phase == 0)
+                if (waveTimer >= 180000 && phase == 0)
                 {
                     onCooldown = true;
+                    timeBetweenSpawns = 2000;
                     phase++;
                 }
                 //6min
-                if (waveTimer >= 420000 && phase == 1)
+                if (waveTimer >= 360000 && phase == 1)
                 {
                     onCooldown = true;
+                    timeBetweenSpawns = 1500;
                     phase++;
                     
                 }
                 //9 min rat phase
-                if (waveTimer >= 600000 && phase == 2)
+                if (waveTimer >= 540000 && phase == 2)
                 {
                     onCooldown = true;
+                    timeBetweenSpawns = 1000;
                     phase++;
                 }                
             }

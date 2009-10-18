@@ -250,7 +250,9 @@ void Game::ClearEnemies()
     }
 }
 
-void Game::RestartLevel() {
+void Game::RestartLevel() 
+{
+    this->CleanupArrays();
     for (u32 i = 0; i < enemyObjects.size(); i++)
     {
         Enemy* enemy = enemyObjects[i];
@@ -532,6 +534,8 @@ core::array<Enemy*> Game::RebuildEnemies()
             }
             else
             {
+                physxManager->removePhysxObject(enemy->pair->PhysxObject);
+                enemy->pair->SceneNode->remove();
                 std::cerr << "Mesh below map, skipped" << std::endl;
             }
         }
