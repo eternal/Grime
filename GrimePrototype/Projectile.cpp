@@ -2,7 +2,7 @@
 #include <iostream>
 //#define WEAPONDEBUG 1
 
-Projectile::Projectile( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IPhysxManager* manager, SPhysxAndNodePair* pair, core::array<Projectile*>* objectArray, core::array<video::ITexture*> explosionTextures, core::array<Enemy*>* enemyArray)
+Projectile::Projectile( scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IPhysxManager* manager, SPhysxAndNodePair* pair, core::array<Projectile*>* objectArray, core::array<video::ITexture*> explosionTextures, core::array<Enemy*>* enemyArray, core::array<SPhysxAndNodePair*>* clutterArray, core::array<Block*>* blockArray)
 {
     this->smgr = sceneManager;
     this->soundEngine = soundEngine;
@@ -11,9 +11,11 @@ Projectile::Projectile( scene::ISceneManager* sceneManager, irrklang::ISoundEngi
     this->projectileObjects = objectArray;
     this->explosionTextures = explosionTextures;
     this->enemyArray = enemyArray;
+    this->clutterArray = clutterArray;
+    this->blockArray = blockArray;
     active = true;
     timeElapsed = 0;
-    radius = 200.0f;
+    radius = 250.0f;
     power = 5;
 }
 
@@ -28,12 +30,18 @@ void Projectile::DamageTargets(vector3df pos, f32 radius, s32 power)
         try 
         {
             Enemy* enemy = (*enemyArray)[i];
-            f32 distance = (enemy->pair->SceneNode->getAbsolutePosition() - this->pair->SceneNode->getAbsolutePosition()).getLength();
+            vector3df direction = enemy->pair->SceneNode->getAbsolutePosition() - this->pair->SceneNode->getAbsolutePosition(); 
+            f32 distance = direction.getLength();
             if (distance <= radius) //explosion radius
             {
-                f32 hitStrength = ((distance/radius) * power) + 2.0f;
+                f32 hitStrength = ((radius - (distance/radius)) * power) + 2.0f;
                 enemy->health -= hitStrength;
-                std::cout << "Target hit: " << hitStrength << " damage." << "Distance: " << distance << std::endl;
+                if (enemy->health > 0)
+                {
+                    enemy->pair->PhysxObject->setLinearVelocity(direction.normalize() * hitStrength);
+                    enemy->pair->updateTransformation();
+                }
+                std::cout << "Target hit: " << hitStrength << " damage." << " Distance: " << distance << std::endl;
             }
         }
         catch (...)
@@ -41,6 +49,45 @@ void Projectile::DamageTargets(vector3df pos, f32 radius, s32 power)
             std::cerr << "Exception caught in Projectile::DamageTargets. Possible corruption of enemyArray." << std::endl;
         }
         
+    }
+    for (u32 i = 0; i < blockArray->size(); i++)
+    {
+        try 
+        {
+            Block* block = (*blockArray)[i];
+            vector3df direction = block->pair->SceneNode->getAbsolutePosition() - this->pair->SceneNode->getAbsolutePosition(); 
+            f32 distance = direction.getLength();
+            if (distance <= radius) //explosion radius
+            {
+                f32 hitStrength = ((radius - (distance/radius)) * power) + 2.0f;
+                block->pair->PhysxObject->setLinearVelocity(direction.normalize() * (hitStrength / 25.0f));
+                block->pair->updateTransformation();
+            }
+        }
+        catch (...)
+        {
+            std::cerr << "Exception caught in Projectile::DamageTargets. Possible corruption of blockArray." << std::endl;
+        }
+
+    }
+    for (u32 i = 0; i < clutterArray->size(); i++)
+    {
+        try 
+        {
+            SPhysxAndNodePair* pair = (*clutterArray)[i];
+            vector3df direction = pair->SceneNode->getAbsolutePosition() - this->pair->SceneNode->getAbsolutePosition(); 
+            f32 distance = direction.getLength();
+            if (distance <= radius) //explosion radius
+            {   
+                f32 hitStrength = ((radius - (distance/radius)) * power) + 2.0f;
+                pair->PhysxObject->setLinearVelocity(direction.normalize() * (hitStrength / 5.0f));
+            }
+        }
+        catch (...)
+        {
+            std::cerr << "Exception caught in Projectile::DamageTargets. Possible corruption of clutterArray." << std::endl;
+        }
+
     }
 }
 
@@ -153,7 +200,7 @@ void Projectile::Detonate()
     anim->drop();
 
     this->DamageTargets(pair->SceneNode->getAbsolutePosition(), radius, power);
-    physxManager->createExplosion(pair->SceneNode->getPosition(), 0.0f, power * 10000.0f, power * 100000.0f, 0.4f);
+    //physxManager->createExplosion(pair->SceneNode->getPosition(), 0.0f, power * 10000.0f, power * 100000.0f, 0.4f);
     this->active = false;
     this->pair->SceneNode->setVisible(false);    
 }

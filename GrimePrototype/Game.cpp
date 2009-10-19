@@ -35,7 +35,7 @@ void Game::SpawnClutter()
     IMesh* clutterHandle = smgr->getMesh("media/Handle1.obj")->getMesh(0);
     IMesh* clutterTeapot = smgr->getMesh("media/TEAPOT.obj")->getMesh(0);
 
-    vector3df smallClutter = vector3df(0.6f,0.6f,0.6f);
+    vector3df smallClutter = vector3df(0.6f,1.0f,0.6f);
     vector3df mediumClutter = vector3df(1.0f,1.0f,1.0f);
     vector3df largeClutter = vector3df(1.5f,1.5f,1.5f);
     vector3df giantClutter = vector3df(2.2f,2.2f,2.2f);
@@ -446,10 +446,21 @@ void Game::WeaponFire(s32 weapon)
                 //TO REFACTOR, PLACE IN GAME CLASS
                 if (objectHit->getType() == EOT_CONVEX_MESH || objectHit->getType() == EOT_BOX || objectHit->getType() == EOT_SPHERE) 
                 {
+                    CreateImpactEffect(closestObject.HitPosition,closestObject.SurfaceNormal);
+                    bool enemyFound = false;
+                    bool blockFound = false;
+                    for (u32 i = 0 ; i < blockObjects.size() ; ++i) 
+                    {
+                        if (blockObjects[i]->pair->PhysxObject == objectHit) 
+                        {
+                            blockFound = true;
+                        }
+                    }
                     for (u32 i = 0 ; i < enemyObjects.size() ; ++i) 
                     {  // check it against the objects in our array to see if it matches
                         if (enemyObjects[i]->pair->PhysxObject == objectHit) 
                         {
+                            enemyFound = true;
                             Enemy* enemy = enemyObjects[i];
                             //add small pushback and texture explosion
                             s32 chance = GetRandom(4);
@@ -464,7 +475,6 @@ void Game::WeaponFire(s32 weapon)
 
                             if (enemy->IsStillAlive())
                             {
-                                CreateImpactEffect(closestObject.HitPosition,closestObject.SurfaceNormal);
                                 std::cout << enemy->health << " health left" << std::endl;
                             }
                             else
@@ -497,12 +507,16 @@ void Game::WeaponFire(s32 weapon)
                             }
                             break;
                         }
-                    }	
+                    }
+                    if (!(enemyFound) && !(blockFound))
+                    {
+                        objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
+                    }
+                    	
                 }                    
                 //for any other objects except for the camera
                 else if (objectHit != cameraPair->PhysxObject) 
                 {
-                    objectHit->setLinearVelocity(line.getVector().normalize() * 30.0f);
                     CreateImpactEffect(closestObject.HitPosition, closestObject.SurfaceNormal);
                     //physxManager->createExplosion(closestObject.HitPosition, 100.0f, 300000000.0f, 100000000000.0f, 0.2f);
                 }
@@ -516,7 +530,7 @@ void Game::WeaponFire(s32 weapon)
             t = t + vel * 20.0f;
             vel *= 800.0f;
 
-            projectileObjects.push_back(new Projectile(smgr,soundEngine,physxManager, CreateSphere(t, 10.0f, 10000.0f, &vel), &projectileObjects, explosionTextures, &enemyObjects));
+            projectileObjects.push_back(new Projectile(smgr,soundEngine,physxManager, CreateSphere(t, 10.0f, 10000.0f, &vel), &projectileObjects, explosionTextures, &enemyObjects, &clutterObjects, &blockObjects));
         }
         else if (player->GetWeapon() == WEAPON_CLOSE)
         {
