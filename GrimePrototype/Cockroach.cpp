@@ -207,6 +207,9 @@ void Cockroach::Update(s32 time)
         {                    
             try 
             {   
+                sound->stop();
+                sound->drop();
+                soundEngine->play3D("media/sounds/InsectDeath2.wav", this->pair->SceneNode->getPosition());
                 for (u32 i = 0; i < enemyArray->size(); ++i)
                 {
                     Enemy* enemy = (*enemyArray)[i];

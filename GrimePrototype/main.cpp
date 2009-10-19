@@ -89,8 +89,8 @@ int main()
     }
     
 	//set screen buffer resolution
-	//dimension2du ScreenRTT = !driver->getVendorInfo().equals_ignore_case("NVIDIA Corporation") ? dimension2du(1024, 1024) : driver->getScreenSize();
-    dimension2du ScreenRTT = driver->getScreenSize();
+	dimension2du ScreenRTT = !driver->getVendorInfo().equals_ignore_case("NVIDIA Corporation") ? dimension2du(1024, 1024) : driver->getScreenSize();
+    //dimension2du ScreenRTT = driver->getScreenSize();
     
 	//effects handler
 	smgr->getFileSystem()->addZipFileArchive("media/kitchen.pk3");
@@ -165,6 +165,7 @@ int main()
         //start drawing  
         if (device->isWindowActive())
         { 
+            //soundEngine->update();
 			driver->beginScene(true, true, video::SColor(255,200,200,200));
             //s32 realTimeEffect = device->getTimer()->getRealTime();
 #ifdef DEBUG            
@@ -177,6 +178,14 @@ int main()
 #endif // DEBUG			
             //std::cout << "Time taken to draw: " <<  device->getTimer()->getRealTime() - realTimeEffect << std::endl;
             receiver.Update(elapsedTime);
+            soundEngine->update();
+            vector3df position;
+            if (stateManager->currentState == EGS_GAME)
+            {
+                game->player->pair->PhysxObject->getPosition(position);
+                vector3df direction = game->player->pair->camera->getTarget() - position;
+                soundEngine->setListenerPosition(position, direction);
+            }
 	        //s32 realtimedebug = device->getTimer()->getRealTime();
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            

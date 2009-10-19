@@ -59,6 +59,8 @@ class Player : public Entity
         
         s32 blockAmmunitionTimer;
         s32 damagedTimer;
+        s32 webTimer;
+        
         s32 knockbackChargeupTimer;
         bool knockbackChargeup;
         

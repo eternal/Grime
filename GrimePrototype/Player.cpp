@@ -16,6 +16,7 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     health = 100;
     blockAmmunitionTimer = 0;
     damagedTimer = 0;
+    webTimer = 0;
     knockbackChargeupTimer = 0;
     knockbackChargeup = false;
     

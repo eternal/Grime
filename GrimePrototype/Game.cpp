@@ -17,6 +17,9 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
     gameOver = false;
     newGameSelected = true;
     restart = false;
+    
+    //this->bgMusic = soundEngine->play2D("media/sounds/Calm1.wav",true,false,true);
+    soundEngine->setSoundVolume(1.0f);
 }
 
 Game::~Game(void)
@@ -259,6 +262,7 @@ void Game::LoadLevel()
 }
 void Game::Update( s32 time )
 {
+    //std::cout << soundEngine->getSoundVolume() << std::endl;
     if (player->health <= 0) 
     {
         //defeat
@@ -436,6 +440,8 @@ void Game::WeaponFire(s32 weapon)
         }
         else if (player->GetWeapon() == WEAPON_PISTOL)
         {
+            ISound* bang = soundEngine->play2D("media/sounds/Bang5.wav", false, false, true);
+            bang->setVolume(0.5f);
             // Perform a raycast to find the objects we just shot at
             core::line3df line;
             line.start = cameraPair->camera->getPosition();

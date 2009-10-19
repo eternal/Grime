@@ -51,6 +51,7 @@ public:
     gui::IGUIImage* crosshair;
     
     gui::IGUIImage* damageOverlay;
+    gui::IGUIImage* webOverlay;
     gui::IGUIImage* deadOverlay;
 
     gui::IGUIImage* imgHealth;

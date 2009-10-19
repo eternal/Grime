@@ -46,6 +46,17 @@ void StateManager::Update(s32 time)
                 f32 opacity = ((f32)game->player->damagedTimer / 510.0f) *255.0f;
                 damageOverlay->setColor(SColor((u32)opacity, 255,255,255));
             }
+            
+            if (game->player->webTimer > 0)
+            {
+                game->player->webTimer -= time;
+                if (game->player->webTimer <= 0)
+                {
+                    game->player->webTimer =0;
+                }
+                f32 opacity = ((f32)game->player->webTimer / 510.0f) *255.0f;
+                webOverlay->setColor(SColor((u32)opacity, 255,255,255)); 
+            }
 
             if (game->player->weaponCooldown[WEAPON_RPG] <= 0)
             {
@@ -226,6 +237,9 @@ void StateManager::LoadState(s32 state)
             damageOverlay = guienv->addImage(driver->getTexture("media/gui/RED2.png"), core::position2di(-200,-125));
             damageOverlay->setColor(SColor(0,255,255,255));
             
+            webOverlay = guienv->addImage(driver->getTexture("media/gui/White.png"), core::position2di(-200,-125));
+            webOverlay->setColor(SColor(0,255,255,255));
+
             deadOverlay = guienv->addImage(driver->getTexture("media/gui/RED.png"), core::position2di(0,0));
             deadOverlay->setColor(SColor(0,255,255,255));
             
