@@ -18,6 +18,7 @@ enum ENUM_GAME_STATES {
 class StateManager
 {
 public:
+    IrrlichtDevice* device;
     ISceneManager* smgr;
     IPhysxManager* physxManager;
     video::IVideoDriver* driver;

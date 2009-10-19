@@ -28,6 +28,7 @@ public:
     Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* physxManager, EffectHandler* effect);
     ~Game(void);
     
+    IrrlichtDevice* device;
     ISceneManager* smgr;
     ISoundEngine* soundEngine;
     IPhysxManager* physxManager;
@@ -46,6 +47,10 @@ public:
     
     s32 cleanupTimer;
     s32 updateTimer;
+    s32 endTimer;
+    s32 endPhase;
+    
+    bool restart;
     
     core::array<video::ITexture*> explosionTextures;
     core::array<video::ITexture*> impactTextures;

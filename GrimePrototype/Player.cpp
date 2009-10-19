@@ -9,6 +9,7 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     this->soundEngine = soundEngine;
     this->pair = cameraPair;
     ratKilled = false;
+    gameComplete = false;
     vector3df pos;
     this->pair->PhysxObject->getPosition(pos);
     this->sound = soundEngine->play3D("media/sounds/Run1.wav", pos, true, true, true);

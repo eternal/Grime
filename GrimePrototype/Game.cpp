@@ -6,6 +6,9 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
     blockFinalToggle = false;
     cleanupTimer = 0;
     updateTimer = 0;
+    endTimer = 0;
+    endPhase = 0;
+    this->device = device;
     this->smgr = device->getSceneManager();
     this->soundEngine = soundEngine;
     this->physxManager = physxManager;
@@ -13,6 +16,7 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
     this->guienv = device->getGUIEnvironment();
     gameOver = false;
     newGameSelected = true;
+    restart = false;
 }
 
 Game::~Game(void)
@@ -264,11 +268,33 @@ void Game::Update( s32 time )
     }
     else 
     {
-        if (player->ratKilled)
+        if (player->ratKilled && player->gameComplete)
         {
             //victory
-            //this->ClearEnemies();
-            //roll credits or some bs
+            this->ClearEnemies();
+            endTimer += time;
+            if (endTimer >= 1000 && endPhase == 0)
+            {
+                gui::IGUIEnvironment* guienv = device->getGUIEnvironment();
+                gui::IGUIImage* black = guienv->addImage(device->getVideoDriver()->getTexture("media/gui/BLACK.png"),position2di(0,0));
+                black->setColor(SColor(20,255,255,255));
+                endTimer = 0;
+                endPhase++;
+            }
+            else if (endTimer >= 100 && endPhase > 0)
+            {
+                gui::IGUIEnvironment* guienv = device->getGUIEnvironment();
+                gui::IGUIImage* black = guienv->addImage(device->getVideoDriver()->getTexture("media/gui/BLACK.png"),position2di(0,0));
+                black->setColor(SColor(20,255,255,255));
+                endTimer = 0;
+                endPhase++;
+            }
+            if (endPhase == 30)
+            {
+                gui::IGUIImage* black = guienv->addImage(device->getVideoDriver()->getTexture("media/gui/BLACK.png"),position2di(0,0));
+                black->setColor(SColor(255,255,255,255));
+                restart = true;
+            }
         }
         cleanupTimer += time;
         if (cleanupTimer >= 25000)
@@ -365,6 +391,7 @@ void Game::RestartLevel()
     player->pair->updateTransformation();
 
     this->gameOver = false;
+    this->endTimer = 0;
     this->smgr->getActiveCamera()->setInputReceiverEnabled(true);
     this->SpawnClutter();
     
@@ -373,6 +400,8 @@ void Game::RestartLevel()
     spawnManager->waveTimer = 0;
     spawnManager->phase = 0;
     spawnManager->spawnsActive = false;
+    player->gameComplete = false;
+    player->ratKilled = false;
     player->health = 100;
     player->weaponAmmunition[WEAPON_BLOCKGUN] = 25;
 }

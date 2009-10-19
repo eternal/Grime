@@ -148,6 +148,16 @@ int main()
         u32 realTimeUpdates = device->getTimer()->getRealTime();
 #endif // DEBUG        
         stateManager->Update(elapsedTime);
+        if (stateManager->game->restart)
+        {
+            Game* newGame = new Game(device, soundEngine, physxManager, effect);
+            Game* oldGame = game;
+            game = newGame;
+            delete oldGame;
+            stateManager->game = newGame;
+            stateManager->LoadState(EGS_MENU);
+            receiver.game = newGame;
+        }
 #ifdef DEBUG               
         u32 updatesTime = device->getTimer()->getRealTime() - realTimeUpdates;
 #endif // DEBUG        

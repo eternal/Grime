@@ -65,7 +65,6 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     strength = 20;
-    //health = 50;
     health = 5;
     speed = 1.0f;
 }
@@ -278,6 +277,7 @@ void Rat::Update( s32 time )
             if (explosionPhase == 10)
             {
                 CreateExplosion(pair->SceneNode->getPosition(), true);
+                this->target->gameComplete = true;
                 try 
                 {   
                     for (u32 i = 0; i < enemyArray->size(); ++i)

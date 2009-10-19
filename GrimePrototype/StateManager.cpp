@@ -3,6 +3,7 @@
 StateManager::StateManager(IrrlichtDevice* device, IPhysxManager* physxManager, Game* game)
 {
     this->smgr = device->getSceneManager();
+    this->device = device;
     this->physxManager = physxManager;
     this->guienv = device->getGUIEnvironment();
     this->driver = device->getVideoDriver();
@@ -182,6 +183,13 @@ void StateManager::LoadState(s32 state)
 {
     smgr->clear();
     guienv->clear();
+    SSceneDesc sceneDesc;
+    // Set the bounding box of the physx "scene"
+    sceneDesc.MaxBounds = core::aabbox3df(core::vector3df(-2300,-200,-2000), core::vector3df(2000,1500,2000));
+    sceneDesc.BoundPlanes = true;
+    // Y axis up
+    sceneDesc.UpAxis = 1;
+    physxManager->resetScene(sceneDesc);
     switch (state)
     {
         case EGS_MENU:

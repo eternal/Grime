@@ -55,6 +55,7 @@ class Player : public Entity
         s32 currentWeapon;   
         
         bool ratKilled;
+        bool gameComplete;
         
         s32 blockAmmunitionTimer;
         s32 damagedTimer;
