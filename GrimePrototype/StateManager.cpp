@@ -344,27 +344,6 @@ void StateManager::LoadState(s32 state)
             NodeInit(nodeSink, roomScale);
             NodeInit(nodePantry, roomScale);
             
-            IMesh* clutterBowl = smgr->getMesh("media/Bowl.obj")->getMesh(0);
-            IMesh* clutterCup = smgr->getMesh("media/Cup1.obj")->getMesh(0);
-            IMesh* clutterPlate = smgr->getMesh("media/Plate1.obj")->getMesh(0);
-            
-            
-                       
-            SPhysxAndNodePair* bowl = new SPhysxAndNodePair;
-            bowl->SceneNode = smgr->addMeshSceneNode(clutterBowl,0,-1, vector3df(0.0f,20.0f,0.0f),vector3df(0.0f,0.0f,0.0f),vector3df(1.0f,1.0f,1.0f));
-            bowl->PhysxObject = physxManager->createConvexMeshObject(physxManager->createConvexMesh(clutterBowl->getMeshBuffer(0), vector3df(1.0f,1.0f,1.0f)), vector3df(0.0f,20.0f,0.0f));
-            game->clutterObjects.push_back(bowl);
-            
-            SPhysxAndNodePair* cup = new SPhysxAndNodePair;
-            cup->SceneNode = smgr->addMeshSceneNode(clutterCup,0,-1, vector3df(0.0f,20.0f,0.0f),vector3df(0.0f,0.0f,0.0f),vector3df(1.0f,1.0f,1.0f));
-            cup->PhysxObject = physxManager->createConvexMeshObject(physxManager->createConvexMesh(clutterCup->getMeshBuffer(0), vector3df(1.0f,1.0f,1.0f)), vector3df(0.0f,20.0f,0.0f));
-            game->clutterObjects.push_back(cup);
-            
-            SPhysxAndNodePair* plate = new SPhysxAndNodePair;
-            plate->SceneNode = smgr->addMeshSceneNode(clutterPlate,0,-1, vector3df(0.0f,20.0f,0.0f),vector3df(0.0f,0.0f,0.0f),vector3df(1.0f,1.0f,1.0f));
-            plate->PhysxObject = physxManager->createConvexMeshObject(physxManager->createConvexMesh(clutterPlate->getMeshBuffer(0), vector3df(1.0f,1.0f,1.0f)), vector3df(0.0f,20.0f,0.0f));
-            game->clutterObjects.push_back(plate);
-            
             game->LoadLevel();
             this->currentState = EGS_GAME;
         }

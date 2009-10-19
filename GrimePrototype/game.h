@@ -76,5 +76,7 @@ public:
     core::array<Projectile*> RebuildProjectiles();
     void WeaponCloseRaycast(core::line3df line);
     void ClearEnemies();
+    void AddClutter(IMesh* mesh, vector3df position, vector3df scale);
+    void SpawnClutter();
 };
 

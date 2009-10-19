@@ -153,7 +153,7 @@ void Projectile::Detonate()
     anim->drop();
 
     this->DamageTargets(pair->SceneNode->getAbsolutePosition(), radius, power);
-    physxManager->createExplosion(pair->SceneNode->getAbsolutePosition(), radius * 3.0f, power * 1000000.0f, power * 1000000.0f, 0.2f);
+    physxManager->createExplosion(pair->SceneNode->getPosition(), 0.0f, power * 10000.0f, power * 100000.0f, 0.4f);
     this->active = false;
     this->pair->SceneNode->setVisible(false);    
 }

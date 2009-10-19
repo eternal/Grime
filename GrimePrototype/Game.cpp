@@ -19,6 +19,63 @@ Game::~Game(void)
 {
 }
 
+void Game::AddClutter(IMesh* mesh, vector3df position, vector3df scale)
+{
+    SPhysxAndNodePair* pair = new SPhysxAndNodePair;
+    pair->SceneNode = smgr->addMeshSceneNode(mesh,0,-1, position,vector3df(0.0f,0.0f,0.0f),scale);
+    pair->PhysxObject = physxManager->createConvexMeshObject(physxManager->createConvexMesh(mesh->getMeshBuffer(0), scale), position);
+    clutterObjects.push_back(pair);
+}
+
+void Game::SpawnClutter()
+{
+    IMesh* clutterBowl = smgr->getMesh("media/Bowl.obj")->getMesh(0);
+    IMesh* clutterCup = smgr->getMesh("media/Cup1.obj")->getMesh(0);
+    IMesh* clutterPlate = smgr->getMesh("media/Plate2.obj")->getMesh(0);
+    IMesh* clutterHandle = smgr->getMesh("media/Handle1.obj")->getMesh(0);
+    IMesh* clutterTeapot = smgr->getMesh("media/TEAPOT.obj")->getMesh(0);
+
+    vector3df smallClutter = vector3df(0.6f,0.6f,0.6f);
+    vector3df mediumClutter = vector3df(1.0f,1.0f,1.0f);
+    vector3df largeClutter = vector3df(1.5f,1.5f,1.5f);
+    vector3df giantClutter = vector3df(2.2f,2.2f,2.2f);
+
+    AddClutter(clutterBowl, vector3df(610.0f,20.0f,50.0f), mediumClutter);
+    AddClutter(clutterCup, vector3df(320.0f,40.0f,0.0f), mediumClutter);
+    AddClutter(clutterPlate, vector3df(230.0f,40.0f,50.0f), mediumClutter);
+    AddClutter(clutterBowl, vector3df(440.0f,20.0f,0.0f), mediumClutter);
+    AddClutter(clutterPlate, vector3df(260.0f,40.0f,-100.0f), mediumClutter);
+    AddClutter(clutterBowl, vector3df(270.0f,20.0f,150.0f), mediumClutter);
+    AddClutter(clutterPlate, vector3df(290.0f,20.0f,-50.0f), mediumClutter);
+    AddClutter(clutterPlate, vector3df(310.0f,20.0f,50.0f), largeClutter);           
+    AddClutter(clutterBowl, vector3df(390.0f,20.0f,-50.0f), largeClutter);         
+    AddClutter(clutterPlate, vector3df(450.0f,20.0f,50.0f), largeClutter);           
+    AddClutter(clutterCup, vector3df(670.0f,20.0f,50.0f), smallClutter);
+    AddClutter(clutterPlate, vector3df(-380.0f,20.0f,0.0f), smallClutter);         
+
+    AddClutter(clutterCup, vector3df(-550.0f,40.0f,50.0f), mediumClutter);
+    AddClutter(clutterCup, vector3df(-580.0f,40.0f,0.0f), mediumClutter);
+    AddClutter(clutterBowl, vector3df(-560.0f,20.0f,50.0f), largeClutter);
+    AddClutter(clutterPlate, vector3df(-620.0f,20.0f,50.0f), largeClutter); 
+    AddClutter(clutterPlate, vector3df(-640.0f,40.0f,0.0f), largeClutter);
+    AddClutter(clutterBowl, vector3df(-660.0f,20.0f,50.0f), smallClutter);
+
+    AddClutter(clutterCup, vector3df(460.0f,40.0f,850.0f), smallClutter);
+    AddClutter(clutterCup, vector3df(560.0f,40.0f,800.0f), smallClutter);
+    AddClutter(clutterBowl, vector3df(460.0f,20.0f,750.0f), largeClutter);
+    AddClutter(clutterPlate, vector3df(520.0f,20.0f,850.0f), mediumClutter); 
+    AddClutter(clutterPlate, vector3df(640.0f,40.0f,800.0f), largeClutter);
+    AddClutter(clutterBowl, vector3df(660.0f,20.0f,900.0f), smallClutter);
+
+    AddClutter(clutterHandle, vector3df(-1000.0f,20.0f,100.0f), mediumClutter);
+
+    AddClutter(clutterHandle, vector3df(-1200.0f,20.0f, -1200.0f), smallClutter);
+
+    AddClutter(clutterBowl, vector3df(1627.0f,0.0f,-890.0f), giantClutter);
+
+    AddClutter(clutterTeapot, vector3df(1201.0f, 582.1f, 0.0f), mediumClutter);
+}
+
 // Creates a sphere at the specified position, of the specified size and with the specified intial velocity (useful for throwing it)
 SPhysxAndNodePair* Game::CreateSphere(const core::vector3df& pos, f32 radius, f32 density, core::vector3df* initialVelocity) 
 {
@@ -193,6 +250,7 @@ void Game::LoadLevel()
     effect->addPostProcessingEffectFromFile(core::stringc("media/shaders/BloomP.hlsl"));
     effect->addPostProcessingEffectFromFile(core::stringc("media/shaders/Toon.hlsl"));
     this->RebuildEnemies();
+    this->SpawnClutter();
     this->RestartLevel();
 }
 void Game::Update( s32 time )
@@ -284,6 +342,11 @@ void Game::RestartLevel()
         enemy->pair->SceneNode->remove();
         delete enemy;
     }
+    for (u32 i = 0; i < clutterObjects.size(); i++)
+    {
+        clutterObjects[i]->SceneNode->remove();
+        physxManager->removePhysxObject(clutterObjects[i]->PhysxObject);
+    }
     for (u32 i = 0; i < blockObjects.size(); i++)
     {
         Block* block = blockObjects[i];
@@ -293,6 +356,7 @@ void Game::RestartLevel()
     }
     enemyObjects.clear();
     blockObjects.clear();
+    clutterObjects.clear();
 
     player->pair->PhysxObject->setPosition(startPosition);
     player->pair->PhysxObject->setLinearVelocity(vector3df(0.0f,0.0f,0.0f));
@@ -300,6 +364,7 @@ void Game::RestartLevel()
 
     this->gameOver = false;
     this->smgr->getActiveCamera()->setInputReceiverEnabled(true);
+    this->SpawnClutter();
     
     spawnManager->timeBetweenSpawns = 2500;
     spawnManager->cooldownTimer = 0;
