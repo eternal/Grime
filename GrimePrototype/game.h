@@ -37,6 +37,8 @@ public:
     core::array<Enemy*> enemyObjects;
     core::array<Block*> blockObjects;
     core::array<Projectile*> projectileObjects;
+    core::array<SPhysxAndNodePair*> clutterObjects;
+    
     SpawnManager* spawnManager;
     SPhysxAndCameraPair* cameraPair;
     ISceneNode* roomnode;

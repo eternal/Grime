@@ -250,9 +250,9 @@ void StateManager::LoadState(s32 state)
             vector3df roomTranslate(0.0f,0.0f,0.0f);
             vector3df roomRotate(90.0f,0.0f,0.0f);
             IMesh* meshRoom = smgr->getMesh("media/level/roomplace.b3d")->getMesh(0);
-            IMesh* meshFridge = smgr->getMesh("media/level/fridge.b3d")->getMesh(0);
+            IMesh* meshFridge = smgr->getMesh("media/fridgeattempt.b3d")->getMesh(0);
             IMesh* meshBenchUpper = smgr->getMesh("media/level/kitchenbenchupper.b3d")->getMesh(0);
-            IMesh* meshBenchLower = smgr->getMesh("media/level/kitchenbenchlower.b3d")->getMesh(0);
+            IMesh* meshBenchLower = smgr->getMesh("media/kitchenbenchlowerattempt.b3d")->getMesh(0);
             IMesh* meshMicrowave = smgr->getMesh("media/level/kitchenmicrowave.b3d")->getMesh(0);
             IMesh* meshMirror = smgr->getMesh("media/level/kitchenmirror.b3d")->getMesh(0);
             IMesh* meshPlant = smgr->getMesh("media/level/kitchenplant.b3d")->getMesh(0);
@@ -286,6 +286,8 @@ void StateManager::LoadState(s32 state)
             nodePlantTwo->setAutomaticCulling(EAC_BOX);
             
             IMeshSceneNode* nodeFridge = smgr->addMeshSceneNode(meshFridge, 0, -1, vector3df(20.0f,0.0f,-100.0f), vector3df(90.0f,0.0f,0.0f), vector3df(130.0f,130.0f,130.0f));
+            //IMeshSceneNode* nodeFridge = smgr->addMeshSceneNode(meshFridge, 0, -1, roomTranslate, roomRotate, roomScale);
+            //NodeInit(nodeFridge,roomScale);
             for (u32 i = 0 ; i < nodeFridge->getMesh()->getMeshBufferCount(); ++i) 
             {
                 //first calculate the mesh triangles and make physx object
@@ -293,6 +295,7 @@ void StateManager::LoadState(s32 state)
                 //secondly add the object to the world
                 physxManager->createTriangleMeshObject(triMesh,vector3df(20.0f,0.0f,-100.0f),vector3df(90.0f,0.0f,0.0f));
             }
+            //physxManager->createBoxObject(vector3df(-200.0f,0.0f,500.0f),vector3df(0.0f,0.0f,0.0f),vector3df(200.0f,400.0f,200.0f), 30000000000000.0f);
             for (u32 i = 0; i < nodeFridge->getMaterialCount(); i++) 
             {
                 nodeFridge->getMaterial(i).Lighting = true;
@@ -340,6 +343,27 @@ void StateManager::LoadState(s32 state)
             //NodeInit(nodePlant, roomScale);
             NodeInit(nodeSink, roomScale);
             NodeInit(nodePantry, roomScale);
+            
+            IMesh* clutterBowl = smgr->getMesh("media/Bowl.obj")->getMesh(0);
+            IMesh* clutterCup = smgr->getMesh("media/Cup1.obj")->getMesh(0);
+            IMesh* clutterPlate = smgr->getMesh("media/Plate1.obj")->getMesh(0);
+            
+            
+                       
+            SPhysxAndNodePair* bowl = new SPhysxAndNodePair;
+            bowl->SceneNode = smgr->addMeshSceneNode(clutterBowl,0,-1, vector3df(0.0f,20.0f,0.0f),vector3df(0.0f,0.0f,0.0f),vector3df(1.0f,1.0f,1.0f));
+            bowl->PhysxObject = physxManager->createConvexMeshObject(physxManager->createConvexMesh(clutterBowl->getMeshBuffer(0), vector3df(1.0f,1.0f,1.0f)), vector3df(0.0f,20.0f,0.0f));
+            game->clutterObjects.push_back(bowl);
+            
+            SPhysxAndNodePair* cup = new SPhysxAndNodePair;
+            cup->SceneNode = smgr->addMeshSceneNode(clutterCup,0,-1, vector3df(0.0f,20.0f,0.0f),vector3df(0.0f,0.0f,0.0f),vector3df(1.0f,1.0f,1.0f));
+            cup->PhysxObject = physxManager->createConvexMeshObject(physxManager->createConvexMesh(clutterCup->getMeshBuffer(0), vector3df(1.0f,1.0f,1.0f)), vector3df(0.0f,20.0f,0.0f));
+            game->clutterObjects.push_back(cup);
+            
+            SPhysxAndNodePair* plate = new SPhysxAndNodePair;
+            plate->SceneNode = smgr->addMeshSceneNode(clutterPlate,0,-1, vector3df(0.0f,20.0f,0.0f),vector3df(0.0f,0.0f,0.0f),vector3df(1.0f,1.0f,1.0f));
+            plate->PhysxObject = physxManager->createConvexMeshObject(physxManager->createConvexMesh(clutterPlate->getMeshBuffer(0), vector3df(1.0f,1.0f,1.0f)), vector3df(0.0f,20.0f,0.0f));
+            game->clutterObjects.push_back(plate);
             
             game->LoadLevel();
             this->currentState = EGS_GAME;

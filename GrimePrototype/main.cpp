@@ -171,7 +171,7 @@ int main() {
 
 			if (lastFPS != fps)
 			{
-				core::stringw str = L"Grime Prototype [";
+				core::stringw str = L"Grime [";
 				str += driver->getName();
 				str += "] FPS:";
 				str += fps;

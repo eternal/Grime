@@ -30,6 +30,18 @@ struct SPhysxAndNodePair {
             }
 
     }
+    void updateRotation() 
+    {
+        core::vector3df vec(0,0,0);
+        // Update the node's position to that of the physx object
+
+        if (PhysxObject)
+        {
+            PhysxObject->getRotation(vec);
+            SceneNode->setRotation(vec);            
+        }
+
+    }
     IPhysxObject* PhysxObject;
     scene::ISceneNode* SceneNode;
 

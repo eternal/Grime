@@ -231,6 +231,17 @@ void Game::Update( s32 time )
                 std::cerr << "Exception Handled in Game::Update. Enemies array rebuilt" << std::endl;
             }
         }
+        for (u32 i=0; i<clutterObjects.size(); i++)
+        {
+            try {
+                clutterObjects[i]->updateTransformation();
+                clutterObjects[i]->updateRotation();
+            }
+            catch (...)
+            {
+                std::cerr << "Clutter corruption" << std::endl;
+            }
+        }
         for (u32 i = 0; i < projectileObjects.size(); i++)
         {
             try 
