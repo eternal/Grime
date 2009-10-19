@@ -58,12 +58,12 @@ bool EventReceiver::OnEvent(const SEvent& event)
                     {
                         switch (event.KeyInput.Key) 
                         { 
-                        case KEY_ADD:   
-                            game->spawnManager->timeBetweenSpawns+= 100;
-                            break;
-                        case KEY_SUBTRACT:
-                            game->spawnManager->timeBetweenSpawns-= 100;
-                            break;
+                        //case KEY_ADD:   
+                        //    game->spawnManager->timeBetweenSpawns+= 100;
+                        //    break;
+                        //case KEY_SUBTRACT:
+                        //    game->spawnManager->timeBetweenSpawns-= 100;
+                        //    break;
                         case KEY_SPACE:
                             //jump
                             game->player->Jump();
@@ -83,62 +83,62 @@ bool EventReceiver::OnEvent(const SEvent& event)
                                 this->device->getVideoDriver()->writeImageToFile(device->getVideoDriver()->createScreenShot(),filename,0);
                             }
                             break;
-                        case KEY_KEY_G: 
-                            {
-                                Block* block = new Block(game->smgr, game->physxManager, &game->enemyObjects, &game->blockObjects);
-                                game->blockObjects.push_back(block);
-                            }
-                            break;  
-                        case KEY_KEY_H:
-                            game->ConvertBlocks();
-                            break;
-                        case KEY_KEY_J: 
-                            {
-                                game->CleanupArrays();
-                            }
-                            break;
-                        case KEY_KEY_P:
-                            {
-                                game->spawnManager->onCooldown = true;
-                            }   
-                            break;                      
-                        case KEY_KEY_1: 
-                            {
-                                game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
-                            }
-                            break;
-                        case KEY_KEY_2: 
-                            {
-                                game->spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
-                            }
-                            break;
-                        case KEY_KEY_3: 
-                            {
-                                game->spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
-                            }
-                            break;
-                        case KEY_KEY_4: 
-                            {
-                                game->spawnManager->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
-                            }
-                            break; 
-                        case KEY_KEY_5:
-                            {
-                                game->spawnManager->SpawnCockroach(game->spawnManager->RandomPoint());
-                            }
-                        break;
-                        case KEY_KEY_0:
-                            game->spawnManager->waveTimer = 530000;
-                            game->spawnManager->phase = 3;
-                        break;
-                        case KEY_KEY_I:
-                            game->RestartLevel();
-                            break;
-                        case KEY_KEY_C:
-                        {
-                            game->ClearEnemies();
-                        }
-                        break;
+                        //case KEY_KEY_G: 
+                        //    {
+                        //        Block* block = new Block(game->smgr, game->physxManager, &game->enemyObjects, &game->blockObjects);
+                        //        game->blockObjects.push_back(block);
+                        //    }
+                        //    break;  
+                        //case KEY_KEY_H:
+                        //    game->ConvertBlocks();
+                        //    break;
+                        //case KEY_KEY_J: 
+                        //    {
+                        //        game->CleanupArrays();
+                        //    }
+                        //    break;
+                        //case KEY_KEY_P:
+                        //    {
+                        //        game->spawnManager->onCooldown = true;
+                        //    }   
+                        //    break;                      
+                        //case KEY_KEY_1: 
+                        //    {
+                        //        game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
+                        //    }
+                        //    break;
+                        //case KEY_KEY_2: 
+                        //    {
+                        //        game->spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
+                        //    }
+                        //    break;
+                        //case KEY_KEY_3: 
+                        //    {
+                        //        game->spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
+                        //    }
+                        //    break;
+                        //case KEY_KEY_4: 
+                        //    {
+                        //        game->spawnManager->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
+                        //    }
+                        //    break; 
+                        //case KEY_KEY_5:
+                        //    {
+                        //        game->spawnManager->SpawnCockroach(game->spawnManager->RandomPoint());
+                        //    }
+                        //break;
+                        //case KEY_KEY_0:
+                        //    game->spawnManager->waveTimer = 530000;
+                        //    game->spawnManager->phase = 3;
+                        //break;
+                        //case KEY_KEY_I:
+                        //    game->RestartLevel();
+                        //    break;
+                        //case KEY_KEY_C:
+                        //{
+                        //    game->ClearEnemies();
+                        //}
+                        //break;
                         case KEY_KEY_O:
                             stateManager->LoadState(EGS_MENU);
                             break;
@@ -146,12 +146,12 @@ bool EventReceiver::OnEvent(const SEvent& event)
                             // Toggle the debug data visibility
                             game->physxManager->setDebugDataVisible(!game->physxManager->isDebugDataVisible());
                             break;
-                        case KEY_MULTIPLY:
-                            game->spawnManager->timeBetweenSpawns = 100;
-                            break;
-                        case KEY_DIVIDE:
-                            game->spawnManager->timeBetweenSpawns = 2500;
-                            break;
+                        //case KEY_MULTIPLY:
+                        //    game->spawnManager->timeBetweenSpawns = 100;
+                        //    break;
+                        //case KEY_DIVIDE:
+                        //    game->spawnManager->timeBetweenSpawns = 2500;
+                        //    break;
                         case KEY_ESCAPE:
                             //close the device and exit
                             device->closeDevice();

@@ -2,8 +2,13 @@
 //  Grime Prototype main.cpp
 //  build 200910181838
 //=============================================================================
-#define DEBUG 1
-//#define FULLSCREEN 1
+//#define DEBUG 1
+#define FULLSCREEN 1
+// console window hiding
+#ifndef DEBUG
+    #define NOMINMAX
+    #include <windows.h> 
+#endif
 #include <irrlicht.h>
 #include <iostream>
 #include <IrrPhysx.h>
@@ -31,7 +36,7 @@ using namespace IrrPhysx;
 #endif
 #ifndef DEBUG
 //get rid of the console window, found on the msdn forums somewhere
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:main")
+//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:main")
 #endif
 
 //main globals for devices etc
@@ -44,8 +49,14 @@ EffectHandler* effect = NULL;
 irrklang::ISoundEngine* soundEngine = NULL;
 Game* game = NULL;
 StateManager* stateManager = NULL;
-
-int main() {
+#ifndef DEBUG
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
+{
+#endif
+#ifdef DEBUG
+int main()
+{
+#endif
 	video::E_DRIVER_TYPE driverType;
 	driverType = video::EDT_DIRECT3D9;
 	//event receiver instance
@@ -122,34 +133,43 @@ int main() {
         s32 timeNow = device->getTimer()->getTime();
         s32 elapsedTime = timeNow - lastTime;
         lastTime = timeNow;
-        
+#ifdef DEBUG               
         u32 realTime = device->getTimer()->getRealTime();
+#endif // DEBUG        
         //simulate physics
 	    physxManager->simulate(elapsedTime/1000.0f);
 	    //REMEMBER: DO NOT MODIFY PHYSX OBJECTS WHILE SIMULATING
 	    physxManager->fetchResults();
+#ifdef DEBUG       	    
 	    u32 physicsSimulateTime = device->getTimer()->getRealTime() - realTime;
+#endif // DEBUG	    
         //std::cout << "Time taken to simulate: " <<  device->getTimer()->getRealTime() - realTime << std::endl;
-        
+#ifdef DEBUG               
         u32 realTimeUpdates = device->getTimer()->getRealTime();
+#endif // DEBUG        
         stateManager->Update(elapsedTime);
+#ifdef DEBUG               
         u32 updatesTime = device->getTimer()->getRealTime() - realTimeUpdates;
+#endif // DEBUG        
         //std::cout << "Time taken to update: " <<  device->getTimer()->getRealTime() - realTimeUpdates << std::endl;
         //start drawing  
         if (device->isWindowActive())
         { 
 			driver->beginScene(true, true, video::SColor(255,200,200,200));
             //s32 realTimeEffect = device->getTimer()->getRealTime();
+#ifdef DEBUG            
             u32 realTimeEffect = device->getTimer()->getRealTime();
+#endif // DEBUG            
 			effect->update();
 			//smgr->drawAll();
+#ifdef DEBUG       			
 			u32 effectTime = device->getTimer()->getRealTime() - realTimeEffect;
+#endif // DEBUG			
             //std::cout << "Time taken to draw: " <<  device->getTimer()->getRealTime() - realTimeEffect << std::endl;
             receiver.Update(elapsedTime);
 	        //s32 realtimedebug = device->getTimer()->getRealTime();
 #ifdef DEBUG //physx debug data to show bounding boxes   
             physxManager->renderDebugData(video::SColor(225,255,255,255));            
-#endif // DEBUG
             //std::cout << "Time taken to draw debug: " <<  device->getTimer()->getRealTime() - realtimedebug << std::endl;     
             //s32 realtimegui = device->getTimer()->getRealTime();
             stringw debugstring = "Simulate: ";
@@ -159,9 +179,13 @@ int main() {
             debugstring += " Draw: ";
             debugstring += effectTime;
             //wprintf(debugstring.c_str());
-            gui::IGUIStaticText* debug = guienv->addStaticText(debugstring.c_str(), rect<s32>(1175,725,1275,800));
+            gui::IGUIStaticText* debug = guienv->addStaticText(debugstring.c_str(), rect<s32>(1175,725,1275,800));            
             guienv->drawAll();
             debug->remove();
+#endif //DEBUG            
+#ifndef DEBUG
+            guienv->drawAll();
+#endif            
             //std::cout << "Time taken to draw debug: " <<  device->getTimer()->getRealTime() - realtimegui << std::endl;     
             
             //done rendering
