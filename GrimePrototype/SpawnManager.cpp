@@ -1,6 +1,6 @@
 #include "SpawnManager.h"
 
-SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockArray, Player* player )
+SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockArray, Player* player, core::array<video::ITexture*>* explosionTextures)
 {
     this->smgr = smgr;
     this->physxManager = physxManager;
@@ -8,6 +8,7 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     this->blockArray = blockArray;
     this->timeBetweenSpawns = timeBetweenSpawns;
     this->soundEngine = soundEngine;
+    this->explosionTextures = explosionTextures;
     this->player = player;
     currentTimer = 0;
     spawnTimer = 0;
@@ -192,7 +193,7 @@ void SpawnManager::SpawnSpider( vector3df position )
 
 void SpawnManager::SpawnRat( vector3df position )
 {
-    Enemy* enemy = new Rat(smgr, soundEngine, ratMesh, physxManager, enemyObjects, player, position);
+    Enemy* enemy = new Rat(smgr, soundEngine, ratMesh, physxManager, enemyObjects, player, explosionTextures, position);
     enemyObjects->push_back(enemy);
 }
 
@@ -201,7 +202,7 @@ void SpawnManager::DIRTYMESHFIX()
     enemyObjects->push_back( new Spider(smgr, soundEngine, spiderMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
     enemyObjects->push_back( new Cockroach(smgr, soundEngine, cockroachMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
     enemyObjects->push_back( new Beetle(smgr, soundEngine, beetleMesh, physxManager, enemyObjects, blockArray, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
-    enemyObjects->push_back( new Rat(smgr, soundEngine, ratMesh, physxManager, enemyObjects, NULL, vector3df(0.0f, -1050.0f, 0.0f)));
+    enemyObjects->push_back( new Rat(smgr, soundEngine, ratMesh, physxManager, enemyObjects, NULL, explosionTextures, vector3df(0.0f, -1050.0f, 0.0f)));
 }
 
 irr::core::vector3df SpawnManager::RandomPointLower()

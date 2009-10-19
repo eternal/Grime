@@ -58,6 +58,8 @@ class Player : public Entity
         
         s32 blockAmmunitionTimer;
         s32 damagedTimer;
+        s32 knockbackChargeupTimer;
+        bool knockbackChargeup;
         
         s32 weaponCooldown[NUMBER_OF_WEAPONS];
         

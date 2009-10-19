@@ -63,7 +63,7 @@ public:
     void LoadLevel();
     
     void Update(s32 time);
-    
+
     s32 GetRandom(s32 upper);
     void RestartLevel();
     void WeaponFire();

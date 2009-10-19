@@ -34,11 +34,11 @@ void Projectile::DamageTargets(vector3df pos, f32 radius, s32 power)
             f32 distance = direction.getLength();
             if (distance <= radius) //explosion radius
             {
-                f32 hitStrength = ((radius - (distance/radius)) * power) + 2.0f;
+                f32 hitStrength = ((1 - (distance/radius)) * power) + 2.0f;
                 enemy->health -= hitStrength;
                 if (enemy->health > 0)
                 {
-                    enemy->pair->PhysxObject->setLinearVelocity(direction.normalize() * hitStrength);
+                    enemy->pair->PhysxObject->setLinearVelocity(direction.normalize() * (hitStrength * 50.0f));
                     enemy->pair->updateTransformation();
                 }
                 std::cout << "Target hit: " << hitStrength << " damage." << " Distance: " << distance << std::endl;
@@ -59,8 +59,8 @@ void Projectile::DamageTargets(vector3df pos, f32 radius, s32 power)
             f32 distance = direction.getLength();
             if (distance <= radius) //explosion radius
             {
-                f32 hitStrength = ((radius - (distance/radius)) * power) + 2.0f;
-                block->pair->PhysxObject->setLinearVelocity(direction.normalize() * (hitStrength / 25.0f));
+                f32 hitStrength = ((1 - (distance/radius)) * power) + 2.0f;
+                block->pair->PhysxObject->setLinearVelocity(direction.normalize() * (hitStrength * 8.0f));
                 block->pair->updateTransformation();
             }
         }
@@ -79,8 +79,8 @@ void Projectile::DamageTargets(vector3df pos, f32 radius, s32 power)
             f32 distance = direction.getLength();
             if (distance <= radius) //explosion radius
             {   
-                f32 hitStrength = ((radius - (distance/radius)) * power) + 2.0f;
-                pair->PhysxObject->setLinearVelocity(direction.normalize() * (hitStrength / 5.0f));
+                f32 hitStrength = ((1 - (distance/radius)) * power) + 2.0f;
+                pair->PhysxObject->setLinearVelocity(direction.normalize() * (hitStrength * 100.0f));
             }
         }
         catch (...)

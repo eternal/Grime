@@ -29,7 +29,7 @@ enum ENEMY_SPAWN_POSITIONS
 class SpawnManager
 {
 public:
-    SpawnManager(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockArray, Player* player);
+    SpawnManager(ISceneManager* smgr, ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockArray, Player* player, core::array<video::ITexture*>* explosionTextures);
     ~SpawnManager(void);
     
     ISceneManager* smgr;
@@ -38,6 +38,8 @@ public:
     core::array<Block*>* blockArray;
     ISoundEngine* soundEngine;
     Player* player;
+    
+    core::array<video::ITexture*>* explosionTextures;
     
     IAnimatedMesh* cockroachMesh;
     IAnimatedMesh* spiderMesh;

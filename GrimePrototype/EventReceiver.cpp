@@ -32,7 +32,30 @@ void EventReceiver::Update(s32 time)
                 {
                     if (leftPressed)
                     {
-                        game->WeaponFire();
+                        if (game->player->currentWeapon == WEAPON_CLOSE)
+                        {
+                            if (!(game->player->CurrentWeaponOnCooldown()))
+                            {
+                                game->player->knockbackChargeup = true;
+                            }
+                            if (game->player->knockbackChargeupTimer >= 1000)
+                            {
+                                game->WeaponFire(WEAPON_CLOSE);
+                                game->player->knockbackChargeup = false;
+                                game->player->knockbackChargeupTimer = 0;
+                            }
+                        }
+                        else
+                        {
+                            game->WeaponFire();
+                            game->player->knockbackChargeup = false;
+                            game->player->knockbackChargeupTimer = 0;
+                        }    
+                    }
+                    else
+                    {
+                        game->player->knockbackChargeup = false;
+                        game->player->knockbackChargeupTimer = 0;
                     }
                     if (rightPressed)
                     {
@@ -102,26 +125,26 @@ bool EventReceiver::OnEvent(const SEvent& event)
                         //        game->spawnManager->onCooldown = true;
                         //    }   
                         //    break;                      
-                        //case KEY_KEY_1: 
-                        //    {
-                        //        game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
-                        //    }
-                        //    break;
-                        //case KEY_KEY_2: 
-                        //    {
-                        //        game->spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
-                        //    }
-                        //    break;
-                        //case KEY_KEY_3: 
-                        //    {
-                        //        game->spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
-                        //    }
-                        //    break;
-                        //case KEY_KEY_4: 
-                        //    {
-                        //        game->spawnManager->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
-                        //    }
-                        //    break; 
+                        case KEY_KEY_1: 
+                            {
+                                game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
+                            }
+                            break;
+                        case KEY_KEY_2: 
+                            {
+                                game->spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
+                            }
+                            break;
+                        case KEY_KEY_3: 
+                            {
+                                game->spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
+                            }
+                            break;
+                        case KEY_KEY_4: 
+                            {
+                                game->spawnManager->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
+                            }
+                            break; 
                         //case KEY_KEY_5:
                         //    {
                         //        game->spawnManager->SpawnCockroach(game->spawnManager->RandomPoint());
@@ -263,6 +286,10 @@ bool EventReceiver::OnEvent(const SEvent& event)
                             {
                                 device->closeDevice();
                             }
+                            break;
+                        case KEY_ESCAPE:
+                            //close the device and exit
+                            device->closeDevice();
                             break;
                        }
                     }

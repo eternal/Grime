@@ -2,8 +2,8 @@
 //  Grime Prototype main.cpp
 //  build 200910181838
 //=============================================================================
-//#define DEBUG 1
-#define FULLSCREEN 1
+#define DEBUG 1
+//#define FULLSCREEN 1
 // console window hiding
 #ifndef DEBUG
     #define NOMINMAX

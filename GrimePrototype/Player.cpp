@@ -15,6 +15,8 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     health = 100;
     blockAmmunitionTimer = 0;
     damagedTimer = 0;
+    knockbackChargeupTimer = 0;
+    knockbackChargeup = false;
     
     currentWeapon = WEAPON_PISTOL;
     for (u32 i = 0; i < NUMBER_OF_WEAPONS; i++)
@@ -204,6 +206,11 @@ void Player::Jump()
 }
 void Player::Update(s32 time) 
 {
+    if (knockbackChargeup)
+    {
+        knockbackChargeupTimer += time;
+        std::cout << knockbackChargeupTimer << std::endl;
+    }
     for (u32 i = 0; i < NUMBER_OF_WEAPONS; i++)
     {
         if (weaponCooldown[i] > 0.0f)

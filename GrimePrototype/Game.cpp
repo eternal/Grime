@@ -209,7 +209,7 @@ void Game::LoadLevel()
     startPosition = vector3df(0.0f,30.1f,0.0f);
     this->CreateCamera();
     player = new Player(smgr, soundEngine, physxManager, cameraPair, effect);
-    spawnManager = new SpawnManager(smgr, soundEngine, physxManager, &enemyObjects, &blockObjects, player);
+    spawnManager = new SpawnManager(smgr, soundEngine, physxManager, &enemyObjects, &blockObjects, player, &explosionTextures);
     // Preload texture animators
     // just for prototype only
     c8 tmp[64];
@@ -267,6 +267,8 @@ void Game::Update( s32 time )
         if (player->ratKilled)
         {
             //victory
+            //this->ClearEnemies();
+            //roll credits or some bs
         }
         cleanupTimer += time;
         if (cleanupTimer >= 25000)
@@ -482,28 +484,28 @@ void Game::WeaponFire(s32 weapon)
                                 CreateExplosion(closestObject.HitPosition);   
                                 //kill enemy
                                 //remove from arrays and memory
-                                try 
-                                {
-                                    physxManager->removePhysxObject(enemy->pair->PhysxObject);
-                                    enemy->pair->SceneNode->remove();
-                                    delete enemy;
-                                    enemyObjects.erase(i);  
-                                }                       
-                                catch (...)
-                                {
-                                    std::cerr << "Automatic removal failure" << std::endl;
-                                    try 
-                                    {
-                                        enemyObjects.erase(i); //preserve arrays
-                                        enemy->active = false;
-                                        enemy->pair->SceneNode->setVisible(false);
-                                        enemy->pair->SceneNode->remove();
-                                    }
-                                    catch (...)
-                                    {
-                                        std::cerr << "Recovery failure. Adverse effects may be experienced." << std::endl;
-                                    }
-                                }
+                                //try 
+                                //{
+                                //    physxManager->removePhysxObject(enemy->pair->PhysxObject);
+                                //    enemy->pair->SceneNode->remove();
+                                //    delete enemy;
+                                //    enemyObjects.erase(i);  
+                                //}                       
+                                //catch (...)
+                                //{
+                                //    std::cerr << "Automatic removal failure" << std::endl;
+                                //    try 
+                                //    {
+                                //        enemyObjects.erase(i); //preserve arrays
+                                //        enemy->active = false;
+                                //        enemy->pair->SceneNode->setVisible(false);
+                                //        enemy->pair->SceneNode->remove();
+                                //    }
+                                //    catch (...)
+                                //    {
+                                //        std::cerr << "Recovery failure. Adverse effects may be experienced." << std::endl;
+                                //    }
+                                //}
                             }
                             break;
                         }

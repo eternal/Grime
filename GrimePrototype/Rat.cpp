@@ -1,6 +1,6 @@
 #include "Rat.h"
 
-Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* objectArray, Player* player, vector3df position /*= vector3df(-501.0f,100.0f,-230.0f)*/ )
+Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine, IAnimatedMesh* mesh, IPhysxManager* manager, core::array<Enemy*>* objectArray, Player* player, core::array<video::ITexture*>* explosionTextures, vector3df position /*= vector3df(-501.0f,100.0f,-230.0f)*/)
 {
     
     /*Rat
@@ -19,10 +19,14 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     this->soundEngine = soundEngine;
     this->enemyArray = objectArray;
     this->target = player;
+    this->mesh = mesh;
     this->active = true;
     this->health = 1;
     this->speed = 1.0f;
     this->strength = 1;
+    this->endingExplosionTimer = 0;
+    this->explosionPhase = 0;
+    this->explosionTextures = explosionTextures;
     //instantiate pair
     pair = new SPhysxAndNodePair;
     attackPhase = false;
@@ -61,11 +65,45 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     strength = 20;
-    health = 50;
+    //health = 50;
+    health = 5;
     speed = 1.0f;
 }
 Rat::~Rat(void)
 {
+}
+
+s32 Rat::GetRandom(s32 upper) 
+{
+    return (rand() % upper) + 1;
+}
+
+void Rat::CreateExplosion( vector3df position, bool massive )
+{
+    scene::ISceneNodeAnimator* anim = NULL;
+    // create animation for explosion
+    anim = smgr->createTextureAnimator((*explosionTextures), 100, false);
+    scene::IBillboardSceneNode* bill;
+    if (massive)
+    {
+        bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(600,600), position);
+    }
+    else 
+    {
+        bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(60,60), position);
+    }
+    // Setup the material
+    bill->setMaterialFlag(video::EMF_LIGHTING, false);
+    bill->setMaterialTexture(0, (*explosionTextures)[0]);
+    bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+    // Add the animator
+    bill->addAnimator(anim);
+    anim->drop();
+    // create deletion animator to automatically remove the billboard
+    anim = smgr->createDeleteAnimator(100*10);
+
+    bill->addAnimator(anim);
+    anim->drop();
 }
 
 void Rat::CheckPhase() 
@@ -102,7 +140,7 @@ void Rat::Update( s32 time )
             {
                 vector3df pos;
                 this->pair->PhysxObject->getPosition(pos);
-                pos.Y = 20.0f;
+                pos.Y = 10.0f;
                 this->pair->PhysxObject->setPosition(pos);
                 this->pair->updateTransformation();
 
@@ -223,28 +261,45 @@ void Rat::Update( s32 time )
             {
                 this->target->ratKilled = true;
             }
-                               
-            try 
-            {   
-                for (u32 i = 0; i < enemyArray->size(); ++i)
-                {
-                    Enemy* enemy = (*enemyArray)[i];
-                    if (enemy->pair == this->pair)
-                    {
-                        enemyArray->erase(i);
-                        break;
-                    }                   
-                }
-                physxMan->removePhysxObject(this->pair->PhysxObject);
-                this->pair->SceneNode->setVisible(false);
-                this->pair->SceneNode->remove();
-            }
-            catch (...)
+            endingExplosionTimer += time;
+            if (endingExplosionTimer >= 250 )
             {
-                std::cerr << "another exception" << std::endl;
-                std::cerr << "Enemy: " << &pair << std::endl; 
+                IMeshBuffer* meshBuffer = mesh->getMeshBuffer(1);
+                S3DVertex* S3vertices = reinterpret_cast<S3DVertex*>(meshBuffer->getVertices());
+                s32 vertexChosen = GetRandom(meshBuffer->getVertexCount());
+                std::cout << vertexChosen << std::endl;
+                vector3df pos = S3vertices[vertexChosen].Pos + this->pair->SceneNode->getPosition();
+                pos.Y += GetRandom(75);
+                CreateExplosion(pos, false); 
+                endingExplosionTimer = 0;   
+                explosionPhase++;            
             }
-            active = false;
+            
+            if (explosionPhase == 10)
+            {
+                CreateExplosion(pair->SceneNode->getPosition(), true);
+                try 
+                {   
+                    for (u32 i = 0; i < enemyArray->size(); ++i)
+                    {
+                        Enemy* enemy = (*enemyArray)[i];
+                        if (enemy->pair == this->pair)
+                        {
+                            enemyArray->erase(i);
+                            break;
+                        }                   
+                    }
+                    physxMan->removePhysxObject(this->pair->PhysxObject);
+                    this->pair->SceneNode->setVisible(false);
+                    this->pair->SceneNode->remove();
+                }
+                catch (...)
+                {
+                    std::cerr << "another exception" << std::endl;
+                    std::cerr << "Enemy: " << &pair << std::endl; 
+                }
+                active = false;
+            }
         } 
     }
 }
