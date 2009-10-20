@@ -465,8 +465,8 @@ void Game::WeaponFire(s32 weapon)
             {
                 Block* block = new Block(smgr, soundEngine, physxManager, &enemyObjects, &blockObjects);
                 blockObjects.push_back(block);
+                player->weaponAmmunition[WEAPON_BLOCKGUN]--;
             }
-            player->weaponAmmunition[WEAPON_BLOCKGUN]--;
         }
         else if (player->GetWeapon() == WEAPON_PISTOL)
         {

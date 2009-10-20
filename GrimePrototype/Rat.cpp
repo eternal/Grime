@@ -37,6 +37,8 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     soundResetTimer = 0.0f;
     soundWalkCurrentPosition = 0;
     immuneToBlockCrush = true;
+    
+    roarTimer = (rand() % 2000) + 750;
 
     IPhysxMesh* pmesh = physxMan->createConvexMesh(mesh->getMeshBuffer(1), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, rot, 30000000.0f);
@@ -105,6 +107,12 @@ void Rat::CreateExplosion( vector3df position, bool massive )
     if (massive)
     {
         bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(600,600), position);
+        
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom1.wav");
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom2.wav");
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom3.wav");
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom4.wav");
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom5.wav");
     }
     else 
     {
@@ -156,6 +164,31 @@ void Rat::Update( s32 time )
         {
             try 
             {
+                if (roarTimer > 0)
+                {
+                    roarTimer -= time;
+                }
+                else
+                {
+                    u32 soundSelect = (rand() % 4);
+                    if (soundSelect == 0)
+                    {
+                        soundEngine->play2D("media/sounds/rat/Roar1.wav");
+                    }
+                    else if (soundSelect == 1)
+                    {
+                        soundEngine->play2D("media/sounds/rat/Roar2.wav");
+                    }
+                    else if (soundSelect == 2)
+                    {
+                        soundEngine->play2D("media/sounds/rat/Roar3.wav");
+                    }
+                    else 
+                    {
+                        soundEngine->play2D("media/sounds/rat/Roar4.wav");
+                    }
+                    roarTimer = (rand() % 6000) + 750;
+                }
                 vector3df pos;
                 this->pair->PhysxObject->getPosition(pos);
                 pos.Y = 10.0f;
@@ -314,6 +347,10 @@ void Rat::Update( s32 time )
         { 
             if (!(this->IsStillAlive()))
             {
+                if (this->target->ratKilled == false)
+                {
+                    soundEngine->play2D("media/sounds/rat/RoarFinal.ogg");
+                }
                 this->target->ratKilled = true;
             }
             endingExplosionTimer += time;

@@ -16,6 +16,8 @@ public:
     vector3df previousPosition;
     f32 distanceSinceFootstep;
     
+    s32 roarTimer;
+    
     void Update(s32 time);
     void CheckPhase();
     void CreateExplosion( vector3df position, bool massive );
