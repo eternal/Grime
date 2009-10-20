@@ -276,10 +276,18 @@ void Game::Update( s32 time )
         if (player->ratKilled && player->gameComplete)
         {
             //victory
-            this->ClearEnemies();
             endTimer += time;
-            if (endTimer >= 1000 && endPhase == 0)
+            if (endTimer >= 2000 && endPhase == 0)
             {
+                try
+                {
+                    this->CleanupArrays();
+                    this->ClearEnemies();
+                }
+                catch (...)
+                {
+                    std::cerr << "Final cleanup failure" << std::endl;
+                }
                 gui::IGUIEnvironment* guienv = device->getGUIEnvironment();
                 gui::IGUIImage* black = guienv->addImage(device->getVideoDriver()->getTexture("media/gui/BLACK.png"),position2di(0,0));
                 black->setColor(SColor(20,255,255,255));

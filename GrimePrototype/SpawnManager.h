@@ -52,6 +52,7 @@ public:
     s32 timeBetweenSpawns;
     s32 currentTimer;
     s32 minuteTimer;
+    bool masterPause;
     
     s32 spawnTimer;
     

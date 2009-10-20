@@ -2,8 +2,8 @@
 //  Grime Prototype main.cpp
 //  build 200910181838
 //=============================================================================
-#define DEBUG 1
-//#define FULLSCREEN 1
+//#define DEBUG 1
+#define FULLSCREEN 1
 // console window hiding
 #ifndef DEBUG
     #define NOMINMAX
@@ -35,8 +35,7 @@ using namespace IrrPhysx;
 #pragma comment(lib,"irrKlang.lib")
 #endif
 #ifndef DEBUG
-//get rid of the console window, found on the msdn forums somewhere
-//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:main")
+#pragma comment(linker, "/SUBSYSTEM:Windows")
 #endif
 
 //main globals for devices etc

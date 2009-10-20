@@ -274,7 +274,7 @@ void Rat::Update( s32 time )
                 explosionPhase++;            
             }
             
-            if (explosionPhase == 10)
+            if (explosionPhase == 20)
             {
                 CreateExplosion(pair->SceneNode->getPosition(), true);
                 this->target->gameComplete = true;

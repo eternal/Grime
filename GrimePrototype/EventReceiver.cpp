@@ -130,22 +130,35 @@ bool EventReceiver::OnEvent(const SEvent& event)
                         //    break;                      
                         case KEY_KEY_1: 
                             {
-                                game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
+                                if (event.KeyInput.Shift)
+                                {
+                                    game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
+                                }
+                                
                             }
                             break;
                         case KEY_KEY_2: 
                             {
+                                if (event.KeyInput.Shift)
+                                {
                                 game->spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
+                                }
                             }
                             break;
                         case KEY_KEY_3: 
                             {
+                                if (event.KeyInput.Shift)
+                                {
                                 game->spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
+                                }
                             }
                             break;
                         case KEY_KEY_4: 
                             {
+                                if (event.KeyInput.Shift)
+                                {
                                 game->spawnManager->SpawnRat(vector3df(1500.0f,100.0f,-800.0f));
+                                }
                             }
                             break; 
                         //case KEY_KEY_5:
@@ -157,20 +170,32 @@ bool EventReceiver::OnEvent(const SEvent& event)
                         //    game->spawnManager->waveTimer = 530000;
                         //    game->spawnManager->phase = 3;
                         //break;
-                        //case KEY_KEY_I:
-                        //    game->RestartLevel();
-                        //    break;
+                        case KEY_KEY_I:
+                            if (event.KeyInput.Shift)
+                            {
+                            game->RestartLevel();
+                            }
+                            break;
+                        case KEY_KEY_O:
+                            if (event.KeyInput.Shift)
+                            {
+                            game->spawnManager->masterPause = !game->spawnManager->masterPause;
+                            }
+                            break;
                         //case KEY_KEY_C:
                         //{
                         //    game->ClearEnemies();
                         //}
                         //break;
-                        case KEY_KEY_O:
-                            stateManager->LoadState(EGS_MENU);
-                            break;
+                        //case KEY_KEY_O:
+                        //    stateManager->LoadState(EGS_MENU);
+                        //    break;
                         case KEY_KEY_V:
+                            if (event.KeyInput.Shift)
+                            {
                             // Toggle the debug data visibility
                             game->physxManager->setDebugDataVisible(!game->physxManager->isDebugDataVisible());
+                            }
                             break;
                         //case KEY_MULTIPLY:
                         //    game->spawnManager->timeBetweenSpawns = 100;

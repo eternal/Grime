@@ -19,7 +19,7 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     timeBetweenSpawns = 2500;
     spawnsActive = false;
     onCooldown = false;
-    
+    masterPause = false;
     spawnPosition[BASIN_HIGH] = vector3df(1401.0f, 680.1f, 0.0f);
     spawnPosition[MICROWAVE_HIGH] = vector3df(580.0f, 680.0f, -1125.0f);
     spawnPosition[MICROWAVE_LOWER] = vector3df(1627, 30.0f, -890.0f);
@@ -43,6 +43,10 @@ SpawnManager::~SpawnManager(void)
 }
 void SpawnManager::Update( s32 time )
 {
+    if (masterPause)
+    {
+        return;
+    }
     for (u32 i = 0; i < NUMBER_OF_POSITIONS; i++)
     {
         if (spawnLocationCooldown[i] >= 0)
