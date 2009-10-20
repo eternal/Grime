@@ -106,6 +106,9 @@ bool EventReceiver::OnEvent(const SEvent& event)
                                 this->device->getVideoDriver()->writeImageToFile(device->getVideoDriver()->createScreenShot(),filename,0);
                             }
                             break;
+                        case KEY_MINUS:
+                            this->game->player->health = 100;
+                        break;
                         //case KEY_KEY_G: 
                         //    {
                         //        Block* block = new Block(game->smgr, game->physxManager, &game->enemyObjects, &game->blockObjects);

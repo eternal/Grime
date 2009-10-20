@@ -18,7 +18,7 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
     newGameSelected = true;
     restart = false;
     
-    //this->bgMusic = soundEngine->play2D("media/sounds/Calm1.wav",true,false,true);
+    this->bgMusic = soundEngine->play2D("media/sounds/Calm1.wav",true,false,true);
     soundEngine->setSoundVolume(1.0f);
 }
 
@@ -367,6 +367,7 @@ void Game::ClearEnemies()
 void Game::RestartLevel() 
 {
     this->CleanupArrays();
+    soundEngine->removeAllSoundSources();
     for (u32 i = 0; i < enemyObjects.size(); i++)
     {
         Enemy* enemy = enemyObjects[i];

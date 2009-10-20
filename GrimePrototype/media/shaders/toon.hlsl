@@ -7,7 +7,7 @@ float4 pixelMain( float2 TexCoords : TEXCOORD0 ) : COLOR0
 	//Color.g = round(Color.g*30)/30;
 	//Color.b = round(Color.b*30)/30;
 
-	const float threshold = 0.2f;
+	const float threshold = 1.0f;
 
 	const int NUM = 9;
 	const float2 c[NUM] =

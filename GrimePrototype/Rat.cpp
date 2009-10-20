@@ -65,7 +65,7 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     strength = 20;
-    health = 5;
+    health = 50;
     speed = 1.0f;
 }
 Rat::~Rat(void)

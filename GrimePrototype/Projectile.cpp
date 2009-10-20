@@ -203,4 +203,13 @@ void Projectile::Detonate()
     //physxManager->createExplosion(pair->SceneNode->getPosition(), 0.0f, power * 10000.0f, power * 100000.0f, 0.4f);
     this->active = false;
     this->pair->SceneNode->setVisible(false);    
+    this->pair->SceneNode->remove();
+    for (u32 i = 0; i < projectileObjects->size(); i++)
+    {
+        if ((*projectileObjects)[i]->pair == this->pair)
+        {
+            projectileObjects->erase(i);
+        }
+    }
+    
 }

@@ -93,7 +93,6 @@ int main()
     //dimension2du ScreenRTT = driver->getScreenSize();
     
 	//effects handler
-	smgr->getFileSystem()->addZipFileArchive("media/kitchen.pk3");
 	effect = new EffectHandler(device, "media/shaders", ScreenRTT, true);
 
     if (!effect)
