@@ -314,7 +314,7 @@ void StateManager::LoadState(s32 state)
             nodePantry->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);
             
             vector3df doorTranslate = vector3df(-650.0f,-20.0f,350.0f);
-            vector3df doorScale = vector3df(1800,1800,1200);
+            vector3df doorScale = vector3df(1800,1800,1400);
             IMeshSceneNode* nodeDoor = smgr->addMeshSceneNode(meshDoor, 0, -1, doorTranslate, roomRotate, doorScale);
             for (u32 i = 0 ; i < nodeDoor->getMesh()->getMeshBufferCount(); ++i) 
             {
