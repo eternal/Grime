@@ -37,6 +37,9 @@ SpawnManager::SpawnManager( ISceneManager* smgr, ISoundEngine* soundEngine, IPhy
     spiderMesh = smgr->getMesh("media/spiderlowpoly.x");
     ratMesh = smgr->getMesh("media/ratlowpoly.x");
     beetleMesh = smgr->getMesh("media/buglowpoly.x");
+    
+    calm = soundEngine->play2D("media/sounds/Calm1.wav", true, true, true);
+    bgMusic = soundEngine->play2D("media/sounds/music/31_Ghosts_IV.mp3", true, true, true);
 }
 SpawnManager::~SpawnManager(void)
 {
@@ -64,6 +67,8 @@ void SpawnManager::Update( s32 time )
                 //setup phase
                 spawnsActive = true;
                 onCooldown = true;
+                calm = soundEngine->play2D("media/sounds/Calm1.wav", true, false, true);
+                //bgMusic->setIsPaused(true);
             }
             if (spawnsActive)
             {
@@ -99,16 +104,20 @@ void SpawnManager::Update( s32 time )
                 if (waveTimer >= 180000 && phase == 0)
                 {
                     onCooldown = true;
+                    bgMusic->setIsPaused(true);
+                    calm = soundEngine->play2D("media/sounds/Calm1.wav", true, false, true);
                     timeBetweenSpawns = 2000;
-                    player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
+                    //player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
                     phase++;
                 }
                 //6min
                 if (waveTimer >= 360000 && phase == 1)
                 {
                     onCooldown = true;
+                    bgMusic->setIsPaused(true);
+                    calm = soundEngine->play2D("media/sounds/Calm1.wav", true, false, true);
                     timeBetweenSpawns = 1500;
-                    player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
+                    //player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
                     phase++;
                     
                 }
@@ -116,7 +125,9 @@ void SpawnManager::Update( s32 time )
                 if (waveTimer >= 540000 && phase == 2)
                 {
                     onCooldown = true;
-                    player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
+                    bgMusic->setIsPaused(true);
+                    calm = soundEngine->play2D("media/sounds/Calm1.wav", true, false, true);
+                    //player->weaponAmmunition[WEAPON_BLOCKGUN] += 5;
                     timeBetweenSpawns = 1000;
                     phase++;
                 }                
@@ -130,6 +141,24 @@ void SpawnManager::Update( s32 time )
         if (cooldownTimer >= 60000)
         {
             onCooldown = false;
+            calm->setIsPaused(true);
+            u32 soundSelect = (rand() % 4);
+            if (soundSelect == 0)
+            {
+                bgMusic = soundEngine->play2D("media/sounds/music/31_Ghosts_IV.ogg", true, false, true);
+            }
+            else if (soundSelect == 1)
+            {
+                bgMusic = soundEngine->play2D("media/sounds/music/32_Ghosts_IV.ogg", true, false, true);
+            }
+            else if (soundSelect == 2)
+            {
+                bgMusic = soundEngine->play2D("media/sounds/music/33_Ghosts_IV.ogg", true, false, true);
+            }
+            else
+            {
+                bgMusic = soundEngine->play2D("media/sounds/music/35_Ghosts_IV.ogg", true, false, true);
+            }
             std::cout << phase << std::endl;
             cooldownTimer = 0;
         }

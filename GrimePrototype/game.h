@@ -45,8 +45,6 @@ public:
     ISceneNode* roomnode;
     IMesh* room;
     
-    ISound* bgMusic;
-    
     s32 cleanupTimer;
     s32 updateTimer;
     s32 endTimer;

@@ -19,7 +19,6 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
     newGameSelected = true;
     restart = false;
     
-    this->bgMusic = soundEngine->play2D("media/sounds/Calm1.wav",true,false,true);
     soundEngine->setSoundVolume(1.0f);
 }
 

@@ -39,6 +39,9 @@ public:
     ISoundEngine* soundEngine;
     Player* player;
     
+    ISound* calm;
+    ISound* bgMusic;
+    
     core::array<video::ITexture*>* explosionTextures;
     
     IAnimatedMesh* cockroachMesh;

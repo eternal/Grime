@@ -17,7 +17,7 @@ Projectile::Projectile( scene::ISceneManager* sceneManager, irrklang::ISoundEngi
     timeElapsed = 0;
     radius = 250.0f;
     power = 5;
-    projectileFlight = soundEngine->play2D("media/sounds/weapons/rpg/Flight.wav", true, true, true);
+    projectileFlight = soundEngine->play2D("media/sounds/weapons/rpg/Flight4.wav", true, true, true);
 }
 
 Projectile::~Projectile(void)
