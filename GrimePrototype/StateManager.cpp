@@ -179,7 +179,7 @@ void StateManager::NodeInit(IMeshSceneNode* node, vector3df scale)
     //normalize mesh's normals as it has been scaled
     node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     //node->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);
-    node->setAutomaticCulling(EAC_BOX);
+    //node->setAutomaticCulling(EAC_BOX);
     //get the mesh buffers of the mesh and create physics representation
     for (u32 i = 0 ; i < node->getMesh()->getMeshBufferCount(); ++i) 
     {
@@ -278,9 +278,9 @@ void StateManager::LoadState(s32 state)
             vector3df roomTranslate(0.0f,0.0f,0.0f);
             vector3df roomRotate(90.0f,0.0f,0.0f);
             IMesh* meshRoom = smgr->getMesh("media/level/roomplace.b3d")->getMesh(0);
-            IMesh* meshFridge = smgr->getMesh("media/fridgeattempt.b3d")->getMesh(0);
+            IMesh* meshFridge = smgr->getMesh("media/level/fridgeattempt.b3d")->getMesh(0);
             IMesh* meshBenchUpper = smgr->getMesh("media/level/kitchenbenchupper.b3d")->getMesh(0);
-            IMesh* meshBenchLower = smgr->getMesh("media/kitchenbenchlowerattempt.b3d")->getMesh(0);
+            IMesh* meshBenchLower = smgr->getMesh("media/level/kitchenbenchlowerattempt.b3d")->getMesh(0);
             IMesh* meshMicrowave = smgr->getMesh("media/level/kitchenmicrowave.b3d")->getMesh(0);
             IMesh* meshMirror = smgr->getMesh("media/level/kitchenmirror.b3d")->getMesh(0);
             IMesh* meshPlant = smgr->getMesh("media/level/kitchenplant.b3d")->getMesh(0);
@@ -311,7 +311,7 @@ void StateManager::LoadState(s32 state)
                 nodePlantTwo->getMaterial(i).Lighting = true;
             }
             nodePlantTwo->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-            nodePlantTwo->setAutomaticCulling(EAC_BOX);
+            //nodePlantTwo->setAutomaticCulling(EAC_BOX);
             
             IMeshSceneNode* nodeFridge = smgr->addMeshSceneNode(meshFridge, 0, -1, vector3df(20.0f,0.0f,-100.0f), vector3df(90.0f,0.0f,0.0f), vector3df(130.0f,130.0f,130.0f));
             //IMeshSceneNode* nodeFridge = smgr->addMeshSceneNode(meshFridge, 0, -1, roomTranslate, roomRotate, roomScale);
@@ -330,7 +330,7 @@ void StateManager::LoadState(s32 state)
             }
             nodeFridge->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);
             nodeFridge->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-            nodeFridge->setAutomaticCulling(EAC_BOX);
+            //nodeFridge->setAutomaticCulling(EAC_BOX);
             
             IMeshSceneNode* nodeMicrowave = smgr->addMeshSceneNode(meshMicrowave, 0, -1, vector3df(-120.0f,100.0f,-100.0f), vector3df(90.0f,0.0f,0.0f), vector3df(100.0f,100.0f,100.0f));
             for (u32 i = 0 ; i < nodeMicrowave->getMesh()->getMeshBufferCount(); ++i) 
@@ -345,7 +345,7 @@ void StateManager::LoadState(s32 state)
                 nodeMicrowave->getMaterial(i).Lighting = true;
             }
             nodeMicrowave->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-            nodeMicrowave->setAutomaticCulling(EAC_BOX);
+            //nodeMicrowave->setAutomaticCulling(EAC_BOX);
             
             IMeshSceneNode* nodeMirror = smgr->addMeshSceneNode(meshMirror, 0, -1, vector3df(-395.0f,100.0f,-100.0f), vector3df(90.0f,0.0f,0.0f), vector3df(100.0f,100.0f,100.0f));
             for (u32 i = 0 ; i < nodeMirror->getMesh()->getMeshBufferCount(); ++i) 
@@ -360,7 +360,7 @@ void StateManager::LoadState(s32 state)
                 nodeMirror->getMaterial(i).Lighting = true;
             }
             nodeMirror->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-            nodeMirror->setAutomaticCulling(EAC_BOX);
+            //nodeMirror->setAutomaticCulling(EAC_BOX);
 
             NodeInit(nodeRoom, roomScale);
             //NodeInit(nodeFridge, roomScale);
