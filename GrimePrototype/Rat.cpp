@@ -63,7 +63,7 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     //since mesh was scaled, normalise normals
     pair->SceneNode->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     strength = 20;
-    health = 50;
+    health = 5;
     speed = 1.0f;
 }
 Rat::~Rat(void)
@@ -77,6 +77,27 @@ s32 Rat::GetRandom(s32 upper)
 
 void Rat::CreateExplosion( vector3df position, bool massive )
 {
+    u32 soundSelect = (rand() % 5);
+    if (soundSelect == 0)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom1.wav");
+    }
+    else if (soundSelect == 1)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom2.wav");
+    }
+    else if (soundSelect == 2)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom3.wav");
+    }
+    else if (soundSelect == 3)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom4.wav");
+    }
+    else
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom5.wav");
+    }
     scene::ISceneNodeAnimator* anim = NULL;
     // create animation for explosion
     anim = smgr->createTextureAnimator((*explosionTextures), 100, false);
