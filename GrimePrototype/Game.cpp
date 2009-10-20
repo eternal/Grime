@@ -14,6 +14,7 @@ Game::Game(IrrlichtDevice* device, ISoundEngine* soundEngine, IPhysxManager* phy
     this->physxManager = physxManager;
     this->effect = effect;
     this->guienv = device->getGUIEnvironment();
+    this->quadMesh = smgr->getMesh("media/quad.ms3d");
     gameOver = false;
     newGameSelected = true;
     restart = false;
@@ -159,7 +160,7 @@ void Game::CreateImpactEffect( vector3df position, vector3df normal )
     scene::ISceneNodeAnimator* deleteAnim = smgr->createDeleteAnimator(25*6);
 
     // create impact quad
-    scene::IMeshSceneNode* node = smgr->addMeshSceneNode(smgr->getMesh("media/quad.ms3d"));
+    scene::IMeshSceneNode* node = smgr->addMeshSceneNode(quadMesh);
     node->setPosition(position + normal * 0.25f);
     node->setScale(scale);
     // Rotate the quad to match that of the specified normal

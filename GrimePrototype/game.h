@@ -60,6 +60,8 @@ public:
     bool gameOver;
     bool newGameSelected;
     
+    IAnimatedMesh* quadMesh;
+    
     vector3df startPosition;
     bool blockFinalToggle;
     

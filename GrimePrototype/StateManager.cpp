@@ -222,6 +222,9 @@ void StateManager::LoadState(s32 state)
         case EGS_GAME:
         {
             //add crosshair to centre of screen (64x64 image so -32)
+            driver->getTexture("media/gui/Crosshairs/RPG.png");
+            driver->getTexture("media/gui/Crosshairs/Knockback.png");
+
             crosshair = guienv->addImage(driver->getTexture("media/gui/Crosshairs/MG.png"),core::position2di(resolution.Width/2-75,resolution.Height/2-75));
             crosshair->setColor(SColor(100,255,255,255));
             
@@ -242,6 +245,9 @@ void StateManager::LoadState(s32 state)
 
             deadOverlay = guienv->addImage(driver->getTexture("media/gui/RED.png"), core::position2di(0,0));
             deadOverlay->setColor(SColor(0,255,255,255));
+            
+            gui::IGUIImage* fadeoutOverlay = guienv->addImage(driver->getTexture("media/gui/BLACK.png"), core::position2di(0,0));  //preload texture
+            fadeoutOverlay->setColor(SColor(0,255,255,255));
             
             //grab bitmap font
             guienv->getSkin()->setFont(guienv->getFont("media/GillSans12.png"));

@@ -29,6 +29,7 @@ Cockroach::Cockroach(scene::ISceneManager* sceneManager, irrklang::ISoundEngine*
     physxRot.Y -= 45.0f;
     immuneToBlockCrush = false;
     this->node = sceneManager->addMeshSceneNode(mesh, NULL, -1, pos, rot, scale);
+    scale.Z += 0.1f;
     IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(2), scale);
     //IPhysxMesh* pmesh = physxMan->createConvexMesh(this->node->getMesh()->getMeshBuffer(0), scale);
     pair->PhysxObject = physxMan->createConvexMeshObject(pmesh, pos, physxRot, 1000.0f);
