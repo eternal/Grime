@@ -286,6 +286,7 @@ void StateManager::LoadState(s32 state)
             IMesh* meshPlant = smgr->getMesh("media/level/kitchenplant.b3d")->getMesh(0);
             IMesh* meshSink = smgr->getMesh("media/level/kitchensink.b3d")->getMesh(0);
             IMesh* meshPantry = smgr->getMesh("media/level/pantry.b3d")->getMesh(0);
+            IMesh* meshDoor = smgr->getMesh("media/level/door.b3d")->getMesh(0);
 
             IMeshSceneNode* nodeRoom = smgr->addMeshSceneNode(meshRoom, 0, -1, roomTranslate, roomRotate, roomScale);
             //IMeshSceneNode* nodeFridge = smgr->addMeshSceneNode(meshFridge, 0, -1, roomTranslate, roomRotate, roomScale);
@@ -295,16 +296,46 @@ void StateManager::LoadState(s32 state)
             //IMeshSceneNode* nodeMirror = smgr->addMeshSceneNode(meshMirror, 0, -1, roomTranslate, roomRotate, roomScale);
             //IMeshSceneNode* nodePlant = smgr->addMeshSceneNode(meshPlant, 0, -1, roomTranslate, roomRotate, roomScale);
             IMeshSceneNode* nodeSink = smgr->addMeshSceneNode(meshSink, 0, -1, roomTranslate, roomRotate, roomScale);
-            IMeshSceneNode* nodePantry = smgr->addMeshSceneNode(meshPantry, 0, -1, roomTranslate, roomRotate, roomScale);
-           
             
-            IMeshSceneNode* nodePlantTwo = smgr->addMeshSceneNode(meshPlant, 0, -1, vector3df(-120.0f,0.0f,-10.0f), vector3df(90.0f,0.0f,0.0f), vector3df(100.0f,100.0f,100.0f));
+            vector3df pantryTranslate = vector3df(0.0f,-20.0f,0.0f);
+            IMeshSceneNode* nodePantry = smgr->addMeshSceneNode(meshPantry, 0, -1, pantryTranslate, roomRotate, roomScale);
+            for (u32 i = 0 ; i < nodePantry->getMesh()->getMeshBufferCount(); ++i) 
+            {
+                //first calculate the mesh triangles and make physx object
+                IPhysxMesh* triMesh = physxManager->createTriangleMesh(nodePantry->getMesh()->getMeshBuffer(i), roomScale);
+                //secondly add the object to the world
+                physxManager->createTriangleMeshObject(triMesh,pantryTranslate,vector3df(90.0f,0.0f,0.0f));
+            }
+            for (u32 i = 0; i < nodePantry->getMaterialCount(); i++) 
+            {
+                nodePantry->getMaterial(i).Lighting = true;
+            }  
+            nodePantry->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);   
+            nodePantry->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);
+            
+            vector3df doorTranslate = vector3df(-650.0f,-20.0f,350.0f);
+            vector3df doorScale = vector3df(1800,1800,1200);
+            IMeshSceneNode* nodeDoor = smgr->addMeshSceneNode(meshDoor, 0, -1, doorTranslate, roomRotate, doorScale);
+            for (u32 i = 0 ; i < nodeDoor->getMesh()->getMeshBufferCount(); ++i) 
+            {
+                //first calculate the mesh triangles and make physx object
+                IPhysxMesh* triMesh = physxManager->createTriangleMesh(nodeDoor->getMesh()->getMeshBuffer(i), doorScale);
+                //secondly add the object to the world
+                physxManager->createTriangleMeshObject(triMesh,doorTranslate,vector3df(90.0f,0.0f,0.0f));
+            }
+            for (u32 i = 0; i < nodeDoor->getMaterialCount(); i++) 
+            {
+                nodeDoor->getMaterial(i).Lighting = true;
+            }
+            nodeDoor->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);            
+            
+            IMeshSceneNode* nodePlantTwo = smgr->addMeshSceneNode(meshPlant, 0, -1, vector3df(-160.0f,0.0f,-10.0f), vector3df(90.0f,0.0f,0.0f), vector3df(100.0f,100.0f,100.0f));
             for (u32 i = 0 ; i < nodePlantTwo->getMesh()->getMeshBufferCount(); ++i) 
             {
                 //first calculate the mesh triangles and make physx object
                 IPhysxMesh* triMesh = physxManager->createTriangleMesh(nodePlantTwo->getMesh()->getMeshBuffer(i), vector3df(100.0,100.0f,100.0f));
                 //secondly add the object to the world
-                physxManager->createTriangleMeshObject(triMesh,vector3df(-120.0f,0.0f,-10.0f),vector3df(90.0f,0.0f,0.0f));
+                physxManager->createTriangleMeshObject(triMesh,vector3df(-160.0f,0.0f,-10.0f),vector3df(90.0f,0.0f,0.0f));
             }
             for (u32 i = 0; i < nodePlantTwo->getMaterialCount(); i++) 
             {
@@ -370,7 +401,8 @@ void StateManager::LoadState(s32 state)
             //NodeInit(nodeMirror, roomScale);
             //NodeInit(nodePlant, roomScale);
             NodeInit(nodeSink, roomScale);
-            NodeInit(nodePantry, roomScale);
+            //NodeInit(nodeDoor, roomScale);
+            //NodeInit(nodePantry, roomScale);
             
             game->LoadLevel();
             this->currentState = EGS_GAME;
