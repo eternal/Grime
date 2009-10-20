@@ -17,6 +17,7 @@ Projectile::Projectile( scene::ISceneManager* sceneManager, irrklang::ISoundEngi
     timeElapsed = 0;
     radius = 250.0f;
     power = 5;
+    projectileFlight = soundEngine->play2D("media/sounds/weapons/rpg/Flight.wav", true, true, true);
 }
 
 Projectile::~Projectile(void)
@@ -96,6 +97,7 @@ void Projectile::Update( s32 time )
 {
     if (active)
     {
+        projectileFlight->setIsPaused(false);
         try 
         {
             pair->updateTransformation();
@@ -177,10 +179,31 @@ void Projectile::Update( s32 time )
 void Projectile::Detonate()
 {
     physxManager->removePhysxObject(pair->PhysxObject);
-
+    projectileFlight->setIsPaused(true);
 #ifdef WEAPONDEBUG
     std::cout << "IMPACT" << std::endl;
 #endif    
+    u32 soundSelect = (rand() % 5);
+    if (soundSelect == 0)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom1.wav");
+    }
+    else if (soundSelect == 1)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom2.wav");
+    }
+    else if (soundSelect == 2)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom3.wav");
+    }
+    else if (soundSelect == 3)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom4.wav");
+    }
+    else
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom5.wav");
+    }
     scene::ISceneNodeAnimator* anim = NULL;
     // create animation for explosion
     anim = smgr->createTextureAnimator(explosionTextures, 100, false);

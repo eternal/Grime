@@ -13,6 +13,9 @@ public:
     u32 explosionPhase;
     core::array<video::ITexture*>* explosionTextures;
     
+    vector3df previousPosition;
+    f32 distanceSinceFootstep;
+    
     void Update(s32 time);
     void CheckPhase();
     void CreateExplosion( vector3df position, bool massive );

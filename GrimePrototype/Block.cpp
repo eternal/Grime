@@ -1,11 +1,15 @@
 #include "Block.h"
 
-Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockObjects)
+Block::Block(scene::ISceneManager* smgr, irrklang::ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockObjects)
 {
     this->active = true;
     this->smgr = smgr;
     this->physxManager = physxManager;
     this->blockObjects = blockObjects;
+    this->soundEngine = soundEngine;
+    
+    u32 soundSelect = (rand() % 2);
+    
     core::line3df line;
     line.start = smgr->getActiveCamera()->getPosition();
     //put the end of the line off in the distance 
@@ -41,8 +45,8 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
                 if (!(enemy->immuneToBlockCrush))
                 {
                     enemy->health = 0;
+                    soundEngine->play2D("media/sounds/block/Squish1.wav");
                 }
-
             }
         }
         catch (...)
@@ -79,6 +83,14 @@ Block::Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::arra
         }
         if (!spotTaken)
         {
+            if (soundSelect == 0)
+            {
+                soundEngine->play2D("media/sounds/block/Place1.wav");
+            }
+            else
+            {
+                soundEngine->play2D("media/sounds/block/Place2.wav");
+            }
             vector3df blockPhysicsPosition = blockPosition;
             blockPhysicsPosition.Y -= scale.Y / 2;
             blockPhysicsPosition.X += scale.X / 6.25f;

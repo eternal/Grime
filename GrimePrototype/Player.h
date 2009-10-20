@@ -57,6 +57,9 @@ class Player : public Entity
         bool ratKilled;
         bool gameComplete;
         
+        vector3df previousPosition;
+        f32 distanceSinceFootstep;
+        
         s32 blockAmmunitionTimer;
         s32 damagedTimer;
         s32 webTimer;

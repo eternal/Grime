@@ -24,6 +24,8 @@ public:
     s32 power;
     s32 timeElapsed;
     
+    ISound* projectileFlight;
+    
     void Update(s32 time);
     void DamageTargets(vector3df pos, f32 radius, s32 power);
     void Detonate();

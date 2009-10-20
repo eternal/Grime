@@ -15,6 +15,8 @@ public:
     Game* game;
     StateManager* stateManager;
     IrrlichtDevice* device;
+    ISound* chargeUp;
+    bool weaponCharging;
     
     bool leftPressed;
     bool rightPressed;

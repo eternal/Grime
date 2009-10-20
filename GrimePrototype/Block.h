@@ -5,7 +5,7 @@
 class Block : public Entity
 {
 public:
-    Block(scene::ISceneManager* smgr, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockObjects);
+    Block(scene::ISceneManager* smgr, irrklang::ISoundEngine* soundEngine, IPhysxManager* physxManager, core::array<Enemy*>* enemyObjects, core::array<Block*>* blockObjects);
     ~Block(void);
     void Update(s32 time);
     void ConvertToStatic();
@@ -14,6 +14,7 @@ public:
     bool active;
     
     core::array<Block*>* blockObjects;
+    irrklang::ISoundEngine* soundEngine;
     SPhysxAndBlockPair* pair;
     ISceneManager* smgr;
     IPhysxManager* physxManager;

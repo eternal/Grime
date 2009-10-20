@@ -136,6 +136,27 @@ void Game::CreateExplosion( vector3df position )
     // create animation for explosion
     anim = smgr->createTextureAnimator(explosionTextures, 100, false);
     // create explosion billboard
+    u32 soundSelect = (rand() % 5);
+    if (soundSelect == 0)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom1.wav");
+    }
+    else if (soundSelect == 1)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom2.wav");
+    }
+    else if (soundSelect == 2)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom3.wav");
+    }
+    else if (soundSelect == 3)
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom4.wav");
+    }
+    else
+    {
+        soundEngine->play2D("media/sounds/weapons/rpg/Boom5.wav");
+    }
     scene::IBillboardSceneNode* bill = smgr->addBillboardSceneNode(smgr->getRootSceneNode(), core::dimension2d<f32>(60,60), position);
     // Setup the material
     bill->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -443,14 +464,15 @@ void Game::WeaponFire(s32 weapon)
         {
             if (player->weaponAmmunition[WEAPON_BLOCKGUN] > 0)
             {
-                Block* block = new Block(smgr, physxManager, &enemyObjects, &blockObjects);
+                Block* block = new Block(smgr, soundEngine, physxManager, &enemyObjects, &blockObjects);
                 blockObjects.push_back(block);
             }
             player->weaponAmmunition[WEAPON_BLOCKGUN]--;
         }
         else if (player->GetWeapon() == WEAPON_PISTOL)
         {
-            ISound* bang = soundEngine->play2D("media/sounds/Bang5.wav", false, false, true);
+            ISound* bang = soundEngine->play2D("media/sounds/weapons/Bang7AlphaEXSpecial.wav", false, false, true);
+
             bang->setVolume(0.5f);
             // Perform a raycast to find the objects we just shot at
             core::line3df line;
@@ -571,6 +593,23 @@ void Game::WeaponFire(s32 weapon)
         }
         else if (player->GetWeapon() == WEAPON_RPG)
         {
+            u32 soundSelect = (rand() % 4);
+            if (soundSelect == 0)
+            {
+                soundEngine->play2D("media/sounds/weapons/rpg/RPG1.wav");
+            }
+            else if (soundSelect == 1)
+            {
+                soundEngine->play2D("media/sounds/weapons/rpg/RPG2.wav");
+            }
+            else if (soundSelect == 2)
+            {
+                soundEngine->play2D("media/sounds/weapons/rpg/RPG3.wav");
+            }
+            else
+            {
+                soundEngine->play2D("media/sounds/weapons/rpg/RPG4.wav");
+            }
             core::vector3df t = cameraPair->camera->getPosition();
             core::vector3df vel = cameraPair->camera->getTarget() - cameraPair->camera->getPosition();
             vel.normalize();

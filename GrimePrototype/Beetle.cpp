@@ -149,6 +149,7 @@ void Beetle::Update(s32 time)
                         }
                         if (blockDestroyTimer >= 2000)
                         {
+                            soundEngine->play2D("media/sounds/BeetleAttack.wav");
                             for (u32 i = 0; i < blockArray->size(); i++)
                             {
                                 if (closestObject == (*blockArray)[i]->pair->PhysxObject)
@@ -161,6 +162,15 @@ void Beetle::Update(s32 time)
                                     this->pair->PhysxObject->getPosition(position);
                                     
                                     Block* block = (*blockArray)[i];
+                                    u32 soundSelect = (rand() % 2);
+                                    if (soundSelect == 0)
+                                    {
+                                        soundEngine->play2D("media/sounds/block/Break1.wav");
+                                    }
+                                    else
+                                    {
+                                        soundEngine->play2D("media/sounds/block/Break2.wav");
+                                    }
                                     block->active = false;
                                     block->pair->SceneNode->remove();
                                     physxMan->removePhysxObject(block->pair->PhysxObject);
@@ -197,7 +207,7 @@ void Beetle::Update(s32 time)
                         soundWalkCurrentPosition = sound->getPlayPosition();
                         sound->stop();
                         sound->drop();
-                        sound = soundEngine->play3D("media/sounds/Bite1.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
+                        sound = soundEngine->play3D("media/sounds/BeetleAttack.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
                         sound->setMinDistance(100.0f);
                         sound->setMaxDistance(1000.0f);
                         sound->setIsPaused(false);

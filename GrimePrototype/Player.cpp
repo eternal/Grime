@@ -12,7 +12,8 @@ Player::Player(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* sound
     gameComplete = false;
     vector3df pos;
     this->pair->PhysxObject->getPosition(pos);
-    this->sound = soundEngine->play3D("media/sounds/Run1.wav", pos, true, true, true);
+    previousPosition = pos;
+    distanceSinceFootstep = 0;
     health = 100;
     blockAmmunitionTimer = 0;
     damagedTimer = 0;
@@ -228,9 +229,32 @@ void Player::Update(s32 time)
         blockAmmunitionTimer = 0;
     }
     
+    
     vector3df pos, rot;
     pair->PhysxObject->getPosition(pos);
-    pair->PhysxObject->getRotation(rot);
-    soundEngine->setListenerPosition(pos, rot);
-    sound->setPosition(pos);
+    distanceSinceFootstep += (pos - previousPosition).getLength();
+    if (distanceSinceFootstep >= 30.0f)
+    {
+        u32 soundSelect = (rand() % 4);
+        if (soundSelect == 0)
+        {
+            soundEngine->play2D("media/sounds/Run1-1.wav");
+        }
+        else if (soundSelect == 1)
+        {
+            soundEngine->play2D("media/sounds/Run1-2.wav");
+        }
+        else if (soundSelect == 2)
+        {
+            soundEngine->play2D("media/sounds/Run2-1.wav");
+        }
+        else
+        {
+            soundEngine->play2D("media/sounds/Run2-2.wav");
+        }   
+        distanceSinceFootstep = 0;
+    }
+    previousPosition = pos;
+    //pair->PhysxObject->getRotation(rot);
+    soundEngine->setListenerPosition(pos, this->pair->camera->getTarget() - pos);
 }

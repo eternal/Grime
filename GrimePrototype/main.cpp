@@ -3,7 +3,7 @@
 //  build 200910181838
 //=============================================================================
 //#define DEBUG 1
-#define FULLSCREEN 1
+//#define FULLSCREEN 1
 // console window hiding
 #ifndef DEBUG
     #define NOMINMAX
@@ -119,6 +119,7 @@ int main()
     game = new Game(device, soundEngine, physxManager, effect);
     stateManager = new StateManager(device, physxManager, game);
     receiver.game = game;
+    receiver.chargeUp = soundEngine->play2D("media/sounds/weapons/close/1.wav",false, true, true);
     receiver.stateManager = stateManager;
     
     stateManager->LoadState(EGS_MENU);

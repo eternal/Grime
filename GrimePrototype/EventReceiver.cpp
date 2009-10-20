@@ -6,6 +6,7 @@ EventReceiver::EventReceiver()
     this->device = NULL;
     leftPressed = false;
     rightPressed = false;
+    
 }
 
 EventReceiver::EventReceiver(Game* game, IrrlichtDevice* device)
@@ -14,6 +15,7 @@ EventReceiver::EventReceiver(Game* game, IrrlichtDevice* device)
     this->device = device;
     leftPressed = false;
     rightPressed = false;
+    
 }
 
 EventReceiver::~EventReceiver(void)
@@ -34,14 +36,38 @@ void EventReceiver::Update(s32 time)
                     {
                         if (game->player->currentWeapon == WEAPON_CLOSE)
                         {
-                            if (!(game->player->CurrentWeaponOnCooldown()))
+                            if (!(game->player->CurrentWeaponOnCooldown()) && !(this->weaponCharging))
                             {
                                 game->player->knockbackChargeup = true;
+                                this->weaponCharging = true;
+                                u32 soundSelect = (rand() % 5);
+                                if (soundSelect == 0)
+                                {
+                                    chargeUp = game->soundEngine->play2D("media/sounds/weapons/close/1.wav",false, false, true);
+                                }
+                                else if (soundSelect == 1)
+                                {
+                                    chargeUp = game->soundEngine->play2D("media/sounds/weapons/close/5.wav",false, false, true);
+                                }
+                                else if (soundSelect == 2)
+                                {
+                                    chargeUp = game->soundEngine->play2D("media/sounds/weapons/close/6.wav",false, false, true);
+                                }
+                                else if (soundSelect == 3)
+                                {
+                                    chargeUp = game->soundEngine->play2D("media/sounds/weapons/close/7.wav",false, false, true);
+                                }
+                                else
+                                {
+                                    chargeUp = game->soundEngine->play2D("media/sounds/weapons/close/8.wav",false, false, true);
+                                }
+
                             }
                             if (game->player->knockbackChargeupTimer >= 1000)
                             {
                                 game->WeaponFire(WEAPON_CLOSE);
                                 game->player->knockbackChargeup = false;
+                                this->weaponCharging = false;
                                 game->player->knockbackChargeupTimer = 0;
                             }
                         }
@@ -49,13 +75,23 @@ void EventReceiver::Update(s32 time)
                         {
                             game->WeaponFire();
                             game->player->knockbackChargeup = false;
-                            game->player->knockbackChargeupTimer = 0;
+                            this->weaponCharging = false;
+                            if (game->player->knockbackChargeupTimer > 0)
+                            {
+                                chargeUp->setIsPaused(true);
+                                game->player->knockbackChargeupTimer = 0;
+                            }
                         }    
                     }
                     else
                     {
                         game->player->knockbackChargeup = false;
-                        game->player->knockbackChargeupTimer = 0;
+                        this->weaponCharging = false;
+                        if (game->player->knockbackChargeupTimer > 0)
+                        {
+                            chargeUp->setIsPaused(true);
+                            game->player->knockbackChargeupTimer = 0;
+                        }
                     }
                     if (rightPressed)
                     {
@@ -134,6 +170,10 @@ bool EventReceiver::OnEvent(const SEvent& event)
                                 {
                                     game->spawnManager->SpawnCockroach(vector3df(0.0f,100.0f,0.0f));
                                 }
+                                else
+                                {
+                                    game->player->SetWeapon(WEAPON_PISTOL);
+                                }
                                 
                             }
                             break;
@@ -143,6 +183,10 @@ bool EventReceiver::OnEvent(const SEvent& event)
                                 {
                                 game->spawnManager->SpawnSpider(vector3df(0.0f,100.0f,0.0f));
                                 }
+                                else
+                                {
+                                    game->player->SetWeapon(WEAPON_RPG);
+                                }
                             }
                             break;
                         case KEY_KEY_3: 
@@ -150,6 +194,10 @@ bool EventReceiver::OnEvent(const SEvent& event)
                                 if (event.KeyInput.Shift)
                                 {
                                 game->spawnManager->SpawnBeetle(vector3df(0.0f,100.0f,0.0f));
+                                }
+                                else
+                                {
+                                    game->player->SetWeapon(WEAPON_CLOSE);
                                 }
                             }
                             break;

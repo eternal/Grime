@@ -144,7 +144,23 @@ void Spider::Update(s32 time)
                         sound->stop();
                         sound->drop();
                         //sound->roll();
-                        sound = soundEngine->play3D("media/sounds/Bite1.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
+                        u32 soundSelect = (rand() % 4);
+                        if (soundSelect ==0)
+                        {
+                            sound = soundEngine->play3D("media/sounds/Chitter.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
+                        }
+                        else if (soundSelect == 1)
+                        {
+                            sound = soundEngine->play3D("media/sounds/Chitter2.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
+                        }
+                        else if (soundSelect == 2)
+                        {
+                            sound = soundEngine->play3D("media/sounds/Chitter3.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
+                        }
+                        else
+                        {
+                            sound = soundEngine->play3D("media/sounds/Chitter4.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
+                        }
                         sound->setMinDistance(100.0f);
                         sound->setMaxDistance(1000.0f);
                         sound->setIsPaused(false);

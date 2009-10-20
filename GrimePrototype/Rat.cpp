@@ -12,6 +12,8 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     vector3df pos = position;
     vector3df rot = vector3df(0.0f,0.0f,0.0f);
     vector3df scale = vector3df(1.8f,1.8f,1.8f);
+    previousPosition = position;
+    distanceSinceFootstep = 0;
     //set references
     //set references
     this->smgr = sceneManager;
@@ -50,12 +52,8 @@ Rat::Rat(scene::ISceneManager* sceneManager, irrklang::ISoundEngine* soundEngine
     //pair->SoundNode->setSoundFileName("media/sounds/Bang1.wav");
     // pair->SoundNode->setPlayOnceMode();
     // pair->SoundNode->setMinMaxSoundDistance(1.0f);
-
-    u32 randNum = (rand() % 300) + 1;
-    sound = soundEngine->play3D("media/sounds/InsectWalk1.wav", this->pair->SceneNode->getAbsolutePosition(), true, false, true);
-    sound->setMinDistance(100.0f);
-    sound->setMaxDistance(500.0f);
-    sound->setPlayPosition(randNum);
+    
+    sound = soundEngine->play3D("media/sounds/Bite1.wav",this->pair->SceneNode->getAbsolutePosition(), false, true, true);
 
     this->node->setAnimationSpeed(25.0f);
     //set walking frame loop
@@ -140,6 +138,43 @@ void Rat::Update( s32 time )
                 vector3df pos;
                 this->pair->PhysxObject->getPosition(pos);
                 pos.Y = 10.0f;
+                
+                distanceSinceFootstep += (pos - previousPosition).getLength();
+                if (distanceSinceFootstep >= 45.0f)
+                {
+                    u32 soundSelect = (rand() % 7);
+                    if (soundSelect == 0)
+                    {
+                        soundEngine->play2D("media/sounds/rat/1.wav");
+                    }
+                    else if (soundSelect == 1)
+                    {
+                        soundEngine->play2D("media/sounds/rat/2.wav");
+                    }
+                    else if (soundSelect == 2)
+                    {
+                        soundEngine->play2D("media/sounds/rat/3.wav");
+                    }
+                    else if (soundSelect == 3)
+                    {
+                        soundEngine->play2D("media/sounds/rat/4.wav");
+                    }
+                    else if (soundSelect == 4)
+                    {
+                        soundEngine->play2D("media/sounds/rat/5.wav");
+                    }
+                    else if (soundSelect == 5)
+                    {
+                        soundEngine->play2D("media/sounds/rat/6.wav");
+                    }
+                    else
+                    {
+                        soundEngine->play2D("media/sounds/rat/7.wav");
+                    }   
+                    distanceSinceFootstep = 0;
+                }
+                previousPosition = pos;
+                
                 this->pair->PhysxObject->setPosition(pos);
                 this->pair->updateTransformation();
 
