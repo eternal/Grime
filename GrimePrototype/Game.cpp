@@ -43,8 +43,8 @@ void Game::SpawnClutter()
     IMesh* clutterHandle = smgr->getMesh("media/Handle1.obj")->getMesh(0);
     IMesh* clutterTeapot = smgr->getMesh("media/TEAPOT.obj")->getMesh(0);
 
-    vector3df smallClutter = vector3df(0.6f,1.0f,0.6f);
-    vector3df mediumClutter = vector3df(1.0f,1.0f,1.0f);
+    vector3df smallClutter = vector3df(0.6f,1.2f,0.6f);
+    vector3df mediumClutter = vector3df(1.0f,1.2f,1.0f);
     vector3df largeClutter = vector3df(1.5f,1.5f,1.5f);
     vector3df giantClutter = vector3df(2.2f,2.2f,2.2f);
 
